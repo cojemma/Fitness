@@ -1,0 +1,100 @@
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+build/
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log Files
+*.log
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+.idea/modules
+.idea/shelf
+.idea/vcs.xml
+.idea/jarRepositories.xml
+.idea/misc.xml
+.idea/deploymentTargetDropDown.xml
+.navigation/
+
+# Keystore files
+*.jks
+*.keystore
+
+# External native build folder
+.externalNativeBuild/
+.cxx/
+
+# Google Services (uncomment if using)
+# google-services.json
+
+# NDK
+obj/
+
+# IntelliJ
+*.iml
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Kotlin
+*.kotlin_module
+
+# Proguard
+-keepattributes SourceFile,LineNumberTable
+
+# Captures
+captures/
+
+# Lint
+lint/
+lint-results*.html
+lint-results*.xml
+
+# Room schema exports
+schemas/
+
+# Test results
+/test-results/
+/test-reports/
+
+# Kotlin/Native
+*.konan
+
+# Crash logs
+crash*.txt
