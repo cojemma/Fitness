@@ -11,7 +11,8 @@ import androidx.room.PrimaryKey
     tableName = "workouts",
     indices = [
         Index(value = ["startTime"]),
-        Index(value = ["type"])
+        Index(value = ["type"]),
+        Index(value = ["templateId"])
     ]
 )
 data class WorkoutEntity(
@@ -19,6 +20,7 @@ data class WorkoutEntity(
     val id: Long = 0,
     val name: String,
     val type: String,
+    val templateId: Long?,
     val startTime: Long,
     val endTime: Long?,
     val durationMinutes: Int,

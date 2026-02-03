@@ -5,9 +5,13 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.fitness.sdk.data.local.dao.ExerciseDao
+import com.fitness.sdk.data.local.dao.TemplateDao
 import com.fitness.sdk.data.local.dao.WorkoutDao
 import com.fitness.sdk.data.local.entity.ExerciseEntity
+import com.fitness.sdk.data.local.entity.TemplateExerciseEntity
+import com.fitness.sdk.data.local.entity.TemplateSetEntity
 import com.fitness.sdk.data.local.entity.WorkoutEntity
+import com.fitness.sdk.data.local.entity.WorkoutTemplateEntity
 
 /**
  * Room database for the Fitness SDK.
@@ -15,15 +19,19 @@ import com.fitness.sdk.data.local.entity.WorkoutEntity
 @Database(
     entities = [
         WorkoutEntity::class,
-        ExerciseEntity::class
+        ExerciseEntity::class,
+        WorkoutTemplateEntity::class,
+        TemplateExerciseEntity::class,
+        TemplateSetEntity::class
     ],
-    version = 1,
+    version = 3,
     exportSchema = true
 )
 abstract class FitnessDatabase : RoomDatabase() {
 
     abstract fun workoutDao(): WorkoutDao
     abstract fun exerciseDao(): ExerciseDao
+    abstract fun templateDao(): TemplateDao
 
     companion object {
         private const val DEFAULT_DATABASE_NAME = "fitness_sdk_database"

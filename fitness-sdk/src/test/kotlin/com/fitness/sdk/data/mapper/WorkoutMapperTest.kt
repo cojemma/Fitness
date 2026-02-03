@@ -16,6 +16,7 @@ class WorkoutMapperTest {
             id = 1,
             name = "Morning Run",
             type = "CARDIO",
+            templateId = null,
             startTime = 1000L,
             endTime = 2000L,
             durationMinutes = 30,
@@ -51,6 +52,7 @@ class WorkoutMapperTest {
             id = 1,
             name = "Unknown Workout",
             type = "UNKNOWN_TYPE",
+            templateId = null,
             startTime = 1000L,
             endTime = null,
             durationMinutes = 30,
@@ -73,11 +75,35 @@ class WorkoutMapperTest {
         // Given
         val list = listOf(
             WorkoutWithExercises(
-                WorkoutEntity(1, "W1", "STRENGTH", 1000L, null, 60, 300, null, 1000L, 1000L),
+                WorkoutEntity(
+                    id = 1,
+                    name = "W1",
+                    type = "STRENGTH",
+                    templateId = null,
+                    startTime = 1000L,
+                    endTime = null,
+                    durationMinutes = 60,
+                    caloriesBurned = 300,
+                    notes = null,
+                    createdAt = 1000L,
+                    updatedAt = 1000L
+                ),
                 emptyList()
             ),
             WorkoutWithExercises(
-                WorkoutEntity(2, "W2", "CARDIO", 2000L, null, 30, 200, null, 2000L, 2000L),
+                WorkoutEntity(
+                    id = 2,
+                    name = "W2",
+                    type = "CARDIO",
+                    templateId = null,
+                    startTime = 2000L,
+                    endTime = null,
+                    durationMinutes = 30,
+                    caloriesBurned = 200,
+                    notes = null,
+                    createdAt = 2000L,
+                    updatedAt = 2000L
+                ),
                 emptyList()
             )
         )

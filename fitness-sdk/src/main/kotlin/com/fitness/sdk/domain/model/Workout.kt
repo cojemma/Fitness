@@ -6,6 +6,7 @@ package com.fitness.sdk.domain.model
  * @property id Unique identifier for the workout (0 for new workouts)
  * @property name Name/title of the workout (e.g., "Morning Run", "Leg Day")
  * @property type Type of workout from [WorkoutType] enum
+ * @property templateId ID of the template this workout was created from (null if not from template)
  * @property startTime Timestamp when the workout started (milliseconds since epoch)
  * @property endTime Timestamp when the workout ended (null if still in progress)
  * @property durationMinutes Total duration of the workout in minutes
@@ -19,6 +20,7 @@ data class Workout(
     val id: Long = 0,
     val name: String,
     val type: WorkoutType = WorkoutType.OTHER,
+    val templateId: Long? = null,
     val startTime: Long = System.currentTimeMillis(),
     val endTime: Long? = null,
     val durationMinutes: Int = 0,

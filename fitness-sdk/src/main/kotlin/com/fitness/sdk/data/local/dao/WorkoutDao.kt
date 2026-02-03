@@ -44,4 +44,12 @@ interface WorkoutDao {
     @Transaction
     @Query("SELECT * FROM workouts WHERE id = :id")
     fun observeWorkoutById(id: Long): Flow<WorkoutWithExercises?>
+
+    @Transaction
+    @Query("SELECT * FROM workouts WHERE templateId = :templateId ORDER BY startTime DESC LIMIT 1")
+    suspend fun getLastWorkoutByTemplateId(templateId: Long): WorkoutWithExercises?
+
+    @Transaction
+    @Query("SELECT * FROM workouts WHERE templateId = :templateId ORDER BY startTime DESC")
+    suspend fun getWorkoutsByTemplateId(templateId: Long): List<WorkoutWithExercises>
 }

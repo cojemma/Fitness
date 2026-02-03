@@ -24,7 +24,16 @@ class WorkoutViewModel : ViewModel() {
     private val _savedWorkoutId = MutableStateFlow<Long?>(null)
     val savedWorkoutId: StateFlow<Long?> = _savedWorkoutId.asStateFlow()
 
+    // Track if we've already loaded a workout to prevent overwriting user changes
+    private var loadedWorkoutId: Long? = null
+
     fun loadWorkout(workoutId: Long) {
+        // Prevent reloading if we've already loaded this workout
+        // This preserves user's changes (like added exercises) when navigating back
+        if (loadedWorkoutId == workoutId) {
+            return
+        }
+
         viewModelScope.launch {
             workoutManager.getWorkout(workoutId)
                 .onSuccess { workout ->
@@ -39,6 +48,7 @@ class WorkoutViewModel : ViewModel() {
                             workoutId = it.id
                         )
                         _exercises.value = it.exercises
+                        loadedWorkoutId = workoutId
                     }
                 }
                 .onFailure { e ->

@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fitness.sample.ui.components.ExerciseItem
 import com.fitness.sample.ui.exercise.AddExerciseDialog
+import com.fitness.sdk.domain.model.Exercise
+import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.WorkoutType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +52,9 @@ import com.fitness.sdk.domain.model.WorkoutType
 fun AddWorkoutScreen(
     onNavigateBack: () -> Unit,
     onWorkoutSaved: () -> Unit,
+    onSelectFromLibrary: (() -> Unit)? = null,
+    pendingExercise: ExerciseDefinition? = null,
+    onExerciseConsumed: (() -> Unit)? = null,
     workoutId: Long? = null,
     viewModel: WorkoutViewModel = viewModel()
 ) {
@@ -59,6 +64,15 @@ fun AddWorkoutScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     var showAddExerciseDialog by remember { mutableStateOf(false) }
+
+    // Handle pending exercise from library picker
+    LaunchedEffect(pendingExercise) {
+        pendingExercise?.let { definition ->
+            // Convert ExerciseDefinition to Exercise and add it
+            viewModel.addExercise(definition.toExercise())
+            onExerciseConsumed?.invoke()
+        }
+    }
 
     // Load workout if editing
     LaunchedEffect(workoutId) {
@@ -199,6 +213,12 @@ fun AddWorkoutScreen(
             onExerciseAdded = { exercise ->
                 viewModel.addExercise(exercise)
                 showAddExerciseDialog = false
+            },
+            onSelectFromLibrary = onSelectFromLibrary?.let { selectFromLibrary ->
+                {
+                    showAddExerciseDialog = false
+                    selectFromLibrary()
+                }
             }
         )
     }
