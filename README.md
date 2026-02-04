@@ -135,6 +135,8 @@ workoutManager.deleteWorkout(id)           // Returns Result<Unit>
 templateManager.saveTemplate(template)     // Returns Result<Long>
 templateManager.getTemplates()             // Returns Flow<List<WorkoutTemplate>>
 templateManager.startWorkout(templateId)   // Returns Result<Workout> (active session)
+templateManager.saveWorkoutAsTemplate(workoutId, name) // Create template from workout
+templateManager.updateTemplateFromWorkout(templateId, workoutId) // Update existing template
 
 // Reactive observation
 workoutManager.observeWorkouts()           // Returns Flow<List<Workout>>

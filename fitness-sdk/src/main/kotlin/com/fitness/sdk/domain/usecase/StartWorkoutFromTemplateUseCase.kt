@@ -63,7 +63,8 @@ class StartWorkoutFromTemplateUseCase(
                     reps = targetReps,
                     weight = targetWeight,
                     restSeconds = templateExercise.restSeconds,
-                    notes = templateExercise.notes
+                    notes = templateExercise.notes,
+                    supersetGroupId = templateExercise.supersetGroupId
                 )
             }
 

@@ -36,22 +36,24 @@ A reference implementation using the SDK.
 
 ## The Feature Loop
 ### Current State
-**Version 1.3.0**
+**Version 1.4.0**
 - **Core CRUD**: Workouts and Exercises can be created, read, updated, and deleted.
 - **Exercise Library**: Pre-loaded library of 55+ exercises with categorization.
 - **Template System**: 
     - Create/Edit templates.
     - Start active workout from template.
     - `ActiveWorkoutScreen` with timer and set logging.
+    - **Last Session Data**: Pre-loads previous workout performance for progressive overload tracking using actual per-set records.
+    - **Save as Template**: Options to replace original template, save as new, or skip after workout completion.
 - **Per-Set Recording**: Individual set records (weight, reps) stored in database via `ExerciseSet` entity.
 - **Data Persistence**: Robust local storage using Room.
 
 ### Active Development (Next Steps)
-1.  **UX Improvements**: "Swipe to Delete" for workout cards.
-2.  **Search & Filter**: Global search for workouts and advanced filtering.
-3.  **Visualization**: Charts and graphs for progress tracking (Volume, 1RM stats).
-4.  **In-Workout Tools**: Dedicated rest timer, Superset support (referenced in PRD).
-5.  **Data Portability**: Import/Export (JSON/CSV).
+1.  **Rest Timer Notifications**: Audio/vibration feedback when rest timer completes.
+2.  **UX Improvements**: "Swipe to Delete" for workout cards.
+3.  **Search & Filter**: Global search for workouts and advanced filtering.
+4.  **Visualization**: Charts and graphs for progress tracking (Volume, 1RM stats).
+5.  **In-Workout Tools**: Superset support (referenced in PRD).
 
 ## Handover Readiness
 - **Entry Point**: `FitnessSDK.initialize(context)` in `SampleApplication.kt`.

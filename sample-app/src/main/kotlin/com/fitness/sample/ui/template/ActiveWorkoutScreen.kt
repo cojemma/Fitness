@@ -27,6 +27,8 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -87,16 +89,36 @@ fun ActiveWorkoutScreen(
     val error by viewModel.error.collectAsState()
     val workoutCompleted by viewModel.workoutCompleted.collectAsState()
     
+    val savedWorkoutId by viewModel.savedWorkoutId.collectAsState()
+    val templateSaved by viewModel.templateSaved.collectAsState()
+
+    // Navigation state
     val snackbarHostState = remember { SnackbarHostState() }
+    var showSaveAsTemplateDialog by remember { mutableStateOf(false) }
+    var templateNameInput by remember { mutableStateOf("") }
+    
+    // Check if workout was started from a template
+    val originalTemplateId = viewModel.getOriginalTemplateId()
+    var showCreateNewDialog by remember { mutableStateOf(false) }
 
     // Start workout
     LaunchedEffect(templateId) {
         viewModel.startWorkout(templateId)
     }
 
-    // Handle workout completion
+    // Handle workout completion - show save as template dialog
     LaunchedEffect(workoutCompleted) {
         if (workoutCompleted) {
+            showSaveAsTemplateDialog = true
+        }
+    }
+
+    // Handle template saved - navigate after dialog closes
+    LaunchedEffect(templateSaved) {
+        if (templateSaved) {
+            snackbarHostState.showSnackbar("Template saved!")
+            showSaveAsTemplateDialog = false
+            showCreateNewDialog = false
             onWorkoutComplete()
         }
     }
@@ -112,6 +134,128 @@ fun ActiveWorkoutScreen(
     // Derive current exercise from observed states so it updates when index changes
     val currentExercise = workout?.exercises?.getOrNull(currentExerciseIndex)
     val exerciseCount = workout?.exercises?.size ?: 0
+
+    // Check if workout was started from a template
+
+
+    // Save as Template Dialog - Main Options
+    if (showSaveAsTemplateDialog && !showCreateNewDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showSaveAsTemplateDialog = false
+                onWorkoutComplete()
+            },
+            title = {
+                Text(
+                    text = "Workout Complete! 🎉",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = "Great workout! What would you like to do with it?",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Option 1: Replace Original Template (only if started from template)
+                    if (originalTemplateId != null) {
+                        Button(
+                            onClick = {
+                                viewModel.updateOriginalTemplate()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = savedWorkoutId != null
+                        ) {
+                            Text("Update Original Template")
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    
+                    // Option 2: Create New Template
+                    OutlinedButton(
+                        onClick = {
+                            showCreateNewDialog = true
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Save as New Template")
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Option 3: Skip
+                    OutlinedButton(
+                        onClick = {
+                            showSaveAsTemplateDialog = false
+                            onWorkoutComplete()
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    ) {
+                        Text("Skip")
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {}
+        )
+    }
+    
+    // Create New Template Dialog (name input)
+    if (showCreateNewDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showCreateNewDialog = false
+                showSaveAsTemplateDialog = false
+                onWorkoutComplete()
+            },
+            title = {
+                Text(
+                    text = "New Template Name",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = templateNameInput,
+                        onValueChange = { templateNameInput = it },
+                        label = { Text("Template Name") },
+                        placeholder = { Text(workout?.name ?: "My Template") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val name = templateNameInput.ifBlank { workout?.name ?: "My Template" }
+                        viewModel.saveAsTemplate(name)
+                    },
+                    enabled = savedWorkoutId != null
+                ) {
+                    Text("Create")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = {
+                        showCreateNewDialog = false
+                    }
+                ) {
+                    Text("Back")
+                }
+            }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -203,6 +347,19 @@ fun ActiveWorkoutScreen(
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
+
+                    // Superset Info
+                    val currentSupersetId = currentExercise.supersetGroupId
+                    if (currentSupersetId != null) {
+                        val otherExercisesInSuperset = workout?.exercises?.filterIndexed { index, ex -> 
+                             ex.supersetGroupId == currentSupersetId && index != currentExerciseIndex
+                        } ?: emptyList()
+
+                        if (otherExercisesInSuperset.isNotEmpty()) {
+                            SupersetInfoCard(otherExercises = otherExercisesInSuperset)
+                            Spacer(modifier = Modifier.height(16.dp))
+                        }
+                    }
 
                     // Current exercise card
                     CurrentExerciseCard(
@@ -591,4 +748,45 @@ private fun formatTime(seconds: Int): String {
     val minutes = seconds / 60
     val remainingSeconds = seconds % 60
     return "%d:%02d".format(minutes, remainingSeconds)
+}
+
+@Composable
+private fun SupersetInfoCard(
+    otherExercises: List<com.fitness.sdk.domain.model.Exercise>,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Link,
+                contentDescription = "Superset",
+                tint = MaterialTheme.colorScheme.tertiary
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = "Superset",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Paired with: ${otherExercises.joinToString { it.name }}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+    }
 }

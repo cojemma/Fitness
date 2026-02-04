@@ -191,6 +191,55 @@ class TemplateViewModel : ViewModel() {
         }
     }
 
+    fun moveExercise(fromIndex: Int, toIndex: Int) {
+        val current = _exercises.value.toMutableList()
+        if (fromIndex in current.indices && toIndex in current.indices) {
+            val item = current.removeAt(fromIndex)
+            current.add(toIndex, item)
+            _exercises.value = current
+        }
+    }
+
+    fun swapExercise(index: Int, newExerciseName: String) {
+        val current = _exercises.value.toMutableList()
+        if (index in current.indices) {
+            // Preserve sets if possible? For now, we'll keep the sets but update the name.
+            // In a real app, we might want to check if the new exercise is weighted vs bodyweight etc.
+            // But here the requirement is "permanently update template".
+            current[index] = current[index].copy(exerciseName = newExerciseName)
+            _exercises.value = current
+        }
+    }
+
+    fun createSuperset(indices: List<Int>) {
+        if (indices.size < 2) return
+        
+        // Use the smallest existing superset ID or generate a new one
+        val current = _exercises.value.toMutableList()
+        val validIndices = indices.filter { it in current.indices }
+        
+        if (validIndices.size < 2) return
+
+        // Find existing ID or create new one (simple increment for now, or random)
+        // In a real app we'd manage IDs more carefully. Here we can use the negative of current time for temp IDs
+        // or just find the max existing ID + 1.
+        val existingIds = current.mapNotNull { it.supersetGroupId }
+        val newId = (existingIds.maxOrNull() ?: 0) + 1
+
+        validIndices.forEach { index ->
+            current[index] = current[index].copy(supersetGroupId = newId)
+        }
+        _exercises.value = current
+    }
+
+    fun breakSuperset(index: Int) {
+        val current = _exercises.value.toMutableList()
+        if (index in current.indices) {
+            current[index] = current[index].copy(supersetGroupId = null)
+            _exercises.value = current
+        }
+    }
+
     fun saveTemplate() {
         if (_name.value.isBlank()) {
             _error.value = "Please enter a template name"

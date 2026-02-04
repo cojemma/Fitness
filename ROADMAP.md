@@ -33,8 +33,9 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Error handling | ✅ | Result<T> pattern for all operations |
 | Exercise library | ✅ | Predefined exercises (55+) with muscle/category |
 | Exercise search | ✅ | Search and filter exercises by name/muscle/category |
-| Workout templates | ✅ | Save and reuse workout routines |
+| Workout templates | ✅ | Save and reuse workout routines, update from completed workouts |
 | Per-set recording | ✅ | Store individual set records (weight, reps) per exercise |
+| Last Session Data | ✅ | Pre-load previous performance data for progressive overload |
 
 ### SDK - To Develop
 
@@ -121,6 +122,7 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.4.0 | 2026-02-04 | Execution & UX: Progressive overload tracking (last session data), "Save as Template" with replacement logic, Rest Timer auto-start. |
 | 1.3.0 | 2026-02-04 | Per-Set Recording: Store individual set records (weight, reps) for detailed tracking. Display per-set data in workout details. |
 | 1.2.0 | 2026-02-03 | Workout Template System: Create, edit, and start workouts from templates. Active workout session UI. |
 | 1.1.0 | 2026-02-03 | Exercise library with 55+ predefined exercises, picker screen |

@@ -24,7 +24,8 @@ data class Exercise(
     val durationSeconds: Int = 0,
     val restSeconds: Int = 0,
     val notes: String? = null,
-    val setRecords: List<ExerciseSet> = emptyList()
+    val setRecords: List<ExerciseSet> = emptyList(),
+    val supersetGroupId: Int? = null
 ) {
     /**
      * Calculate the total volume (sets × reps × weight) for this exercise.

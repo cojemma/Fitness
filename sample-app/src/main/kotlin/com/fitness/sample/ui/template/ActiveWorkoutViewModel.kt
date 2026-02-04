@@ -63,6 +63,14 @@ class ActiveWorkoutViewModel : ViewModel() {
     private val _workoutCompleted = MutableStateFlow(false)
     val workoutCompleted: StateFlow<Boolean> = _workoutCompleted.asStateFlow()
 
+    // Saved workout ID for potential template creation
+    private val _savedWorkoutId = MutableStateFlow<Long?>(null)
+    val savedWorkoutId: StateFlow<Long?> = _savedWorkoutId.asStateFlow()
+
+    // Template save success
+    private val _templateSaved = MutableStateFlow(false)
+    val templateSaved: StateFlow<Boolean> = _templateSaved.asStateFlow()
+
     fun startWorkout(templateId: Long) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -226,7 +234,8 @@ class ActiveWorkoutViewModel : ViewModel() {
             )
 
             workoutManager.createWorkout(finishedWorkout)
-                .onSuccess {
+                .onSuccess { workoutId ->
+                    _savedWorkoutId.value = workoutId
                     _workoutCompleted.value = true
                 }
                 .onFailure { e ->
@@ -237,6 +246,49 @@ class ActiveWorkoutViewModel : ViewModel() {
 
     fun clearError() {
         _error.value = null
+    }
+
+    /**
+     * Save the completed workout as a new template.
+     */
+    fun saveAsTemplate(name: String, description: String? = null) {
+        val workoutId = _savedWorkoutId.value ?: return
+        viewModelScope.launch {
+            templateManager.saveWorkoutAsTemplate(workoutId, name, description)
+                .onSuccess {
+                    _templateSaved.value = true
+                }
+                .onFailure { e ->
+                    _error.value = e.message ?: "Failed to save as template"
+                }
+        }
+    }
+
+    /**
+     * Update the original template with the current workout's data.
+     * Only available when the workout was started from a template.
+     */
+    fun updateOriginalTemplate() {
+        val workoutId = _savedWorkoutId.value ?: return
+        val workout = _workout.value ?: return
+        val templateId = workout.templateId ?: return
+        
+        viewModelScope.launch {
+            templateManager.updateTemplateFromWorkout(templateId, workoutId)
+                .onSuccess {
+                    _templateSaved.value = true
+                }
+                .onFailure { e ->
+                    _error.value = e.message ?: "Failed to update template"
+                }
+        }
+    }
+
+    /**
+     * Get the original template ID if the workout was started from a template.
+     */
+    fun getOriginalTemplateId(): Long? {
+        return _workout.value?.templateId
     }
 
     override fun onCleared() {

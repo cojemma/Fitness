@@ -98,5 +98,18 @@ interface TemplateManager {
         templateName: String,
         description: String? = null
     ): Result<Long>
+
+    /**
+     * Update an existing template using data from a completed workout.
+     * Overwrites exercises in the template with those from the workout.
+     *
+     * @param templateId The ID of the template to update
+     * @param workoutId The ID of the workout to use as source
+     * @return Result indicating success or failure
+     */
+    suspend fun updateTemplateFromWorkout(
+        templateId: Long,
+        workoutId: Long
+    ): Result<Unit>
 }
 

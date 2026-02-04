@@ -27,6 +27,7 @@ import com.fitness.sdk.domain.usecase.SaveWorkoutAsTemplateUseCase
 import com.fitness.sdk.domain.usecase.SaveWorkoutUseCase
 import com.fitness.sdk.domain.usecase.SearchExercisesUseCase
 import com.fitness.sdk.domain.usecase.StartWorkoutFromTemplateUseCase
+import com.fitness.sdk.domain.usecase.UpdateTemplateFromWorkoutUseCase
 import com.fitness.sdk.domain.usecase.UpdateWorkoutUseCase
 
 /**
@@ -146,12 +147,16 @@ object FitnessSDK {
             val duplicateTemplateUseCase = DuplicateTemplateUseCase(templateRepository)
 
             // Create execution automation use cases
-            val getLastSessionDataUseCase = GetLastSessionDataUseCase(database.workoutDao())
+            val getLastSessionDataUseCase = GetLastSessionDataUseCase(database.workoutDao(), database.exerciseDao())
             val startWorkoutFromTemplateUseCase = StartWorkoutFromTemplateUseCase(
                 templateRepository,
                 getLastSessionDataUseCase
             )
             val saveWorkoutAsTemplateUseCase = SaveWorkoutAsTemplateUseCase(
+                repository,
+                templateRepository
+            )
+            val updateTemplateFromWorkoutUseCase = UpdateTemplateFromWorkoutUseCase(
                 repository,
                 templateRepository
             )
@@ -164,7 +169,8 @@ object FitnessSDK {
                 duplicateTemplateUseCase,
                 startWorkoutFromTemplateUseCase,
                 getLastSessionDataUseCase,
-                saveWorkoutAsTemplateUseCase
+                saveWorkoutAsTemplateUseCase,
+                updateTemplateFromWorkoutUseCase
             )
 
             isInitialized = true

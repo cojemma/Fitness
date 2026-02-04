@@ -39,7 +39,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -79,10 +82,19 @@ fun AddTemplateScreen(
         templateId?.let { viewModel.loadTemplate(it) }
     }
 
+            // Swap target state
+    var swapTargetIndex by rememberSaveable { mutableStateOf<Int?>(null) }
+
     // Handle pending exercise from picker
     LaunchedEffect(pendingExercise) {
         pendingExercise?.let { exercise ->
-            viewModel.addExercise(exercise.name)
+            val target = swapTargetIndex
+            if (target != null) {
+                viewModel.swapExercise(target, exercise.name)
+                swapTargetIndex = null
+            } else {
+                viewModel.addExercise(exercise.name)
+            }
             onExerciseConsumed?.invoke()
         }
     }
@@ -228,7 +240,10 @@ fun AddTemplateScreen(
                     )
                     
                     OutlinedButton(
-                        onClick = onSelectFromLibrary,
+                        onClick = {
+                            swapTargetIndex = null // Ensure we are in adding mode
+                            onSelectFromLibrary()
+                        },
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Icon(
@@ -264,7 +279,22 @@ fun AddTemplateScreen(
                         onAddSet = { viewModel.addSet(index) },
                         onRemoveSet = { setIndex -> viewModel.removeSet(index, setIndex) },
                         onUpdateSet = { setIndex, set -> viewModel.updateSet(index, setIndex, set) },
-                        onUpdateRestSeconds = { seconds -> viewModel.updateRestSeconds(index, seconds) }
+                        onUpdateRestSeconds = { seconds -> viewModel.updateRestSeconds(index, seconds) },
+                        onMoveUp = { viewModel.moveExercise(index, index - 1) },
+                        onMoveDown = { viewModel.moveExercise(index, index + 1) },
+                        onSwapExercise = {
+                            swapTargetIndex = index
+                            onSelectFromLibrary()
+                        },
+                        onSuperset = {
+                            if (exercise.supersetGroupId != null) {
+                                viewModel.breakSuperset(index)
+                            } else {
+                                // Link with next
+                                viewModel.createSuperset(listOf(index, index + 1))
+                            }
+                        },
+                        isSuperset = exercise.supersetGroupId != null
                     )
                 }
             }

@@ -28,7 +28,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -49,13 +60,19 @@ fun TemplateExerciseCard(
     onRemoveSet: (Int) -> Unit,
     onUpdateSet: (Int, TemplateSetState) -> Unit,
     onUpdateRestSeconds: (Int) -> Unit,
+    onSwapExercise: () -> Unit,
+    onMoveUp: () -> Unit,
+    onMoveDown: () -> Unit,
+    onSuperset: () -> Unit,
+    isSuperset: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = if (isSuperset) MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f) 
+                           else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
     ) {
         Column(
@@ -69,12 +86,74 @@ fun TemplateExerciseCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = exercise.exerciseName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f)
-                )
+                Row(
+                    Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (isSuperset) {
+                        Icon(
+                            imageVector = Icons.Default.Link,
+                            contentDescription = "Superset",
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    Text(
+                        text = exercise.exerciseName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Box {
+                    var showMenu by remember { mutableStateOf(false) }
+
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = "Options"
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Move Up") },
+                            onClick = { 
+                                onMoveUp()
+                                showMenu = false 
+                            },
+                            leadingIcon = { Icon(Icons.Default.KeyboardArrowUp, null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Move Down") },
+                            onClick = { 
+                                onMoveDown()
+                                showMenu = false 
+                            },
+                            leadingIcon = { Icon(Icons.Default.KeyboardArrowDown, null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Swap Exercise") },
+                            onClick = { 
+                                onSwapExercise()
+                                showMenu = false 
+                            },
+                            leadingIcon = { Icon(Icons.Default.Refresh, null) }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(if (isSuperset) "Unlink Superset" else "Link to Next (Superset)") },
+                            onClick = { 
+                                onSuperset()
+                                showMenu = false 
+                            },
+                            leadingIcon = { Icon(Icons.Default.Link, null) }
+                        )
+                    }
+                }
                 
                 IconButton(
                     onClick = onRemoveExercise,

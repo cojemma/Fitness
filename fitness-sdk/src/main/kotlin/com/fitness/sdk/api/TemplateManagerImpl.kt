@@ -11,6 +11,7 @@ import com.fitness.sdk.domain.usecase.GetTemplatesUseCase
 import com.fitness.sdk.domain.usecase.SaveTemplateUseCase
 import com.fitness.sdk.domain.usecase.SaveWorkoutAsTemplateUseCase
 import com.fitness.sdk.domain.usecase.StartWorkoutFromTemplateUseCase
+import com.fitness.sdk.domain.usecase.UpdateTemplateFromWorkoutUseCase
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -24,7 +25,8 @@ class TemplateManagerImpl(
     private val duplicateTemplateUseCase: DuplicateTemplateUseCase,
     private val startWorkoutFromTemplateUseCase: StartWorkoutFromTemplateUseCase,
     private val getLastSessionDataUseCase: GetLastSessionDataUseCase,
-    private val saveWorkoutAsTemplateUseCase: SaveWorkoutAsTemplateUseCase
+    private val saveWorkoutAsTemplateUseCase: SaveWorkoutAsTemplateUseCase,
+    private val updateTemplateFromWorkoutUseCase: UpdateTemplateFromWorkoutUseCase
 ) : TemplateManager {
 
     override suspend fun saveTemplate(template: WorkoutTemplate): Result<Long> {
@@ -65,6 +67,13 @@ class TemplateManagerImpl(
         description: String?
     ): Result<Long> {
         return saveWorkoutAsTemplateUseCase(workoutId, templateName, description)
+    }
+
+    override suspend fun updateTemplateFromWorkout(
+        templateId: Long,
+        workoutId: Long
+    ): Result<Unit> {
+        return updateTemplateFromWorkoutUseCase(templateId, workoutId)
     }
 }
 
