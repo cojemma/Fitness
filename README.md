@@ -53,6 +53,7 @@ src/main/kotlin/com/fitness/sdk/
 │   ├── model/
 │   │   ├── Workout.kt           # Workout data class
 │   │   ├── Exercise.kt          # Exercise data class
+│   │   ├── ExerciseSet.kt       # Individual set record (weight, reps)
 │   │   ├── WorkoutType.kt       # Enum: STRENGTH, CARDIO, etc.
 │   │   ├── ExerciseDefinition.kt  # Library exercise template
 │   │   ├── MuscleGroup.kt       # Enum: CHEST, BACK, LEGS, etc.
@@ -76,13 +77,15 @@ src/main/kotlin/com/fitness/sdk/
 │   │   └── entity/
 │   │       ├── WorkoutEntity.kt
 │   │       ├── ExerciseEntity.kt
+│   │       ├── ExerciseSetEntity.kt  # Per-set performance records
 │   │       └── WorkoutWithExercises.kt
 │   ├── library/
 │   │   ├── ExerciseLibraryProvider.kt  # Interface
 │   │   └── DefaultExerciseLibrary.kt   # 55+ predefined exercises
 │   ├── mapper/
 │   │   ├── WorkoutMapper.kt
-│   │   └── ExerciseMapper.kt
+│   │   ├── ExerciseMapper.kt
+│   │   └── ExerciseSetMapper.kt
 │   └── repository/
 │       └── WorkoutRepositoryImpl.kt
 └── api/

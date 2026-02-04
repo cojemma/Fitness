@@ -3,6 +3,7 @@ package com.fitness.sdk.data.repository
 import com.fitness.sdk.data.local.dao.ExerciseDao
 import com.fitness.sdk.data.local.dao.WorkoutDao
 import com.fitness.sdk.data.mapper.ExerciseMapper
+import com.fitness.sdk.data.mapper.ExerciseSetMapper
 import com.fitness.sdk.data.mapper.WorkoutMapper
 import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.repository.WorkoutRepository
@@ -27,7 +28,16 @@ class WorkoutRepositoryImpl(
         // Insert exercises with the workout ID
         if (workout.exercises.isNotEmpty()) {
             val exerciseEntities = ExerciseMapper.toEntityList(workout.exercises, workoutId)
-            exerciseDao.insertExercises(exerciseEntities)
+            val exerciseIds = exerciseDao.insertExercises(exerciseEntities)
+
+            // Insert set records for each exercise
+            workout.exercises.forEachIndexed { index, exercise ->
+                if (exercise.setRecords.isNotEmpty()) {
+                    val exerciseId = exerciseIds[index]
+                    val setEntities = ExerciseSetMapper.toEntityList(exercise.setRecords, exerciseId)
+                    exerciseDao.insertExerciseSets(setEntities)
+                }
+            }
         }
 
         workoutId
@@ -35,18 +45,68 @@ class WorkoutRepositoryImpl(
 
     override suspend fun getWorkouts(): List<Workout> = withContext(Dispatchers.IO) {
         val workoutsWithExercises = workoutDao.getAllWorkouts()
-        WorkoutMapper.toDomainList(workoutsWithExercises)
+        workoutsWithExercises.map { workoutWithExercises ->
+            val exerciseIds = workoutWithExercises.exercises.map { it.id }
+            val allSetRecords = if (exerciseIds.isNotEmpty()) {
+                exerciseDao.getExerciseSetsByExerciseIds(exerciseIds)
+            } else {
+                emptyList()
+            }
+            val setsByExercise = allSetRecords.groupBy { it.exerciseId }
+
+            val exercises = workoutWithExercises.exercises.map { entity ->
+                val setRecords = setsByExercise[entity.id]?.let { 
+                    ExerciseSetMapper.toDomainList(it) 
+                } ?: emptyList()
+                ExerciseMapper.toDomain(entity, setRecords)
+            }
+
+            WorkoutMapper.toDomain(workoutWithExercises.workout, exercises)
+        }
     }
 
     override suspend fun getWorkoutById(id: Long): Workout? = withContext(Dispatchers.IO) {
-        val workoutWithExercises = workoutDao.getWorkoutById(id)
-        workoutWithExercises?.let { WorkoutMapper.toDomain(it) }
+        val workoutWithExercises = workoutDao.getWorkoutById(id) ?: return@withContext null
+        
+        val exerciseIds = workoutWithExercises.exercises.map { it.id }
+        val allSetRecords = if (exerciseIds.isNotEmpty()) {
+            exerciseDao.getExerciseSetsByExerciseIds(exerciseIds)
+        } else {
+            emptyList()
+        }
+        val setsByExercise = allSetRecords.groupBy { it.exerciseId }
+
+        val exercises = workoutWithExercises.exercises.map { entity ->
+            val setRecords = setsByExercise[entity.id]?.let { 
+                ExerciseSetMapper.toDomainList(it) 
+            } ?: emptyList()
+            ExerciseMapper.toDomain(entity, setRecords)
+        }
+
+        WorkoutMapper.toDomain(workoutWithExercises.workout, exercises)
     }
 
     override suspend fun getWorkoutsByDateRange(startTime: Long, endTime: Long): List<Workout> =
         withContext(Dispatchers.IO) {
             val workoutsWithExercises = workoutDao.getWorkoutsByDateRange(startTime, endTime)
-            WorkoutMapper.toDomainList(workoutsWithExercises)
+            workoutsWithExercises.map { workoutWithExercises ->
+                val exerciseIds = workoutWithExercises.exercises.map { it.id }
+                val allSetRecords = if (exerciseIds.isNotEmpty()) {
+                    exerciseDao.getExerciseSetsByExerciseIds(exerciseIds)
+                } else {
+                    emptyList()
+                }
+                val setsByExercise = allSetRecords.groupBy { it.exerciseId }
+
+                val exercises = workoutWithExercises.exercises.map { entity ->
+                    val setRecords = setsByExercise[entity.id]?.let { 
+                        ExerciseSetMapper.toDomainList(it) 
+                    } ?: emptyList()
+                    ExerciseMapper.toDomain(entity, setRecords)
+                }
+
+                WorkoutMapper.toDomain(workoutWithExercises.workout, exercises)
+            }
         }
 
     override suspend fun updateWorkout(workout: Workout) = withContext(Dispatchers.IO) {
@@ -54,16 +114,27 @@ class WorkoutRepositoryImpl(
         val workoutEntity = WorkoutMapper.toEntity(workout)
         workoutDao.updateWorkout(workoutEntity)
 
-        // Delete existing exercises and insert updated ones
+        // Delete existing exercises (set records will cascade delete)
         exerciseDao.deleteExercisesByWorkoutId(workout.id)
+        
+        // Insert updated exercises with set records
         if (workout.exercises.isNotEmpty()) {
             val exerciseEntities = ExerciseMapper.toEntityList(workout.exercises, workout.id)
-            exerciseDao.insertExercises(exerciseEntities)
+            val exerciseIds = exerciseDao.insertExercises(exerciseEntities)
+
+            // Insert set records for each exercise
+            workout.exercises.forEachIndexed { index, exercise ->
+                if (exercise.setRecords.isNotEmpty()) {
+                    val exerciseId = exerciseIds[index]
+                    val setEntities = ExerciseSetMapper.toEntityList(exercise.setRecords, exerciseId)
+                    exerciseDao.insertExerciseSets(setEntities)
+                }
+            }
         }
     }
 
     override suspend fun deleteWorkout(id: Long) = withContext(Dispatchers.IO) {
-        // Exercises are deleted automatically via CASCADE
+        // Exercises and set records are deleted automatically via CASCADE
         workoutDao.deleteWorkout(id)
     }
 
@@ -79,3 +150,4 @@ class WorkoutRepositoryImpl(
         }
     }
 }
+

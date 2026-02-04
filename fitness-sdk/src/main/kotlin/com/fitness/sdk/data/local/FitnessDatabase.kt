@@ -8,6 +8,7 @@ import com.fitness.sdk.data.local.dao.ExerciseDao
 import com.fitness.sdk.data.local.dao.TemplateDao
 import com.fitness.sdk.data.local.dao.WorkoutDao
 import com.fitness.sdk.data.local.entity.ExerciseEntity
+import com.fitness.sdk.data.local.entity.ExerciseSetEntity
 import com.fitness.sdk.data.local.entity.TemplateExerciseEntity
 import com.fitness.sdk.data.local.entity.TemplateSetEntity
 import com.fitness.sdk.data.local.entity.WorkoutEntity
@@ -20,11 +21,12 @@ import com.fitness.sdk.data.local.entity.WorkoutTemplateEntity
     entities = [
         WorkoutEntity::class,
         ExerciseEntity::class,
+        ExerciseSetEntity::class,
         WorkoutTemplateEntity::class,
         TemplateExerciseEntity::class,
         TemplateSetEntity::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = true
 )
 abstract class FitnessDatabase : RoomDatabase() {

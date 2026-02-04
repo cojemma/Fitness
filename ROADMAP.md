@@ -34,6 +34,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Exercise library | ✅ | Predefined exercises (55+) with muscle/category |
 | Exercise search | ✅ | Search and filter exercises by name/muscle/category |
 | Workout templates | ✅ | Save and reuse workout routines |
+| Per-set recording | ✅ | Store individual set records (weight, reps) per exercise |
 
 ### SDK - To Develop
 
@@ -69,7 +70,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Component | Status | Description |
 |--------|--------|-------------|
 | Workout card | ✅ | Card with type icon, duration, calories |
-| Exercise item | ✅ | Row showing sets × reps, weight |
+| Exercise item | ✅ | Row showing sets × reps, weight with per-set details |
 | Stats summary | ✅ | Weekly totals (workouts, calories, duration) |
 | Empty state | ✅ | Placeholder when no workouts |
 | Workout type dropdown | ✅ | Select workout category |
@@ -120,6 +121,7 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3.0 | 2026-02-04 | Per-Set Recording: Store individual set records (weight, reps) for detailed tracking. Display per-set data in workout details. |
 | 1.2.0 | 2026-02-03 | Workout Template System: Create, edit, and start workouts from templates. Active workout session UI. |
 | 1.1.0 | 2026-02-03 | Exercise library with 55+ predefined exercises, picker screen |
 | 1.0.0 | 2026-02-03 | Initial release with core features |

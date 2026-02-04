@@ -109,7 +109,8 @@ fun ActiveWorkoutScreen(
         }
     }
 
-    val currentExercise = viewModel.getCurrentExercise()
+    // Derive current exercise from observed states so it updates when index changes
+    val currentExercise = workout?.exercises?.getOrNull(currentExerciseIndex)
     val exerciseCount = workout?.exercises?.size ?: 0
 
     Scaffold(
@@ -325,8 +326,8 @@ private fun CurrentExerciseCard(
     onLogSet: (Int, Float?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var repsInput by remember(currentSet) { mutableStateOf(targetReps.toString()) }
-    var weightInput by remember(currentSet) { mutableStateOf(targetWeight?.toString() ?: "") }
+    var repsInput by remember(exerciseName, currentSet) { mutableStateOf(targetReps.toString()) }
+    var weightInput by remember(exerciseName, currentSet) { mutableStateOf(targetWeight?.toString() ?: "") }
 
     Card(
         modifier = modifier.fillMaxWidth(),

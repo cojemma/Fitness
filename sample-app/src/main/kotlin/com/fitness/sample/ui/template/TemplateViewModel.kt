@@ -19,6 +19,9 @@ class TemplateViewModel : ViewModel() {
 
     private val templateManager = FitnessSDK.getTemplateManager()
 
+    // Track if we've already loaded a template to prevent overwriting user changes
+    private var loadedTemplateId: Long? = null
+
     // Template state
     private val _templateId = MutableStateFlow<Long?>(null)
     val templateId: StateFlow<Long?> = _templateId.asStateFlow()
@@ -45,6 +48,12 @@ class TemplateViewModel : ViewModel() {
     val saveSuccess: StateFlow<Boolean> = _saveSuccess.asStateFlow()
 
     fun loadTemplate(id: Long) {
+        // Prevent reloading if we've already loaded this template
+        // This preserves user's changes (like added exercises) when navigating back
+        if (loadedTemplateId == id) {
+            return
+        }
+
         viewModelScope.launch {
             templateManager.getTemplateById(id)
                 .onSuccess { template ->
@@ -67,6 +76,7 @@ class TemplateViewModel : ViewModel() {
                             supersetGroupId = exercise.supersetGroupId
                         )
                     }
+                    loadedTemplateId = id
                 }
                 .onFailure { e ->
                     _error.value = e.message ?: "Failed to load template"

@@ -187,11 +187,22 @@ class ActiveWorkoutViewModel : ViewModel() {
 
             val workout = _workout.value ?: return@launch
 
-            // Build exercises with actual logged data
+            // Build exercises with actual logged set data
             val updatedExercises = workout.exercises.mapIndexed { index, exercise ->
                 val loggedSets = _completedSets.value[index] ?: emptyList()
                 
-                // Calculate averages from logged data
+                // Convert logged sets to ExerciseSet domain objects
+                val setRecords = loggedSets.map { entry ->
+                    com.fitness.sdk.domain.model.ExerciseSet(
+                        setNumber = entry.setNumber,
+                        reps = entry.reps,
+                        weight = entry.weight,
+                        isWarmupSet = false,
+                        completedAt = System.currentTimeMillis()
+                    )
+                }
+
+                // Calculate summary values from logged data for backward compatibility
                 val avgReps = if (loggedSets.isNotEmpty()) {
                     loggedSets.map { it.reps }.average().toInt()
                 } else exercise.reps
@@ -203,7 +214,8 @@ class ActiveWorkoutViewModel : ViewModel() {
                 exercise.copy(
                     sets = loggedSets.size.coerceAtLeast(1),
                     reps = avgReps,
-                    weight = avgWeight
+                    weight = avgWeight,
+                    setRecords = setRecords
                 )
             }
 

@@ -2,6 +2,7 @@ package com.fitness.sdk.data.mapper
 
 import com.fitness.sdk.data.local.entity.ExerciseEntity
 import com.fitness.sdk.domain.model.Exercise
+import com.fitness.sdk.domain.model.ExerciseSet
 
 /**
  * Mapper functions for converting between Exercise domain model and ExerciseEntity.
@@ -38,7 +39,26 @@ object ExerciseMapper {
             weight = entity.weight,
             durationSeconds = entity.durationSeconds,
             restSeconds = entity.restSeconds,
-            notes = entity.notes
+            notes = entity.notes,
+            setRecords = emptyList()
+        )
+    }
+
+    /**
+     * Convert database ExerciseEntity to domain Exercise with set records.
+     */
+    fun toDomain(entity: ExerciseEntity, setRecords: List<ExerciseSet>): Exercise {
+        return Exercise(
+            id = entity.id,
+            workoutId = entity.workoutId,
+            name = entity.name,
+            sets = entity.sets,
+            reps = entity.reps,
+            weight = entity.weight,
+            durationSeconds = entity.durationSeconds,
+            restSeconds = entity.restSeconds,
+            notes = entity.notes,
+            setRecords = setRecords
         )
     }
 
@@ -56,3 +76,4 @@ object ExerciseMapper {
         return exercises.map { toEntity(it, workoutId) }
     }
 }
+
