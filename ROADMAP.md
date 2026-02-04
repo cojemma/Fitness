@@ -88,7 +88,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Search workouts | 📋 | High | Search by name or type |
 | Calendar view | 📋 | Medium | View workouts on calendar |
 | Charts/graphs | 📋 | Medium | Visualize progress over time |
-| Workout timer | 📋 | Medium | Built-in rest timer |
+| Workout timer | ✅ | Medium | Built-in rest timer (Managed by TimerManager) |
 | Settings screen | 📋 | Low | App preferences |
 | Dark mode toggle | 📋 | Low | Manual theme switching |
 | Onboarding | 💡 | Low | First-time user guide |
@@ -122,6 +122,7 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.5.0 | 2026-02-04 | Refactoring: Split ActiveWorkoutViewModel into TimerManager and SessionStateManager. Added SDK support for adding exercises to active workouts. |
 | 1.4.0 | 2026-02-04 | Execution & UX: Progressive overload tracking (last session data), "Save as Template" with replacement logic, Rest Timer auto-start. |
 | 1.3.0 | 2026-02-04 | Per-Set Recording: Store individual set records (weight, reps) for detailed tracking. Display per-set data in workout details. |
 | 1.2.0 | 2026-02-03 | Workout Template System: Create, edit, and start workouts from templates. Active workout session UI. |

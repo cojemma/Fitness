@@ -6,6 +6,7 @@ import com.fitness.sdk.data.mapper.ExerciseMapper
 import com.fitness.sdk.data.mapper.ExerciseSetMapper
 import com.fitness.sdk.data.mapper.WorkoutMapper
 import com.fitness.sdk.domain.model.Workout
+import com.fitness.sdk.domain.model.Exercise
 import com.fitness.sdk.domain.repository.WorkoutRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -136,6 +137,18 @@ class WorkoutRepositoryImpl(
     override suspend fun deleteWorkout(id: Long) = withContext(Dispatchers.IO) {
         // Exercises and set records are deleted automatically via CASCADE
         workoutDao.deleteWorkout(id)
+    }
+
+    override suspend fun addExerciseToWorkout(workoutId: Long, exercise: Exercise) = withContext(Dispatchers.IO) {
+        // Map exercise to entity and insert
+        val exerciseEntity = ExerciseMapper.toEntity(exercise, workoutId)
+        val exerciseId = exerciseDao.insertExercise(exerciseEntity)
+
+        // Insert set records if any
+        if (exercise.setRecords.isNotEmpty()) {
+            val setEntities = ExerciseSetMapper.toEntityList(exercise.setRecords, exerciseId)
+            exerciseDao.insertExerciseSets(setEntities)
+        }
     }
 
     override fun observeWorkouts(): Flow<List<Workout>> {

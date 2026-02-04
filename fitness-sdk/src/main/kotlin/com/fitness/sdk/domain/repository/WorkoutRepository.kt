@@ -1,6 +1,7 @@
 package com.fitness.sdk.domain.repository
 
 import com.fitness.sdk.domain.model.Workout
+import com.fitness.sdk.domain.model.Exercise
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -48,6 +49,14 @@ interface WorkoutRepository {
      * @param workout The workout with updated values (must have valid ID)
      */
     suspend fun updateWorkout(workout: Workout)
+
+    /**
+     * Add an exercise to an existing workout.
+     *
+     * @param workoutId The ID of the workout to add the exercise to
+     * @param exercise The exercise to add
+     */
+    suspend fun addExerciseToWorkout(workoutId: Long, exercise: Exercise)
 
     /**
      * Delete a workout by its ID.

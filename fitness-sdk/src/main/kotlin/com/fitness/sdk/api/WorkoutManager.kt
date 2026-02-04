@@ -1,6 +1,7 @@
 package com.fitness.sdk.api
 
 import com.fitness.sdk.domain.model.Workout
+import com.fitness.sdk.domain.model.Exercise
 import com.fitness.sdk.domain.model.WorkoutType
 import kotlinx.coroutines.flow.Flow
 
@@ -57,6 +58,15 @@ interface WorkoutManager {
      * @return Result indicating success or failure
      */
     suspend fun updateWorkout(workout: Workout): Result<Unit>
+
+    /**
+     * Add an exercise to an existing workout.
+     *
+     * @param workoutId The ID of the workout
+     * @param exercise The exercise to add
+     * @return Result indicating success or failure
+     */
+    suspend fun addExerciseToWorkout(workoutId: Long, exercise: Exercise): Result<Unit>
 
     /**
      * Delete a workout.

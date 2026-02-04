@@ -130,6 +130,7 @@ workoutManager.getAllWorkouts()            // Returns Result<List<Workout>>
 workoutManager.getWorkout(id)              // Returns Result<Workout?>
 workoutManager.updateWorkout(workout)      // Returns Result<Unit>
 workoutManager.deleteWorkout(id)           // Returns Result<Unit>
+workoutManager.addExerciseToWorkout(id, exercise) // Returns Result<Unit>
 
 // Template operations
 templateManager.saveTemplate(template)     // Returns Result<Long>
@@ -190,7 +191,11 @@ src/main/kotlin/com/fitness/sample/
     │   ├── ActiveWorkoutScreen.kt    # Active session UI
     │   ├── TemplateViewModel.kt      # Template editor state
     │   ├── TemplateListViewModel.kt  # Template list state
-    │   └── ActiveWorkoutViewModel.kt # Active session state
+    │   ├── TemplateListViewModel.kt  # Template list state
+    │   ├── ActiveWorkoutViewModel.kt # Active session state (Coordinator)
+    │   ├── TimerManager.kt           # Workout/Rest timer logic
+    │   ├── SessionStateManager.kt    # Exercise/Set session logic
+    │   └── SetLogEntry.kt            # Logging data model
     └── exercise/
         ├── AddExerciseDialog.kt          # Add exercise modal
         ├── ExercisePickerScreen.kt       # Browse exercise library

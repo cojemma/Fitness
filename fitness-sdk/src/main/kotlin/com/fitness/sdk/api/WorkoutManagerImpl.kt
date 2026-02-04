@@ -1,12 +1,14 @@
 package com.fitness.sdk.api
 
 import com.fitness.sdk.domain.model.Workout
+import com.fitness.sdk.domain.model.Exercise
 import com.fitness.sdk.domain.model.WorkoutType
 import com.fitness.sdk.domain.usecase.DeleteWorkoutUseCase
 import com.fitness.sdk.domain.usecase.GetWorkoutByIdUseCase
 import com.fitness.sdk.domain.usecase.GetWorkoutsUseCase
 import com.fitness.sdk.domain.usecase.SaveWorkoutUseCase
 import com.fitness.sdk.domain.usecase.UpdateWorkoutUseCase
+import com.fitness.sdk.domain.usecase.AddExerciseToWorkoutUseCase
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -18,7 +20,8 @@ internal class WorkoutManagerImpl(
     private val getWorkoutsUseCase: GetWorkoutsUseCase,
     private val getWorkoutByIdUseCase: GetWorkoutByIdUseCase,
     private val updateWorkoutUseCase: UpdateWorkoutUseCase,
-    private val deleteWorkoutUseCase: DeleteWorkoutUseCase
+    private val deleteWorkoutUseCase: DeleteWorkoutUseCase,
+    private val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase
 ) : WorkoutManager {
 
     override suspend fun createWorkout(workout: Workout): Result<Long> {
@@ -55,5 +58,9 @@ internal class WorkoutManagerImpl(
 
     override fun observeWorkout(id: Long): Flow<Workout?> {
         return getWorkoutByIdUseCase.observe(id)
+    }
+
+    override suspend fun addExerciseToWorkout(workoutId: Long, exercise: Exercise): Result<Unit> {
+        return addExerciseToWorkoutUseCase(workoutId, exercise)
     }
 }

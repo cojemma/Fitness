@@ -6,8 +6,6 @@ import com.fitness.sdk.FitnessSDK
 import com.fitness.sdk.domain.model.Exercise
 import com.fitness.sdk.domain.model.LastSessionData
 import com.fitness.sdk.domain.model.Workout
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,43 +13,27 @@ import kotlinx.coroutines.launch
 
 /**
  * ViewModel for managing an active workout session.
+ * Delegates logic to TimerManager and SessionStateManager.
  */
 class ActiveWorkoutViewModel : ViewModel() {
 
     private val templateManager = FitnessSDK.getTemplateManager()
     private val workoutManager = FitnessSDK.getWorkoutManager()
 
-    // Workout state
-    private val _workout = MutableStateFlow<Workout?>(null)
-    val workout: StateFlow<Workout?> = _workout.asStateFlow()
+    // MANAGERS
+    private val timerManager = TimerManager(viewModelScope)
+    private val sessionStateManager = SessionStateManager()
 
-    private val _lastSessionData = MutableStateFlow<LastSessionData?>(null)
-    val lastSessionData: StateFlow<LastSessionData?> = _lastSessionData.asStateFlow()
+    // DELEGATED STATE
+    val workout: StateFlow<Workout?> = sessionStateManager.workout
+    val lastSessionData: StateFlow<LastSessionData?> = sessionStateManager.lastSessionData
+    val currentExerciseIndex: StateFlow<Int> = sessionStateManager.currentExerciseIndex
+    val currentSetIndex: StateFlow<Int> = sessionStateManager.currentSetIndex
+    val completedSets: StateFlow<Map<Int, List<SetLogEntry>>> = sessionStateManager.completedSets
 
-    private val _currentExerciseIndex = MutableStateFlow(0)
-    val currentExerciseIndex: StateFlow<Int> = _currentExerciseIndex.asStateFlow()
-
-    private val _currentSetIndex = MutableStateFlow(0)
-    val currentSetIndex: StateFlow<Int> = _currentSetIndex.asStateFlow()
-
-    // Set logging state per exercise
-    private val _completedSets = MutableStateFlow<Map<Int, List<SetLogEntry>>>(emptyMap())
-    val completedSets: StateFlow<Map<Int, List<SetLogEntry>>> = _completedSets.asStateFlow()
-
-    // Rest timer
-    private val _restTimeRemaining = MutableStateFlow(0)
-    val restTimeRemaining: StateFlow<Int> = _restTimeRemaining.asStateFlow()
-
-    private val _isResting = MutableStateFlow(false)
-    val isResting: StateFlow<Boolean> = _isResting.asStateFlow()
-
-    private var restTimerJob: Job? = null
-
-    // Workout timer
-    private val _elapsedSeconds = MutableStateFlow(0)
-    val elapsedSeconds: StateFlow<Int> = _elapsedSeconds.asStateFlow()
-
-    private var workoutTimerJob: Job? = null
+    val restTimeRemaining: StateFlow<Int> = timerManager.restTimeRemaining
+    val isResting: StateFlow<Boolean> = timerManager.isResting
+    val elapsedSeconds: StateFlow<Int> = timerManager.elapsedSeconds
 
     // UI state
     private val _error = MutableStateFlow<String?>(null)
@@ -63,11 +45,9 @@ class ActiveWorkoutViewModel : ViewModel() {
     private val _workoutCompleted = MutableStateFlow(false)
     val workoutCompleted: StateFlow<Boolean> = _workoutCompleted.asStateFlow()
 
-    // Saved workout ID for potential template creation
     private val _savedWorkoutId = MutableStateFlow<Long?>(null)
     val savedWorkoutId: StateFlow<Long?> = _savedWorkoutId.asStateFlow()
 
-    // Template save success
     private val _templateSaved = MutableStateFlow(false)
     val templateSaved: StateFlow<Boolean> = _templateSaved.asStateFlow()
 
@@ -78,14 +58,14 @@ class ActiveWorkoutViewModel : ViewModel() {
             // Get last session data first
             templateManager.getLastSessionData(templateId)
                 .onSuccess { data ->
-                    _lastSessionData.value = data
+                    sessionStateManager.setLastSessionData(data)
                 }
 
             // Start workout from template
             templateManager.startWorkout(templateId, preloadLastSession = true)
                 .onSuccess { workout ->
-                    _workout.value = workout
-                    startWorkoutTimer()
+                    sessionStateManager.setWorkout(workout)
+                    timerManager.startWorkoutTimer()
                 }
                 .onFailure { e ->
                     _error.value = e.message ?: "Failed to start workout"
@@ -95,111 +75,52 @@ class ActiveWorkoutViewModel : ViewModel() {
         }
     }
 
-    private fun startWorkoutTimer() {
-        workoutTimerJob?.cancel()
-        workoutTimerJob = viewModelScope.launch {
-            while (true) {
-                delay(1000)
-                _elapsedSeconds.value++
-            }
-        }
-    }
-
-    fun getCurrentExercise(): Exercise? {
-        val workout = _workout.value ?: return null
-        val index = _currentExerciseIndex.value
-        return workout.exercises.getOrNull(index)
-    }
-
-    fun getTargetReps(): Int {
-        return getCurrentExercise()?.reps ?: 10
-    }
-
-    fun getTargetWeight(): Float? {
-        return getCurrentExercise()?.weight
-    }
-
-    fun getLastSetData(exerciseName: String, setNumber: Int): String? {
-        val lastData = _lastSessionData.value?.getSetData(exerciseName, setNumber)
-        return lastData?.getDisplayString()
-    }
+    fun getCurrentExercise(): Exercise? = sessionStateManager.getCurrentExercise()
+    fun getTargetReps(): Int = sessionStateManager.getTargetReps()
+    fun getTargetWeight(): Float? = sessionStateManager.getTargetWeight()
+    fun getLastSetData(exerciseName: String, setNumber: Int): String? = 
+        sessionStateManager.getLastSetData(exerciseName, setNumber)
 
     fun logSet(reps: Int, weight: Float?) {
-        val exerciseIndex = _currentExerciseIndex.value
-        val setIndex = _currentSetIndex.value
-        
-        val entry = SetLogEntry(
-            setNumber = setIndex + 1,
-            reps = reps,
-            weight = weight
-        )
-
-        val current = _completedSets.value.toMutableMap()
-        val exerciseSets = current[exerciseIndex]?.toMutableList() ?: mutableListOf()
-        exerciseSets.add(entry)
-        current[exerciseIndex] = exerciseSets
-        _completedSets.value = current
-
-        // Move to next set or exercise
-        val exercise = getCurrentExercise()
-        if (exercise != null && setIndex + 1 < exercise.sets) {
-            _currentSetIndex.value++
-            startRestTimer(exercise.restSeconds)
-        } else {
-            // Move to next exercise
-            nextExercise()
-        }
-    }
-
-    private fun startRestTimer(seconds: Int) {
-        if (seconds <= 0) return
-        
-        restTimerJob?.cancel()
-        _restTimeRemaining.value = seconds
-        _isResting.value = true
-
-        restTimerJob = viewModelScope.launch {
-            while (_restTimeRemaining.value > 0) {
-                delay(1000)
-                _restTimeRemaining.value--
+        val shouldRest = sessionStateManager.logSet(reps, weight)
+        if (shouldRest) {
+            val exercise = sessionStateManager.getCurrentExercise()
+            if (exercise != null) {
+                timerManager.startRestTimer(exercise.restSeconds)
             }
-            _isResting.value = false
+        } else {
+            // Moved to next exercise without rest (or last set of last exercise)
+            timerManager.skipRest() 
         }
     }
 
     fun skipRest() {
-        restTimerJob?.cancel()
-        _restTimeRemaining.value = 0
-        _isResting.value = false
+        timerManager.skipRest()
     }
 
     fun previousExercise() {
-        if (_currentExerciseIndex.value > 0) {
-            _currentExerciseIndex.value--
-            _currentSetIndex.value = 0
-        }
+        sessionStateManager.previousExercise()
+        timerManager.skipRest() // Cancel rest if navigating
     }
 
     fun nextExercise() {
-        val workout = _workout.value ?: return
-        if (_currentExerciseIndex.value < workout.exercises.size - 1) {
-            _currentExerciseIndex.value++
-            _currentSetIndex.value = 0
-        }
+        sessionStateManager.nextExercise()
+        timerManager.skipRest() // Cancel rest if navigating
     }
 
     fun finishWorkout() {
         viewModelScope.launch {
-            workoutTimerJob?.cancel()
-            restTimerJob?.cancel()
+            timerManager.stopWorkoutTimer()
+            timerManager.skipRest()
 
-            val workout = _workout.value ?: return@launch
+            val workout = workout.value ?: return@launch
+            val setsMap = completedSets.value
 
             // Build exercises with actual logged set data
+            // Note: This logic could move to a specialized mapper or helper if it grows
             val updatedExercises = workout.exercises.mapIndexed { index, exercise ->
-                val loggedSets = _completedSets.value[index] ?: emptyList()
+                val loggedSets = setsMap[index] ?: emptyList()
                 
-                // Convert logged sets to ExerciseSet domain objects
                 val setRecords = loggedSets.map { entry ->
                     com.fitness.sdk.domain.model.ExerciseSet(
                         setNumber = entry.setNumber,
@@ -210,7 +131,6 @@ class ActiveWorkoutViewModel : ViewModel() {
                     )
                 }
 
-                // Calculate summary values from logged data for backward compatibility
                 val avgReps = if (loggedSets.isNotEmpty()) {
                     loggedSets.map { it.reps }.average().toInt()
                 } else exercise.reps
@@ -229,7 +149,7 @@ class ActiveWorkoutViewModel : ViewModel() {
 
             val finishedWorkout = workout.copy(
                 exercises = updatedExercises,
-                durationMinutes = (_elapsedSeconds.value / 60).coerceAtLeast(1),
+                durationMinutes = (elapsedSeconds.value / 60).coerceAtLeast(1),
                 endTime = System.currentTimeMillis()
             )
 
@@ -248,9 +168,6 @@ class ActiveWorkoutViewModel : ViewModel() {
         _error.value = null
     }
 
-    /**
-     * Save the completed workout as a new template.
-     */
     fun saveAsTemplate(name: String, description: String? = null) {
         val workoutId = _savedWorkoutId.value ?: return
         viewModelScope.launch {
@@ -264,13 +181,9 @@ class ActiveWorkoutViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Update the original template with the current workout's data.
-     * Only available when the workout was started from a template.
-     */
     fun updateOriginalTemplate() {
         val workoutId = _savedWorkoutId.value ?: return
-        val workout = _workout.value ?: return
+        val workout = workout.value ?: return
         val templateId = workout.templateId ?: return
         
         viewModelScope.launch {
@@ -284,25 +197,12 @@ class ActiveWorkoutViewModel : ViewModel() {
         }
     }
 
-    /**
-     * Get the original template ID if the workout was started from a template.
-     */
     fun getOriginalTemplateId(): Long? {
-        return _workout.value?.templateId
+        return workout.value?.templateId
     }
 
     override fun onCleared() {
         super.onCleared()
-        workoutTimerJob?.cancel()
-        restTimerJob?.cancel()
+        timerManager.cancelAll()
     }
 }
-
-/**
- * Entry for a logged set.
- */
-data class SetLogEntry(
-    val setNumber: Int,
-    val reps: Int,
-    val weight: Float?
-)

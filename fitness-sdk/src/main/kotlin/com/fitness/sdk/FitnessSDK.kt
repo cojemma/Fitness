@@ -29,6 +29,7 @@ import com.fitness.sdk.domain.usecase.SearchExercisesUseCase
 import com.fitness.sdk.domain.usecase.StartWorkoutFromTemplateUseCase
 import com.fitness.sdk.domain.usecase.UpdateTemplateFromWorkoutUseCase
 import com.fitness.sdk.domain.usecase.UpdateWorkoutUseCase
+import com.fitness.sdk.domain.usecase.AddExerciseToWorkoutUseCase
 
 /**
  * Main entry point for the Fitness SDK.
@@ -118,6 +119,7 @@ object FitnessSDK {
             val getWorkoutByIdUseCase = GetWorkoutByIdUseCase(repository)
             val updateWorkoutUseCase = UpdateWorkoutUseCase(repository)
             val deleteWorkoutUseCase = DeleteWorkoutUseCase(repository)
+            val addExerciseToWorkoutUseCase = AddExerciseToWorkoutUseCase(repository)
 
             // Create WorkoutManager
             workoutManager = WorkoutManagerImpl(
@@ -125,7 +127,8 @@ object FitnessSDK {
                 getWorkoutsUseCase,
                 getWorkoutByIdUseCase,
                 updateWorkoutUseCase,
-                deleteWorkoutUseCase
+                deleteWorkoutUseCase,
+                addExerciseToWorkoutUseCase
             )
 
             // Create exercise library

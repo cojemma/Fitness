@@ -36,7 +36,7 @@ A reference implementation using the SDK.
 
 ## The Feature Loop
 ### Current State
-**Version 1.4.0**
+**Version 1.5.0**
 - **Core CRUD**: Workouts and Exercises can be created, read, updated, and deleted.
 - **Exercise Library**: Pre-loaded library of 55+ exercises with categorization.
 - **Template System**: 
@@ -47,6 +47,9 @@ A reference implementation using the SDK.
     - **Save as Template**: Options to replace original template, save as new, or skip after workout completion.
 - **Per-Set Recording**: Individual set records (weight, reps) stored in database via `ExerciseSet` entity.
 - **Data Persistence**: Robust local storage using Room.
+- **Architecture Refactor**: 
+    - **Active Workout**: Split logic into `ActiveWorkoutViewModel` (Coordination), `TimerManager` (Time tracking), and `SessionStateManager` (Exercise/Set logic) for better maintainability.
+    - **SDK**: Added `addExerciseToWorkout` capability for dynamic workout modification.
 
 ### Active Development (Next Steps)
 1.  **Rest Timer Notifications**: Audio/vibration feedback when rest timer completes.
