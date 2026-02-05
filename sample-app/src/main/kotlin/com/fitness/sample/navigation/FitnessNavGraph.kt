@@ -1,6 +1,7 @@
 package com.fitness.sample.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,6 +16,7 @@ import androidx.navigation.navArgument
 import com.fitness.sample.ui.exercise.ExercisePickerScreen
 import com.fitness.sample.ui.home.HomeScreen
 import com.fitness.sample.ui.template.ActiveWorkoutScreen
+import com.fitness.sample.ui.template.ActiveWorkoutViewModel
 import com.fitness.sample.ui.template.AddTemplateScreen
 import com.fitness.sample.ui.template.TemplateListScreen
 import com.fitness.sample.ui.template.TemplateViewModel
@@ -283,6 +285,12 @@ fun FitnessNavGraph(
         ) { backStackEntry ->
             val templateId = backStackEntry.arguments?.getLong("templateId") ?: 0L
 
+            // ViewModel scoped to this destination's back stack entry (persists while on back stack)
+            val activeWorkoutViewModel: ActiveWorkoutViewModel = viewModel(backStackEntry)
+
+            // Check if we have a pending exercise from the picker
+            val exerciseToAdd = if (pendingExerciseSource == "active_workout") selectedExercise else null
+
             ActiveWorkoutScreen(
                 templateId = templateId,
                 onNavigateBack = {
@@ -293,7 +301,17 @@ fun FitnessNavGraph(
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Templates.route) { inclusive = false }
                     }
-                }
+                },
+                onAddExercise = {
+                    pendingExerciseSource = "active_workout"
+                    navController.navigate(Screen.ExercisePicker.createRoute("active_workout"))
+                },
+                pendingExercise = exerciseToAdd,
+                onExerciseConsumed = {
+                    selectedExercise = null
+                    pendingExerciseSource = null
+                },
+                viewModel = activeWorkoutViewModel
             )
         }
     }

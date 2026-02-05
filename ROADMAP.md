@@ -36,6 +36,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Workout templates | ✅ | Save and reuse workout routines, update from completed workouts |
 | Per-set recording | ✅ | Store individual set records (weight, reps) per exercise |
 | Last Session Data | ✅ | Pre-load previous performance data for progressive overload |
+| Add exercise to workout | ✅ | Add an exercise to an existing workout |
 
 ### SDK - To Develop
 
@@ -64,7 +65,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Exercise picker | ✅ | Browse and select from exercise library |
 | Template list | ✅ | List of saved workout templates |
 | Add template | ✅ | Create/Edit workout template |
-| Active workout | ✅ | Session view with timer and set logging |
+| Active workout | ✅ | Session view with timer, set logging, and add exercise from library (FAB) |
 
 ### UI Components
 
@@ -122,7 +123,7 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.5.0 | 2026-02-04 | Refactoring: Split ActiveWorkoutViewModel into TimerManager and SessionStateManager. Added SDK support for adding exercises to active workouts. |
+| 1.5.0 | 2026-02-04 | Refactoring: Split ActiveWorkoutViewModel into TimerManager and SessionStateManager. SDK addExerciseToWorkout. Add exercise during active workout (FAB + library picker). SessionStateManager merge on setWorkout to prevent race with async startWorkout. |
 | 1.4.0 | 2026-02-04 | Execution & UX: Progressive overload tracking (last session data), "Save as Template" with replacement logic, Rest Timer auto-start. |
 | 1.3.0 | 2026-02-04 | Per-Set Recording: Store individual set records (weight, reps) for detailed tracking. Display per-set data in workout details. |
 | 1.2.0 | 2026-02-03 | Workout Template System: Create, edit, and start workouts from templates. Active workout session UI. |
@@ -136,4 +137,4 @@ These features exist for testing or demonstration purposes:
 1. **Swipe to delete** - Better UX for deleting workouts
 2. **Search workouts** - Find workouts quickly
 3. **Charts** - Visualize workout progress
-4. **Workout timer** - Built-in rest timer between sets
+4. **Rest timer notifications** - Audio/vibration when rest timer completes

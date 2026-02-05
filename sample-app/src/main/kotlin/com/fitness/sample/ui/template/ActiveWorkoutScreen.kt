@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,6 +44,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -66,6 +68,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sdk.domain.model.ExerciseDefinition
 
 /**
  * Active workout session screen with set logging and rest timer.
@@ -76,6 +79,9 @@ fun ActiveWorkoutScreen(
     templateId: Long,
     onNavigateBack: () -> Unit,
     onWorkoutComplete: () -> Unit,
+    onAddExercise: () -> Unit = {},
+    pendingExercise: ExerciseDefinition? = null,
+    onExerciseConsumed: (() -> Unit)? = null,
     viewModel: ActiveWorkoutViewModel = viewModel()
 ) {
     val workout by viewModel.workout.collectAsState()
@@ -104,6 +110,14 @@ fun ActiveWorkoutScreen(
     // Start workout
     LaunchedEffect(templateId) {
         viewModel.startWorkout(templateId)
+    }
+
+    // Handle pending exercise from library picker
+    LaunchedEffect(pendingExercise) {
+        pendingExercise?.let { definition ->
+            viewModel.addExercise(definition)
+            onExerciseConsumed?.invoke()
+        }
     }
 
     // Handle workout completion - show save as template dialog
@@ -305,7 +319,19 @@ fun ActiveWorkoutScreen(
                 )
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddExercise,
+                shape = RoundedCornerShape(16.dp),
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Exercise"
+                )
+            }
+        }
     ) { paddingValues ->
         when {
             isLoading -> {

@@ -19,6 +19,12 @@ class SessionStateManager {
     private val _workout = MutableStateFlow<Workout?>(null)
     val workout: StateFlow<Workout?> = _workout.asStateFlow()
 
+    /**
+     * Exercises added before the workout is fully loaded.
+     * This can happen if the user opens the picker while the template workout is still starting.
+     */
+    private val pendingExercises = mutableListOf<Exercise>()
+
     private val _currentExerciseIndex = MutableStateFlow(0)
     val currentExerciseIndex: StateFlow<Int> = _currentExerciseIndex.asStateFlow()
 
@@ -31,8 +37,25 @@ class SessionStateManager {
     private val _lastSessionData = MutableStateFlow<LastSessionData?>(null)
     val lastSessionData: StateFlow<LastSessionData?> = _lastSessionData.asStateFlow()
 
+    /**
+     * Sets the workout (e.g. when template load completes).
+     * Merges in any exercises added during load to avoid race with addExercise():
+     * - Exercises in pendingExercises (added while workout was null)
+     * - Exercises already in current state but not in incoming template (added after UI showed, before startWorkout() returned)
+     */
     fun setWorkout(workout: Workout) {
-        _workout.value = workout
+        val templateNames = workout.exercises.map { it.name }.toSet()
+        val current = _workout.value
+        val addedDuringLoad = if (current != null) {
+            current.exercises.filter { it.name !in templateNames }
+        } else {
+            emptyList()
+        }
+        val pending = pendingExercises.toList()
+        pendingExercises.clear()
+        val allExtra = pending + addedDuringLoad
+        val merged = if (allExtra.isEmpty()) workout else workout.copy(exercises = workout.exercises + allExtra)
+        _workout.value = merged
     }
 
     fun setLastSessionData(data: LastSessionData?) {
@@ -103,5 +126,19 @@ class SessionStateManager {
     fun getLastSetData(exerciseName: String, setNumber: Int): String? {
         val lastData = _lastSessionData.value?.getSetData(exerciseName, setNumber)
         return lastData?.getDisplayString()
+    }
+
+    /**
+     * Adds an exercise to the current workout.
+     * The exercise is appended to the end of the exercise list.
+     */
+    fun addExercise(exercise: Exercise) {
+        val currentWorkout = _workout.value
+        if (currentWorkout == null) {
+            pendingExercises.add(exercise)
+            return
+        }
+
+        _workout.value = currentWorkout.copy(exercises = currentWorkout.exercises + exercise)
     }
 }

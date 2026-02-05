@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fitness.sdk.FitnessSDK
 import com.fitness.sdk.domain.model.Exercise
+import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.LastSessionData
 import com.fitness.sdk.domain.model.Workout
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -199,6 +200,15 @@ class ActiveWorkoutViewModel : ViewModel() {
 
     fun getOriginalTemplateId(): Long? {
         return workout.value?.templateId
+    }
+
+    /**
+     * Adds an exercise to the current active workout.
+     * Converts ExerciseDefinition to Exercise and adds it to the session state.
+     */
+    fun addExercise(exerciseDefinition: ExerciseDefinition) {
+        val exercise = exerciseDefinition.toExercise()
+        sessionStateManager.addExercise(exercise)
     }
 
     override fun onCleared() {
