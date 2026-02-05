@@ -13,6 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.fitness.sample.ui.exercise.ExerciseListScreen
 import com.fitness.sample.ui.exercise.ExercisePickerScreen
 import com.fitness.sample.ui.home.HomeScreen
 import com.fitness.sample.ui.template.ActiveWorkoutScreen
@@ -38,6 +39,9 @@ sealed class Screen(val route: String) {
     object ExercisePicker : Screen("exercise_picker/{source}") {
         fun createRoute(source: String) = "exercise_picker/$source"
     }
+
+    // Exercise list route
+    object Exercises : Screen("exercises")
 
     // Template routes
     object Templates : Screen("templates")
@@ -189,6 +193,16 @@ fun FitnessNavGraph(
                 onExerciseSelected = { exercise ->
                     selectedExercise = exercise
                     navController.popBackStack()
+                }
+            )
+        }
+
+        // ========== Exercise List Route ==========
+
+        composable(Screen.Exercises.route) {
+            ExerciseListScreen(
+                onWorkoutClick = { workoutId ->
+                    navController.navigate(Screen.WorkoutDetails.createRoute(workoutId))
                 }
             )
         }

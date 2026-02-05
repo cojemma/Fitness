@@ -1,7 +1,8 @@
 package com.fitness.sdk.domain.repository
 
-import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.model.Exercise
+import com.fitness.sdk.domain.model.ExerciseHistory
+import com.fitness.sdk.domain.model.Workout
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -79,4 +80,13 @@ interface WorkoutRepository {
      * @return Flow emitting the workout whenever it changes
      */
     fun observeWorkoutById(id: Long): Flow<Workout?>
+
+    /**
+     * Get aggregated history for an exercise by name.
+     * Includes total sessions, max weight, estimated 1RM, and session summaries.
+     *
+     * @param exerciseName The display name of the exercise (must match stored exercise names)
+     * @return ExerciseHistory with stats and session list
+     */
+    suspend fun getExerciseHistory(exerciseName: String): ExerciseHistory
 }

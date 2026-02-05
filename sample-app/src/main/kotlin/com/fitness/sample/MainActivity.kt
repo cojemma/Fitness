@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +58,12 @@ fun MainScreen() {
             title = "Workouts",
             selectedIcon = Icons.Filled.DateRange,
             unselectedIcon = Icons.Outlined.DateRange
+        ),
+        BottomNavItem(
+            route = Screen.Exercises.route,
+            title = "Exercises",
+            selectedIcon = Icons.Filled.FitnessCenter,
+            unselectedIcon = Icons.Outlined.FitnessCenter
         ),
         BottomNavItem(
             route = Screen.Templates.route,

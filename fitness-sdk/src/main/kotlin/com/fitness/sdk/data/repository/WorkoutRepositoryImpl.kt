@@ -5,8 +5,10 @@ import com.fitness.sdk.data.local.dao.WorkoutDao
 import com.fitness.sdk.data.mapper.ExerciseMapper
 import com.fitness.sdk.data.mapper.ExerciseSetMapper
 import com.fitness.sdk.data.mapper.WorkoutMapper
-import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.model.Exercise
+import com.fitness.sdk.domain.model.ExerciseHistory
+import com.fitness.sdk.domain.model.ExerciseSessionSummary
+import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.repository.WorkoutRepository
 import com.fitness.sdk.data.local.entity.WorkoutWithExercises
 import kotlinx.coroutines.Dispatchers
@@ -137,6 +139,79 @@ class WorkoutRepositoryImpl(
             }
             emit(workout)
         }
+    }
+
+    override suspend fun getExerciseHistory(exerciseName: String): ExerciseHistory = withContext(Dispatchers.IO) {
+        val records = exerciseDao.getExerciseHistoryByName(exerciseName)
+        computeExerciseHistory(records)
+    }
+
+    /**
+     * Compute aggregated exercise history from raw records.
+     * Uses Epley formula for 1RM: 1RM = weight × (1 + reps/30)
+     */
+    private fun computeExerciseHistory(records: List<com.fitness.sdk.data.local.entity.ExerciseHistoryRecord>): ExerciseHistory {
+        if (records.isEmpty()) {
+            return ExerciseHistory(
+                totalSessions = 0,
+                totalSets = 0,
+                maxWeight = null,
+                estimated1RM = null,
+                historyByDate = emptyList()
+            )
+        }
+
+        val workingSets = records.filter { !it.isWarmupSet }
+        val totalSessions = records.map { it.workoutId }.distinct().size
+        val totalSets = records.size
+
+        val maxWeight = workingSets
+            .mapNotNull { it.weight }
+            .maxOrNull()
+
+        val estimated1RM = workingSets
+            .filter { it.weight != null && it.reps >= 1 }
+            .mapNotNull { record ->
+                record.weight?.let { w ->
+                    calculateEpley1RM(w, record.reps)
+                }
+            }
+            .maxOrNull()
+
+        val sessionsByWorkout = records.groupBy { it.workoutId }
+        val historyByDate = sessionsByWorkout.map { (workoutId, sessionRecords) ->
+            val workoutDate = sessionRecords.first().workoutDate
+            val sessionWorkingSets = sessionRecords.filter { !it.isWarmupSet }
+            val bestSet = sessionWorkingSets
+                .filter { it.weight != null && it.reps >= 1 }
+                .maxByOrNull { it.weight ?: 0f }
+                ?.let { "${it.reps} × ${it.weight}kg" }
+                ?: sessionWorkingSets.firstOrNull()?.let { "${it.reps} reps" }
+                ?: "—"
+            val totalVolume = sessionRecords.sumOf { ((it.weight ?: 0f) * it.reps).toDouble() }.toFloat()
+
+            ExerciseSessionSummary(
+                workoutId = workoutId,
+                workoutDate = workoutDate,
+                bestSet = bestSet,
+                setsCount = sessionRecords.size,
+                totalVolume = totalVolume
+            )
+        }.sortedByDescending { it.workoutDate }
+            .take(5)
+
+        return ExerciseHistory(
+            totalSessions = totalSessions,
+            totalSets = totalSets,
+            maxWeight = maxWeight,
+            estimated1RM = estimated1RM,
+            historyByDate = historyByDate
+        )
+    }
+
+    private fun calculateEpley1RM(weight: Float, reps: Int): Float {
+        return if (reps == 1) weight
+        else weight * (1 + reps / 30f)
     }
 }
 

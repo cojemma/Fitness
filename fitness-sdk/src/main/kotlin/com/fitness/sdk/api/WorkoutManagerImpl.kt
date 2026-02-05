@@ -1,9 +1,11 @@
 package com.fitness.sdk.api
 
-import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.model.Exercise
+import com.fitness.sdk.domain.model.ExerciseHistory
+import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.model.WorkoutType
 import com.fitness.sdk.domain.usecase.DeleteWorkoutUseCase
+import com.fitness.sdk.domain.usecase.GetExerciseHistoryUseCase
 import com.fitness.sdk.domain.usecase.GetWorkoutByIdUseCase
 import com.fitness.sdk.domain.usecase.GetWorkoutsUseCase
 import com.fitness.sdk.domain.usecase.SaveWorkoutUseCase
@@ -21,7 +23,8 @@ internal class WorkoutManagerImpl(
     private val getWorkoutByIdUseCase: GetWorkoutByIdUseCase,
     private val updateWorkoutUseCase: UpdateWorkoutUseCase,
     private val deleteWorkoutUseCase: DeleteWorkoutUseCase,
-    private val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase
+    private val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase,
+    private val getExerciseHistoryUseCase: GetExerciseHistoryUseCase
 ) : WorkoutManager {
 
     override suspend fun createWorkout(workout: Workout): Result<Long> {
@@ -62,5 +65,13 @@ internal class WorkoutManagerImpl(
 
     override suspend fun addExerciseToWorkout(workoutId: Long, exercise: Exercise): Result<Unit> {
         return addExerciseToWorkoutUseCase(workoutId, exercise)
+    }
+
+    override suspend fun getExerciseHistory(exerciseName: String): Result<ExerciseHistory> {
+        return try {
+            Result.success(getExerciseHistoryUseCase(exerciseName))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }
