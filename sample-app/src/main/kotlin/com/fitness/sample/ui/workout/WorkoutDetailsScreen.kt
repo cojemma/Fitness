@@ -25,12 +25,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,10 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fitness.sample.ui.components.ExerciseItem
 import com.fitness.sample.ui.components.WorkoutTypeIcon
-import com.fitness.sample.ui.home.HomeViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,17 +49,33 @@ fun WorkoutDetailsScreen(
     workoutId: Long,
     onNavigateBack: () -> Unit,
     onEditWorkout: (Long) -> Unit,
-    viewModel: WorkoutViewModel = viewModel(),
-    homeViewModel: HomeViewModel = viewModel()
+    viewModel: WorkoutViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val exercises by viewModel.exercises.collectAsState()
+    val deleteCompleted by viewModel.deleteCompleted.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(workoutId) {
         viewModel.loadWorkout(workoutId)
     }
 
+    LaunchedEffect(deleteCompleted) {
+        if (deleteCompleted) {
+            viewModel.resetDeleteCompleted()
+            onNavigateBack()
+        }
+    }
+
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearError()
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Workout Details") },
@@ -80,10 +95,7 @@ fun WorkoutDetailsScreen(
                         )
                     }
                     IconButton(
-                        onClick = {
-                            homeViewModel.deleteWorkout(workoutId)
-                            onNavigateBack()
-                        }
+                        onClick = { viewModel.deleteWorkout(workoutId) }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,

@@ -8,8 +8,10 @@ import com.fitness.sdk.data.mapper.WorkoutMapper
 import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.model.Exercise
 import com.fitness.sdk.domain.repository.WorkoutRepository
+import com.fitness.sdk.data.local.entity.WorkoutWithExercises
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -44,31 +46,11 @@ class WorkoutRepositoryImpl(
         workoutId
     }
 
-    override suspend fun getWorkouts(): List<Workout> = withContext(Dispatchers.IO) {
-        val workoutsWithExercises = workoutDao.getAllWorkouts()
-        workoutsWithExercises.map { workoutWithExercises ->
-            val exerciseIds = workoutWithExercises.exercises.map { it.id }
-            val allSetRecords = if (exerciseIds.isNotEmpty()) {
-                exerciseDao.getExerciseSetsByExerciseIds(exerciseIds)
-            } else {
-                emptyList()
-            }
-            val setsByExercise = allSetRecords.groupBy { it.exerciseId }
-
-            val exercises = workoutWithExercises.exercises.map { entity ->
-                val setRecords = setsByExercise[entity.id]?.let { 
-                    ExerciseSetMapper.toDomainList(it) 
-                } ?: emptyList()
-                ExerciseMapper.toDomain(entity, setRecords)
-            }
-
-            WorkoutMapper.toDomain(workoutWithExercises.workout, exercises)
-        }
-    }
-
-    override suspend fun getWorkoutById(id: Long): Workout? = withContext(Dispatchers.IO) {
-        val workoutWithExercises = workoutDao.getWorkoutById(id) ?: return@withContext null
-        
+    /**
+     * Maps WorkoutWithExercises to domain Workout including set records.
+     * Must be called from a coroutine context (e.g. withContext(Dispatchers.IO)).
+     */
+    private suspend fun mapToWorkoutWithSetRecords(workoutWithExercises: WorkoutWithExercises): Workout {
         val exerciseIds = workoutWithExercises.exercises.map { it.id }
         val allSetRecords = if (exerciseIds.isNotEmpty()) {
             exerciseDao.getExerciseSetsByExerciseIds(exerciseIds)
@@ -76,38 +58,26 @@ class WorkoutRepositoryImpl(
             emptyList()
         }
         val setsByExercise = allSetRecords.groupBy { it.exerciseId }
-
         val exercises = workoutWithExercises.exercises.map { entity ->
-            val setRecords = setsByExercise[entity.id]?.let { 
-                ExerciseSetMapper.toDomainList(it) 
+            val setRecords = setsByExercise[entity.id]?.let {
+                ExerciseSetMapper.toDomainList(it)
             } ?: emptyList()
             ExerciseMapper.toDomain(entity, setRecords)
         }
+        return WorkoutMapper.toDomain(workoutWithExercises.workout, exercises)
+    }
 
-        WorkoutMapper.toDomain(workoutWithExercises.workout, exercises)
+    override suspend fun getWorkouts(): List<Workout> = withContext(Dispatchers.IO) {
+        workoutDao.getAllWorkouts().map { mapToWorkoutWithSetRecords(it) }
+    }
+
+    override suspend fun getWorkoutById(id: Long): Workout? = withContext(Dispatchers.IO) {
+        workoutDao.getWorkoutById(id)?.let { mapToWorkoutWithSetRecords(it) }
     }
 
     override suspend fun getWorkoutsByDateRange(startTime: Long, endTime: Long): List<Workout> =
         withContext(Dispatchers.IO) {
-            val workoutsWithExercises = workoutDao.getWorkoutsByDateRange(startTime, endTime)
-            workoutsWithExercises.map { workoutWithExercises ->
-                val exerciseIds = workoutWithExercises.exercises.map { it.id }
-                val allSetRecords = if (exerciseIds.isNotEmpty()) {
-                    exerciseDao.getExerciseSetsByExerciseIds(exerciseIds)
-                } else {
-                    emptyList()
-                }
-                val setsByExercise = allSetRecords.groupBy { it.exerciseId }
-
-                val exercises = workoutWithExercises.exercises.map { entity ->
-                    val setRecords = setsByExercise[entity.id]?.let { 
-                        ExerciseSetMapper.toDomainList(it) 
-                    } ?: emptyList()
-                    ExerciseMapper.toDomain(entity, setRecords)
-                }
-
-                WorkoutMapper.toDomain(workoutWithExercises.workout, exercises)
-            }
+            workoutDao.getWorkoutsByDateRange(startTime, endTime).map { mapToWorkoutWithSetRecords(it) }
         }
 
     override suspend fun updateWorkout(workout: Workout) = withContext(Dispatchers.IO) {
@@ -151,15 +121,21 @@ class WorkoutRepositoryImpl(
         }
     }
 
-    override fun observeWorkouts(): Flow<List<Workout>> {
-        return workoutDao.observeAllWorkouts().map { workoutsWithExercises ->
-            WorkoutMapper.toDomainList(workoutsWithExercises)
+    override fun observeWorkouts(): Flow<List<Workout>> = flow {
+        workoutDao.observeAllWorkouts().collect { workoutsWithExercises ->
+            val workouts = withContext(Dispatchers.IO) {
+                workoutsWithExercises.map { mapToWorkoutWithSetRecords(it) }
+            }
+            emit(workouts)
         }
     }
 
-    override fun observeWorkoutById(id: Long): Flow<Workout?> {
-        return workoutDao.observeWorkoutById(id).map { workoutWithExercises ->
-            workoutWithExercises?.let { WorkoutMapper.toDomain(it) }
+    override fun observeWorkoutById(id: Long): Flow<Workout?> = flow {
+        workoutDao.observeWorkoutById(id).collect { workoutWithExercises ->
+            val workout = workoutWithExercises?.let {
+                withContext(Dispatchers.IO) { mapToWorkoutWithSetRecords(it) }
+            }
+            emit(workout)
         }
     }
 }

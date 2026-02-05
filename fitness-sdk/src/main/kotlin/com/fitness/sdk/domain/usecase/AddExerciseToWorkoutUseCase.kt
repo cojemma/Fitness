@@ -18,6 +18,9 @@ class AddExerciseToWorkoutUseCase(
      */
     suspend operator fun invoke(workoutId: Long, exercise: Exercise): Result<Unit> {
         return try {
+            if (workoutRepository.getWorkoutById(workoutId) == null) {
+                return Result.failure(NoSuchElementException("Workout not found: $workoutId"))
+            }
             workoutRepository.addExerciseToWorkout(workoutId, exercise)
             Result.success(Unit)
         } catch (e: Exception) {

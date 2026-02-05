@@ -24,6 +24,10 @@ class WorkoutViewModel : ViewModel() {
     private val _savedWorkoutId = MutableStateFlow<Long?>(null)
     val savedWorkoutId: StateFlow<Long?> = _savedWorkoutId.asStateFlow()
 
+    /** Set to true when delete succeeds; UI should navigate back. */
+    private val _deleteCompleted = MutableStateFlow(false)
+    val deleteCompleted: StateFlow<Boolean> = _deleteCompleted.asStateFlow()
+
     // Track if we've already loaded a workout to prevent overwriting user changes
     private var loadedWorkoutId: Long? = null
 
@@ -134,6 +138,26 @@ class WorkoutViewModel : ViewModel() {
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    /**
+     * Delete a workout by ID. On success, sets deleteCompleted so the UI can navigate back.
+     * On failure, sets error in uiState for the current screen to show.
+     */
+    fun deleteWorkout(workoutId: Long) {
+        viewModelScope.launch {
+            workoutManager.deleteWorkout(workoutId)
+                .onSuccess {
+                    _deleteCompleted.value = true
+                }
+                .onFailure { e ->
+                    _uiState.value = _uiState.value.copy(error = e.message ?: "Failed to delete workout")
+                }
+        }
+    }
+
+    fun resetDeleteCompleted() {
+        _deleteCompleted.value = false
     }
 }
 
