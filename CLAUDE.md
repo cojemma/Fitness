@@ -69,10 +69,33 @@ Data (fitness-sdk/data)       → Room DB, DAOs, Entities, Mappers, Repository i
 
 ```kotlin
 FitnessSDK.initialize(context) { databaseName("fitness_db"); enableLogging(true) }
-FitnessSDK.getWorkoutManager()          // Workout CRUD
+FitnessSDK.getWorkoutManager()          // Workout CRUD + exercise session counts
 FitnessSDK.getExerciseLibraryManager()  // 55+ predefined exercises
 FitnessSDK.getTemplateManager()         // Template management
 ```
+
+## Localization
+
+- **Supported languages:** English (`values/strings.xml`), Traditional Chinese (`values-zh-rTW/strings.xml`)
+- **Runtime switching:** `AppCompatDelegate.setApplicationLocales()` — requires `AppCompatActivity`
+- **Config:** `res/xml/locales_config.xml` for Android 13+ system per-app language settings
+- **Manifest:** `AppLocalesMetadataHolderService` with `autoStoreLocales=true` for pre-Android 13 persistence
+- **Theme:** Must use `Theme.AppCompat.*` in AndroidManifest (not `Theme.Material.*`) — Compose layers Material 3 on top
+- **Shared utility:** `StringResUtil.kt` — `getMuscleGroupStringRes()` for muscle group name localization
+- **Settings screen:** `ui/settings/SettingsScreen.kt` — language picker dialog, accessible via gear icon in TopAppBar
+
+## Room DAO Guidelines
+
+- **Never use `@Insert(onConflict = OnConflictStrategy.REPLACE)` for batch inserts** where entities have `id = 0` (auto-generate). `REPLACE` causes later entities to overwrite earlier ones sharing the same PK=0. Use `@Insert` (default `ABORT` strategy) instead — Room auto-generates unique IDs correctly.
+- Single-entity inserts with `REPLACE` are safe when used for upsert semantics (e.g., `insertTemplate`).
+
+## Exercise List Sorting
+
+- **Default sort:** Exercise list page sorts by done times (session count, descending) — most-performed exercises appear first.
+- **SDK API:** `WorkoutManager.getExerciseSessionCounts()` returns `Result<Map<String, Int>>` — exercise name to distinct workout session count. `observeExerciseSessionCounts()` returns `Flow<Map<String, Int>>` for reactive updates.
+- **DAO query:** `ExerciseDao.getExerciseSessionCounts()` (one-shot) and `observeExerciseSessionCounts()` (Flow) use `COUNT(DISTINCT workoutId)` grouped by exercise name for efficiency.
+- **Sorting persists through filters:** Search and muscle group filters also apply the session count sort order.
+- **Reactivity:** ViewModel collects session counts via Flow. When counts change, the exercise history cache is invalidated so expanded details refresh on next access.
 
 ## Git Conventions
 

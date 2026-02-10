@@ -101,4 +101,19 @@ interface WorkoutManager {
      * @return Result containing ExerciseHistory with stats
      */
     suspend fun getExerciseHistory(exerciseName: String): Result<ExerciseHistory>
+
+    /**
+     * Get the number of workout sessions for each exercise.
+     *
+     * @return Result containing a map of exercise name to session count
+     */
+    suspend fun getExerciseSessionCounts(): Result<Map<String, Int>>
+
+    /**
+     * Observe the number of workout sessions for each exercise.
+     * Emits new map whenever workout data changes.
+     *
+     * @return Flow of exercise name to session count map
+     */
+    fun observeExerciseSessionCounts(): Flow<Map<String, Int>>
 }

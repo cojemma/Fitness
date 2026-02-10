@@ -89,4 +89,18 @@ interface WorkoutRepository {
      * @return ExerciseHistory with stats and session list
      */
     suspend fun getExerciseHistory(exerciseName: String): ExerciseHistory
+
+    /**
+     * Get session counts for all exercises.
+     *
+     * @return Map of exercise name to session count
+     */
+    suspend fun getExerciseSessionCounts(): Map<String, Int>
+
+    /**
+     * Observe session counts for all exercises as a Flow for reactive updates.
+     *
+     * @return Flow emitting map of exercise name to session count whenever data changes
+     */
+    fun observeExerciseSessionCounts(): Flow<Map<String, Int>>
 }

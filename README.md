@@ -67,6 +67,7 @@ src/main/kotlin/com/fitness/sdk/
 │       ├── UpdateWorkoutUseCase.kt
 │       ├── DeleteWorkoutUseCase.kt
 │       ├── GetExerciseLibraryUseCase.kt
+│       ├── GetExerciseSessionCountsUseCase.kt
 │       └── SearchExercisesUseCase.kt
 ├── data/
 │   ├── local/
@@ -78,6 +79,7 @@ src/main/kotlin/com/fitness/sdk/
 │   │       ├── WorkoutEntity.kt
 │   │       ├── ExerciseEntity.kt
 │   │       ├── ExerciseSetEntity.kt  # Per-set performance records
+│   │       ├── ExerciseSessionCount.kt  # Query result for session counts
 │   │       └── WorkoutWithExercises.kt
 │   ├── library/
 │   │   ├── ExerciseLibraryProvider.kt  # Interface
@@ -131,6 +133,8 @@ workoutManager.getWorkout(id)              // Returns Result<Workout?>
 workoutManager.updateWorkout(workout)      // Returns Result<Unit>
 workoutManager.deleteWorkout(id)           // Returns Result<Unit>
 workoutManager.addExerciseToWorkout(id, exercise) // Returns Result<Unit>
+workoutManager.getExerciseSessionCounts()         // Returns Result<Map<String, Int>>
+workoutManager.observeExerciseSessionCounts()     // Returns Flow<Map<String, Int>>
 
 // Template operations
 templateManager.saveTemplate(template)     // Returns Result<Long>
@@ -198,6 +202,8 @@ src/main/kotlin/com/fitness/sample/
     └── exercise/
         ├── AddExerciseDialog.kt          # Add exercise modal
         ├── ExercisePickerScreen.kt       # Browse exercise library
+        ├── ExerciseListScreen.kt         # Exercise list with history (sorted by done times)
+        ├── ExerciseListViewModel.kt      # Exercise list state with session count sorting
         └── ExerciseLibraryViewModel.kt   # Library search/filter
 ```
 

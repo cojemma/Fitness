@@ -45,11 +45,12 @@ A reference implementation using the SDK.
 
 ### Current State
 
-**Version 1.6.0**
+**Version 1.7.1**
 
 - **Core CRUD**: Workouts and Exercises can be created, read, updated, and deleted.
 - **Exercise Library**: Pre-loaded library of 55+ exercises with categorization.
-- **Exercise List Page**: New "Exercises" tab listing all exercises with expandable history. Each exercise shows total sessions, max weight, estimated 1RM (Epley formula), and session-by-session history. Tap a session to navigate to workout details.
+- **Exercise List Page**: "Exercises" tab listing all exercises with expandable history. Each exercise shows total sessions, max weight, estimated 1RM (Epley formula), and session-by-session history. Tap a session to navigate to workout details. **Default sort by done times** (most-performed exercises appear first).
+- **Exercise Session Counts API**: `WorkoutManager.getExerciseSessionCounts()` returns a map of exercise name to workout session count, enabling efficient sorting without loading full history. `observeExerciseSessionCounts()` provides a reactive Flow for real-time UI updates when workout data changes.
 - **Template System**:
   - Create/Edit templates.
   - Start active workout from template.

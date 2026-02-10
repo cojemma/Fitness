@@ -37,6 +37,8 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Per-set recording | ✅ | Store individual set records (weight, reps) per exercise |
 | Last Session Data | ✅ | Pre-load previous performance data for progressive overload |
 | Add exercise to workout | ✅ | Add an exercise to an existing workout |
+| Exercise session counts | ✅ | Get per-exercise workout session counts for sorting |
+| Reactive session counts | ✅ | Observe session counts via Flow for real-time UI updates |
 
 ### SDK - To Develop
 
@@ -90,6 +92,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Calendar view | 📋 | Medium | View workouts on calendar |
 | Charts/graphs | 📋 | Medium | Visualize progress over time |
 | Workout timer | ✅ | Medium | Built-in rest timer (Managed by TimerManager) |
+| Exercise sort by done times | ✅ | High | Default sort exercises by session count (most-performed first) |
 | Settings screen | 📋 | Low | App preferences |
 | Dark mode toggle | 📋 | Low | Manual theme switching |
 | Onboarding | 💡 | Low | First-time user guide |
@@ -123,6 +126,8 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.7.1 | 2026-02-10 | Fix: Exercise session counts and history now update in real-time via reactive Flow (`observeExerciseSessionCounts()`). History cache invalidation on data change. |
+| 1.7.0 | 2026-02-10 | Exercise list default sort by done times (session count). New SDK API: `getExerciseSessionCounts()`. |
 | 1.5.0 | 2026-02-04 | Refactoring: Split ActiveWorkoutViewModel into TimerManager and SessionStateManager. SDK addExerciseToWorkout. Add exercise during active workout (FAB + library picker). SessionStateManager merge on setWorkout to prevent race with async startWorkout. |
 | 1.4.0 | 2026-02-04 | Execution & UX: Progressive overload tracking (last session data), "Save as Template" with replacement logic, Rest Timer auto-start. |
 | 1.3.0 | 2026-02-04 | Per-Set Recording: Store individual set records (weight, reps) for detailed tracking. Display per-set data in workout details. |

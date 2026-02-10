@@ -11,6 +11,7 @@ import com.fitness.sdk.domain.usecase.GetWorkoutsUseCase
 import com.fitness.sdk.domain.usecase.SaveWorkoutUseCase
 import com.fitness.sdk.domain.usecase.UpdateWorkoutUseCase
 import com.fitness.sdk.domain.usecase.AddExerciseToWorkoutUseCase
+import com.fitness.sdk.domain.usecase.GetExerciseSessionCountsUseCase
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -24,7 +25,8 @@ internal class WorkoutManagerImpl(
     private val updateWorkoutUseCase: UpdateWorkoutUseCase,
     private val deleteWorkoutUseCase: DeleteWorkoutUseCase,
     private val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase,
-    private val getExerciseHistoryUseCase: GetExerciseHistoryUseCase
+    private val getExerciseHistoryUseCase: GetExerciseHistoryUseCase,
+    private val getExerciseSessionCountsUseCase: GetExerciseSessionCountsUseCase
 ) : WorkoutManager {
 
     override suspend fun createWorkout(workout: Workout): Result<Long> {
@@ -73,5 +75,17 @@ internal class WorkoutManagerImpl(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun getExerciseSessionCounts(): Result<Map<String, Int>> {
+        return try {
+            Result.success(getExerciseSessionCountsUseCase())
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun observeExerciseSessionCounts(): Flow<Map<String, Int>> {
+        return getExerciseSessionCountsUseCase.observe()
     }
 }

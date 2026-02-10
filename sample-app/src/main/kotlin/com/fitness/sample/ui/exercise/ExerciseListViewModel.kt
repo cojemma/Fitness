@@ -42,12 +42,36 @@ class ExerciseListViewModel : ViewModel() {
     private val _selectedMuscleGroup = MutableStateFlow<MuscleGroup?>(null)
     val selectedMuscleGroup: StateFlow<MuscleGroup?> = _selectedMuscleGroup.asStateFlow()
 
+    /** Exercise name -> session count, used for default sorting */
+    private var sessionCounts: Map<String, Int> = emptyMap()
+
     init {
         loadExercises()
+        loadSessionCounts()
     }
 
     private fun loadExercises() {
         _exercises.value = exerciseLibrary.getAllExercises()
+    }
+
+    private fun loadSessionCounts() {
+        viewModelScope.launch {
+            workoutManager.observeExerciseSessionCounts()
+                .collect { counts ->
+                    val changed = sessionCounts != counts
+                    sessionCounts = counts
+                    sortExercises()
+                    if (changed) {
+                        _historyCache.value = emptyMap()
+                    }
+                }
+        }
+    }
+
+    private fun sortExercises() {
+        _exercises.update { list ->
+            list.sortedByDescending { sessionCounts[it.name] ?: 0 }
+        }
     }
 
     fun onSearchQueryChange(query: String) {
@@ -68,7 +92,7 @@ class ExerciseListViewModel : ViewModel() {
             query.isNotBlank() -> exerciseLibrary.searchExercises(query)
             muscleGroup != null -> exerciseLibrary.getExercisesByMuscleGroup(muscleGroup)
             else -> exerciseLibrary.getAllExercises()
-        }
+        }.sortedByDescending { sessionCounts[it.name] ?: 0 }
     }
 
     fun loadExerciseHistory(exerciseName: String) {

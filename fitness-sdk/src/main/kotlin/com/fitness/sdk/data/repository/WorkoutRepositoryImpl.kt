@@ -209,6 +209,16 @@ class WorkoutRepositoryImpl(
         )
     }
 
+    override suspend fun getExerciseSessionCounts(): Map<String, Int> = withContext(Dispatchers.IO) {
+        exerciseDao.getExerciseSessionCounts().associate { it.exerciseName to it.sessionCount }
+    }
+
+    override fun observeExerciseSessionCounts(): Flow<Map<String, Int>> {
+        return exerciseDao.observeExerciseSessionCounts().map { list ->
+            list.associate { it.exerciseName to it.sessionCount }
+        }
+    }
+
     private fun calculateEpley1RM(weight: Float, reps: Int): Float {
         return if (reps == 1) weight
         else weight * (1 + reps / 30f)

@@ -6,7 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.fitness.sdk.data.local.entity.ExerciseEntity
 import com.fitness.sdk.data.local.entity.ExerciseHistoryRecord
+import com.fitness.sdk.data.local.entity.ExerciseSessionCount
 import com.fitness.sdk.data.local.entity.ExerciseSetEntity
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Data Access Object for exercise operations.
@@ -57,5 +59,23 @@ interface ExerciseDao {
         ORDER BY w.startTime DESC, es.setNumber
     """)
     suspend fun getExerciseHistoryByName(exerciseName: String): List<ExerciseHistoryRecord>
+
+    /**
+     * Get the number of distinct workout sessions for each exercise name.
+     * Returns a map-like list of (exerciseName, sessionCount) pairs.
+     */
+    @Query("""
+        SELECT e.name AS exerciseName, COUNT(DISTINCT e.workoutId) AS sessionCount
+        FROM exercises e
+        GROUP BY e.name
+    """)
+    suspend fun getExerciseSessionCounts(): List<ExerciseSessionCount>
+
+    @Query("""
+        SELECT e.name AS exerciseName, COUNT(DISTINCT e.workoutId) AS sessionCount
+        FROM exercises e
+        GROUP BY e.name
+    """)
+    fun observeExerciseSessionCounts(): Flow<List<ExerciseSessionCount>>
 }
 
