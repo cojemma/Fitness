@@ -185,4 +185,15 @@
     <string name="cd_add_set">Add set</string>
     <string name="cd_remove_set">Remove set</string>
     <string name="label_rest_between_sets">Rest between sets</string>
+
+    <!-- Custom Exercise -->
+    <string name="title_create_custom_exercise">Create Custom Exercise</string>
+    <string name="cd_create_custom_exercise">Create custom exercise</string>
+    <string name="badge_custom">Custom</string>
+    <string name="label_category">Category</string>
+    <string name="label_primary_muscle">Primary Muscle</string>
+    <string name="label_secondary_muscles">Secondary Muscles</string>
+    <string name="label_instructions">Instructions</string>
+    <string name="label_time_based">Time-based exercise</string>
+    <string name="placeholder_custom_exercise_name">e.g., Cable Lateral Raise</string>
 </resources>

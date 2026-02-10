@@ -13,6 +13,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.fitness.sample.ui.exercise.CreateCustomExerciseScreen
 import com.fitness.sample.ui.exercise.ExerciseListScreen
 import com.fitness.sample.ui.exercise.ExercisePickerScreen
 import com.fitness.sample.ui.home.HomeScreen
@@ -43,6 +44,7 @@ sealed class Screen(val route: String) {
 
     // Exercise list route
     object Exercises : Screen("exercises")
+    object CreateCustomExercise : Screen("create_custom_exercise")
 
     // Template routes
     object Templates : Screen("templates")
@@ -200,6 +202,9 @@ fun FitnessNavGraph(
                 onExerciseSelected = { exercise ->
                     selectedExercise = exercise
                     navController.popBackStack()
+                },
+                onCreateCustomExercise = {
+                    navController.navigate(Screen.CreateCustomExercise.route)
                 }
             )
         }
@@ -213,6 +218,9 @@ fun FitnessNavGraph(
                 },
                 onNavigateToSettings = {
                     navController.navigate(Screen.Settings.route)
+                },
+                onCreateCustomExercise = {
+                    navController.navigate(Screen.CreateCustomExercise.route)
                 }
             )
         }
@@ -339,6 +347,18 @@ fun FitnessNavGraph(
                     pendingExerciseSource = null
                 },
                 viewModel = activeWorkoutViewModel
+            )
+        }
+
+        // ========== Create Custom Exercise Route ==========
+        composable(Screen.CreateCustomExercise.route) {
+            CreateCustomExerciseScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onExerciseSaved = {
+                    navController.popBackStack()
+                }
             )
         }
 

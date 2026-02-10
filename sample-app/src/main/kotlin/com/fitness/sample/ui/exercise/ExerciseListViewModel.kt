@@ -23,6 +23,9 @@ class ExerciseListViewModel : ViewModel() {
     private val exerciseLibrary = FitnessSDK.getExerciseLibraryManager()
     private val workoutManager = FitnessSDK.getWorkoutManager()
 
+    /** All exercises (predefined + custom), kept in sync via Flow */
+    private var allExercises: List<ExerciseDefinition> = emptyList()
+
     private val _exercises = MutableStateFlow<List<ExerciseDefinition>>(emptyList())
     val exercises: StateFlow<List<ExerciseDefinition>> = _exercises.asStateFlow()
 
@@ -47,11 +50,22 @@ class ExerciseListViewModel : ViewModel() {
 
     init {
         loadExercises()
+        observeExercises()
         loadSessionCounts()
     }
 
     private fun loadExercises() {
-        _exercises.value = exerciseLibrary.getAllExercises()
+        allExercises = exerciseLibrary.getAllExercises()
+        _exercises.value = allExercises
+    }
+
+    private fun observeExercises() {
+        viewModelScope.launch {
+            exerciseLibrary.observeAllExercises().collect { exercises ->
+                allExercises = exercises
+                updateFilteredExercises()
+            }
+        }
     }
 
     private fun loadSessionCounts() {
@@ -89,10 +103,20 @@ class ExerciseListViewModel : ViewModel() {
         val muscleGroup = _selectedMuscleGroup.value
 
         _exercises.value = when {
-            query.isNotBlank() -> exerciseLibrary.searchExercises(query)
-            muscleGroup != null -> exerciseLibrary.getExercisesByMuscleGroup(muscleGroup)
-            else -> exerciseLibrary.getAllExercises()
+            query.isNotBlank() -> allExercises.filter {
+                it.name.lowercase().contains(query.lowercase())
+            }
+            muscleGroup != null -> allExercises.filter {
+                it.primaryMuscle == muscleGroup || muscleGroup in it.secondaryMuscles
+            }
+            else -> allExercises
         }.sortedByDescending { sessionCounts[it.name] ?: 0 }
+    }
+
+    fun deleteCustomExercise(id: String) {
+        viewModelScope.launch {
+            exerciseLibrary.deleteCustomExercise(id)
+        }
     }
 
     fun loadExerciseHistory(exerciseName: String) {

@@ -24,7 +24,7 @@ The project is structured as a multi-module Gradle project:
 
 Encapsulates all business logic and data persistence.
 
-- **API Layer**: Public interfaces (`WorkoutManager`, `TemplateManager`) exposed to the app.
+- **API Layer**: Public interfaces (`WorkoutManager`, `TemplateManager`, `ExerciseLibraryManager`) exposed to the app.
 - **Domain Layer**:
   - **Models**: `Workout`, `Exercise`, `WorkoutTemplate`.
   - **Use Cases**: Encapsulated business rules (e.g., `SaveWorkoutUseCase`).
@@ -37,7 +37,7 @@ Encapsulates all business logic and data persistence.
 
 A reference implementation using the SDK.
 
-- **UI Layer**: Jetpack Compose screens (`HomeScreen`, `WorkoutDetailsScreen`, `TemplateListScreen`).
+- **UI Layer**: Jetpack Compose screens (`HomeScreen`, `WorkoutDetailsScreen`, `TemplateListScreen`, `CreateCustomExerciseScreen`).
 - **ViewModels**: State management for screens, interacting with SDK Managers.
 - **Navigation**: `FitnessNavGraph` managing screen transitions.
 
@@ -45,10 +45,11 @@ A reference implementation using the SDK.
 
 ### Current State
 
-**Version 1.7.1**
+**Version 1.8.0**
 
 - **Core CRUD**: Workouts and Exercises can be created, read, updated, and deleted.
 - **Exercise Library**: Pre-loaded library of 55+ exercises with categorization.
+- **Custom Exercises**: Users can create their own exercises with full details (name, category, primary/secondary muscles, description, instructions, time-based toggle, default sets/reps/duration). Custom exercises are persisted in Room and appear alongside predefined exercises in all library views, pickers, and filters. `CompositeExerciseLibraryProvider` transparently merges predefined + custom exercises. Reactive `observeAllExercises()` Flow keeps UI in sync.
 - **Exercise List Page**: "Exercises" tab listing all exercises with expandable history. Each exercise shows total sessions, max weight, estimated 1RM (Epley formula), and session-by-session history. Tap a session to navigate to workout details. **Default sort by done times** (most-performed exercises appear first).
 - **Exercise Session Counts API**: `WorkoutManager.getExerciseSessionCounts()` returns a map of exercise name to workout session count, enabling efficient sorting without loading full history. `observeExerciseSessionCounts()` provides a reactive Flow for real-time UI updates when workout data changes.
 - **Template System**:

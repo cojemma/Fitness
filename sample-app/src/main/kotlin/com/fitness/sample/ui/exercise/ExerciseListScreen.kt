@@ -22,6 +22,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FitnessCenter
@@ -35,6 +37,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,6 +77,7 @@ import java.util.Locale
 fun ExerciseListScreen(
     onWorkoutClick: ((Long) -> Unit)? = null,
     onNavigateToSettings: () -> Unit = {},
+    onCreateCustomExercise: (() -> Unit)? = null,
     viewModel: ExerciseListViewModel = viewModel()
 ) {
     val exercises by viewModel.exercises.collectAsState()
@@ -106,6 +110,13 @@ fun ExerciseListScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            if (onCreateCustomExercise != null) {
+                FloatingActionButton(onClick = onCreateCustomExercise) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_create_custom_exercise))
+                }
+            }
         }
     ) { paddingValues ->
         Column(
@@ -193,7 +204,10 @@ fun ExerciseListScreen(
                                 viewModel.loadExerciseHistory(exercise.name)
                             }
                         },
-                        onWorkoutClick = onWorkoutClick
+                        onWorkoutClick = onWorkoutClick,
+                        onDelete = if (exercise.isCustom) {
+                            { viewModel.deleteCustomExercise(exercise.id) }
+                        } else null
                     )
                 }
             }
@@ -209,7 +223,8 @@ private fun ExerciseListItem(
     isLoading: Boolean,
     loadError: String?,
     onClick: () -> Unit,
-    onWorkoutClick: ((Long) -> Unit)?
+    onWorkoutClick: ((Long) -> Unit)?,
+    onDelete: (() -> Unit)? = null
 ) {
     Card(
         modifier = Modifier
@@ -241,17 +256,47 @@ private fun ExerciseListItem(
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = exercise.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text(
+                            text = exercise.name,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        if (exercise.isCustom) {
+                            Text(
+                                text = stringResource(R.string.badge_custom),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                    }
 
                     Text(
                         text = stringResource(getMuscleGroupStringRes(exercise.primaryMuscle)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
+                }
+
+                if (onDelete != null) {
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.cd_delete),
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
 
                 Icon(

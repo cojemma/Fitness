@@ -8,11 +8,13 @@ import com.fitness.sdk.api.TemplateManager
 import com.fitness.sdk.api.TemplateManagerImpl
 import com.fitness.sdk.api.WorkoutManager
 import com.fitness.sdk.api.WorkoutManagerImpl
+import com.fitness.sdk.data.library.CompositeExerciseLibraryProvider
 import com.fitness.sdk.data.library.DefaultExerciseLibrary
-import com.fitness.sdk.data.library.ExerciseLibraryProvider
 import com.fitness.sdk.data.local.FitnessDatabase
+import com.fitness.sdk.data.repository.CustomExerciseRepositoryImpl
 import com.fitness.sdk.data.repository.TemplateRepositoryImpl
 import com.fitness.sdk.data.repository.WorkoutRepositoryImpl
+import com.fitness.sdk.domain.usecase.DeleteCustomExerciseUseCase
 import com.fitness.sdk.domain.usecase.DeleteTemplateUseCase
 import com.fitness.sdk.domain.usecase.DeleteWorkoutUseCase
 import com.fitness.sdk.domain.usecase.GetExerciseHistoryUseCase
@@ -24,6 +26,7 @@ import com.fitness.sdk.domain.usecase.GetTemplateByIdUseCase
 import com.fitness.sdk.domain.usecase.GetTemplatesUseCase
 import com.fitness.sdk.domain.usecase.GetWorkoutByIdUseCase
 import com.fitness.sdk.domain.usecase.GetWorkoutsUseCase
+import com.fitness.sdk.domain.usecase.SaveCustomExerciseUseCase
 import com.fitness.sdk.domain.usecase.SaveTemplateUseCase
 import com.fitness.sdk.domain.usecase.SaveWorkoutAsTemplateUseCase
 import com.fitness.sdk.domain.usecase.SaveWorkoutUseCase
@@ -32,6 +35,10 @@ import com.fitness.sdk.domain.usecase.StartWorkoutFromTemplateUseCase
 import com.fitness.sdk.domain.usecase.UpdateTemplateFromWorkoutUseCase
 import com.fitness.sdk.domain.usecase.UpdateWorkoutUseCase
 import com.fitness.sdk.domain.usecase.AddExerciseToWorkoutUseCase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 /**
  * Main entry point for the Fitness SDK.
@@ -137,15 +144,31 @@ object FitnessSDK {
                 getExerciseSessionCountsUseCase
             )
 
-            // Create exercise library
-            val exerciseLibraryProvider: ExerciseLibraryProvider = DefaultExerciseLibrary()
-            val getExerciseLibraryUseCase = GetExerciseLibraryUseCase(exerciseLibraryProvider)
-            val searchExercisesUseCase = SearchExercisesUseCase(exerciseLibraryProvider)
+            // Create exercise library (composite: predefined + custom)
+            val compositeExerciseLibraryProvider = CompositeExerciseLibraryProvider(
+                DefaultExerciseLibrary(),
+                database.customExerciseDao()
+            )
+            val getExerciseLibraryUseCase = GetExerciseLibraryUseCase(compositeExerciseLibraryProvider)
+            val searchExercisesUseCase = SearchExercisesUseCase(compositeExerciseLibraryProvider)
+
+            // Create custom exercise repository and use cases
+            val customExerciseRepository = CustomExerciseRepositoryImpl(database.customExerciseDao())
+            val saveCustomExerciseUseCase = SaveCustomExerciseUseCase(customExerciseRepository, compositeExerciseLibraryProvider)
+            val deleteCustomExerciseUseCase = DeleteCustomExerciseUseCase(customExerciseRepository)
 
             exerciseLibraryManager = ExerciseLibraryManagerImpl(
                 getExerciseLibraryUseCase,
-                searchExercisesUseCase
+                searchExercisesUseCase,
+                saveCustomExerciseUseCase,
+                deleteCustomExerciseUseCase,
+                compositeExerciseLibraryProvider
             )
+
+            // Initialize custom exercise cache
+            CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+                compositeExerciseLibraryProvider.refreshCustomExercises()
+            }
 
             // Create template repository and use cases
             val templateRepository = TemplateRepositoryImpl(database.templateDao())

@@ -59,7 +59,8 @@ src/main/kotlin/com/fitness/sdk/
 │   │   ├── MuscleGroup.kt       # Enum: CHEST, BACK, LEGS, etc.
 │   │   └── ExerciseCategory.kt  # Enum: STRENGTH, CARDIO, etc.
 │   ├── repository/
-│   │   └── WorkoutRepository.kt  # Repository interface
+│   │   ├── WorkoutRepository.kt          # Repository interface
+│   │   └── CustomExerciseRepository.kt   # Custom exercise repository interface
 │   └── usecase/
 │       ├── SaveWorkoutUseCase.kt
 │       ├── GetWorkoutsUseCase.kt
@@ -68,28 +69,35 @@ src/main/kotlin/com/fitness/sdk/
 │       ├── DeleteWorkoutUseCase.kt
 │       ├── GetExerciseLibraryUseCase.kt
 │       ├── GetExerciseSessionCountsUseCase.kt
-│       └── SearchExercisesUseCase.kt
+│       ├── SearchExercisesUseCase.kt
+│       ├── SaveCustomExerciseUseCase.kt
+│       └── DeleteCustomExerciseUseCase.kt
 ├── data/
 │   ├── local/
 │   │   ├── FitnessDatabase.kt     # Room database
 │   │   ├── dao/
 │   │   │   ├── WorkoutDao.kt
-│   │   │   └── ExerciseDao.kt
+│   │   │   ├── ExerciseDao.kt
+│   │   │   └── CustomExerciseDao.kt
 │   │   └── entity/
 │   │       ├── WorkoutEntity.kt
 │   │       ├── ExerciseEntity.kt
-│   │       ├── ExerciseSetEntity.kt  # Per-set performance records
-│   │       ├── ExerciseSessionCount.kt  # Query result for session counts
+│   │       ├── ExerciseSetEntity.kt                # Per-set performance records
+│   │       ├── ExerciseSessionCount.kt             # Query result for session counts
+│   │       ├── CustomExerciseDefinitionEntity.kt   # Custom exercise storage
 │   │       └── WorkoutWithExercises.kt
 │   ├── library/
-│   │   ├── ExerciseLibraryProvider.kt  # Interface
-│   │   └── DefaultExerciseLibrary.kt   # 55+ predefined exercises
+│   │   ├── ExerciseLibraryProvider.kt          # Interface
+│   │   ├── DefaultExerciseLibrary.kt           # 55+ predefined exercises
+│   │   └── CompositeExerciseLibraryProvider.kt # Merges predefined + custom exercises
 │   ├── mapper/
 │   │   ├── WorkoutMapper.kt
 │   │   ├── ExerciseMapper.kt
-│   │   └── ExerciseSetMapper.kt
+│   │   ├── ExerciseSetMapper.kt
+│   │   └── CustomExerciseMapper.kt
 │   └── repository/
-│       └── WorkoutRepositoryImpl.kt
+│       ├── WorkoutRepositoryImpl.kt
+│       └── CustomExerciseRepositoryImpl.kt
 └── api/
     ├── WorkoutManager.kt             # Workout operations
     ├── WorkoutManagerImpl.kt
@@ -105,7 +113,7 @@ src/main/kotlin/com/fitness/sdk/
 |-----------|-------------|
 | `FitnessSDK` | Singleton entry point. Initialize with `FitnessSDK.initialize(context)` |
 | `WorkoutManager` | Public API for CRUD operations on workouts |
-| `ExerciseLibraryManager` | Public API for browsing/searching predefined exercises |
+| `ExerciseLibraryManager` | Public API for browsing/searching predefined + custom exercises |
 | `TemplateManager` | Public API for creating, managing, and starting workouts from templates |
 | `ExerciseDefinition` | Template for library exercises with defaults |
 | `Use Cases` | Business logic with validation (e.g., workout name cannot be blank) |
@@ -146,12 +154,17 @@ templateManager.updateTemplateFromWorkout(templateId, workoutId) // Update exist
 // Reactive observation
 workoutManager.observeWorkouts()           // Returns Flow<List<Workout>>
 
-// Exercise library operations
+// Exercise library operations (predefined + custom)
 exerciseLibrary.getAllExercises()                      // List<ExerciseDefinition>
 exerciseLibrary.getExercisesByMuscleGroup(CHEST)       // Filter by muscle
 exerciseLibrary.getExercisesByCategory(STRENGTH)       // Filter by category
 exerciseLibrary.searchExercises("bench")               // Search by name
 exerciseLibrary.getExercise("bench_press")             // Get by ID
+exerciseLibrary.observeAllExercises()                  // Flow<List<ExerciseDefinition>> (reactive)
+
+// Custom exercise management
+exerciseLibrary.saveCustomExercise(exercise)           // Returns Result<Unit>
+exerciseLibrary.deleteCustomExercise(id)               // Returns Result<Unit>
 
 // Convert library exercise to workout exercise
 val benchPress = exerciseLibrary.getExercise("bench_press")
@@ -200,11 +213,13 @@ src/main/kotlin/com/fitness/sample/
     │   ├── SessionStateManager.kt    # Exercise/Set session logic (merge on setWorkout for race safety)
     │   └── SetLogEntry.kt            # Logging data model
     └── exercise/
-        ├── AddExerciseDialog.kt          # Add exercise modal
-        ├── ExercisePickerScreen.kt       # Browse exercise library
-        ├── ExerciseListScreen.kt         # Exercise list with history (sorted by done times)
-        ├── ExerciseListViewModel.kt      # Exercise list state with session count sorting
-        └── ExerciseLibraryViewModel.kt   # Library search/filter
+        ├── AddExerciseDialog.kt              # Add exercise modal
+        ├── ExercisePickerScreen.kt           # Browse exercise library
+        ├── ExerciseListScreen.kt             # Exercise list with history (sorted by done times)
+        ├── ExerciseListViewModel.kt          # Exercise list state with session count sorting
+        ├── ExerciseLibraryViewModel.kt       # Library search/filter
+        ├── CreateCustomExerciseScreen.kt     # Custom exercise creation form
+        └── CreateCustomExerciseViewModel.kt  # Custom exercise form state
 ```
 
 ### Screens
@@ -220,6 +235,7 @@ src/main/kotlin/com/fitness/sample/
 | Add Template | `add_template` | Create new template |
 | Edit Template | `edit_template/{id}` | Edit existing template |
 | Active Workout | `active_workout/{templateId}` | Active training session with timer, set logging, and add-exercise from library |
+| Create Custom Exercise | `create_custom_exercise` | Form to create user-defined exercises |
 
 ### Navigation
 
@@ -234,6 +250,7 @@ sealed class Screen(val route: String) {
     object AddTemplate : Screen("add_template")
     object EditTemplate : Screen("edit_template/{templateId}")
     object ActiveWorkout : Screen("active_workout/{templateId}")
+    object CreateCustomExercise : Screen("create_custom_exercise")
 }
 ```
 

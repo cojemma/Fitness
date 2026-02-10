@@ -70,7 +70,7 @@ Data (fitness-sdk/data)       → Room DB, DAOs, Entities, Mappers, Repository i
 ```kotlin
 FitnessSDK.initialize(context) { databaseName("fitness_db"); enableLogging(true) }
 FitnessSDK.getWorkoutManager()          // Workout CRUD + exercise session counts
-FitnessSDK.getExerciseLibraryManager()  // 55+ predefined exercises
+FitnessSDK.getExerciseLibraryManager()  // 55+ predefined exercises + custom exercises
 FitnessSDK.getTemplateManager()         // Template management
 ```
 
@@ -96,6 +96,17 @@ FitnessSDK.getTemplateManager()         // Template management
 - **DAO query:** `ExerciseDao.getExerciseSessionCounts()` (one-shot) and `observeExerciseSessionCounts()` (Flow) use `COUNT(DISTINCT workoutId)` grouped by exercise name for efficiency.
 - **Sorting persists through filters:** Search and muscle group filters also apply the session count sort order.
 - **Reactivity:** ViewModel collects session counts via Flow. When counts change, the exercise history cache is invalidated so expanded details refresh on next access.
+
+## Custom Exercises
+
+- **Architecture:** `CompositeExerciseLibraryProvider` merges `DefaultExerciseLibrary` (in-memory predefined) with `CustomExerciseDao` (Room-persisted custom exercises). All `ExerciseLibraryProvider` methods transparently return both.
+- **Cache:** `CompositeExerciseLibraryProvider` maintains a `@Volatile cachedCustomExercises` list for synchronous interface methods, updated via `refreshCustomExercises()` (called at SDK init) and `observeAllExercises()` Flow.
+- **Entity:** `CustomExerciseDefinitionEntity` in `custom_exercise_definitions` table. Secondary muscles stored as JSON string (same pattern as `TemplateMapper`).
+- **Mapper:** `CustomExerciseMapper` sets `isCustom = true` on domain model.
+- **Validation:** `SaveCustomExerciseUseCase` checks name not blank and uniqueness against both predefined library and existing custom exercises.
+- **SDK API:** `ExerciseLibraryManager.saveCustomExercise()`, `deleteCustomExercise()`, `observeAllExercises()`.
+- **UI:** `CreateCustomExerciseScreen` — full form (name, category dropdown, primary muscle dropdown, secondary muscle chips, description, instructions, time-based toggle, default sets/reps/duration). FAB on Exercise List and "+" button on Exercise Picker navigate to this screen. Custom exercises show "Custom" badge and delete button in lists.
+- **Database version:** v5 (added `CustomExerciseDefinitionEntity`, destructive migration).
 
 ## Git Conventions
 

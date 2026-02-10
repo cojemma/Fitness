@@ -3,14 +3,15 @@ package com.fitness.sdk.api
 import com.fitness.sdk.domain.model.ExerciseCategory
 import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.MuscleGroup
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Public API for accessing the exercise library.
- * Provides methods to browse and search predefined exercises.
+ * Provides methods to browse and search predefined and custom exercises.
  */
 interface ExerciseLibraryManager {
     /**
-     * Get all exercises in the library.
+     * Get all exercises in the library (predefined + custom).
      * @return List of all exercise definitions
      */
     fun getAllExercises(): List<ExerciseDefinition>
@@ -43,4 +44,29 @@ interface ExerciseLibraryManager {
      * @return List of matching exercises
      */
     fun searchExercises(query: String): List<ExerciseDefinition>
+
+    /**
+     * Save a user-created custom exercise to the library.
+     *
+     * @param exercise The exercise definition to save
+     * @return Result indicating success or failure (e.g., duplicate name)
+     */
+    suspend fun saveCustomExercise(exercise: ExerciseDefinition): Result<Unit>
+
+    /**
+     * Delete a custom exercise from the library.
+     * Only custom exercises (isCustom = true) can be deleted.
+     *
+     * @param id The unique ID of the custom exercise
+     * @return Result indicating success or failure
+     */
+    suspend fun deleteCustomExercise(id: String): Result<Unit>
+
+    /**
+     * Observe all exercises (predefined + custom) as a reactive Flow.
+     * Emits a new list whenever custom exercises are added or removed.
+     *
+     * @return Flow of exercise definition lists
+     */
+    fun observeAllExercises(): Flow<List<ExerciseDefinition>>
 }

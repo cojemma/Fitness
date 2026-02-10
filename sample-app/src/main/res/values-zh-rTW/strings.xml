@@ -185,4 +185,15 @@
     <string name="cd_add_set">新增組</string>
     <string name="cd_remove_set">移除組</string>
     <string name="label_rest_between_sets">組間休息</string>
+
+    <!-- Custom Exercise -->
+    <string name="title_create_custom_exercise">建立自訂動作</string>
+    <string name="cd_create_custom_exercise">建立自訂動作</string>
+    <string name="badge_custom">自訂</string>
+    <string name="label_category">分類</string>
+    <string name="label_primary_muscle">主要肌群</string>
+    <string name="label_secondary_muscles">次要肌群</string>
+    <string name="label_instructions">動作說明</string>
+    <string name="label_time_based">計時動作</string>
+    <string name="placeholder_custom_exercise_name">例如：纜繩側平舉</string>
 </resources>

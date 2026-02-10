@@ -39,6 +39,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Add exercise to workout | ✅ | Add an exercise to an existing workout |
 | Exercise session counts | ✅ | Get per-exercise workout session counts for sorting |
 | Reactive session counts | ✅ | Observe session counts via Flow for real-time UI updates |
+| Custom exercises | ✅ | Create, save, and delete user-defined exercises with full details |
 
 ### SDK - To Develop
 
@@ -68,6 +69,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Template list | ✅ | List of saved workout templates |
 | Add template | ✅ | Create/Edit workout template |
 | Active workout | ✅ | Session view with timer, set logging, and add exercise from library (FAB) |
+| Create custom exercise | ✅ | Form to create user-defined exercises (name, category, muscles, defaults) |
 
 ### UI Components
 
@@ -126,6 +128,7 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.8.0 | 2026-02-10 | Custom exercises: Create, save, delete user-defined exercises. New SDK APIs: `saveCustomExercise()`, `deleteCustomExercise()`, `observeAllExercises()`. CompositeExerciseLibraryProvider merges predefined + custom. New CreateCustomExerciseScreen with full form. Custom badge and delete action in exercise list. |
 | 1.7.1 | 2026-02-10 | Fix: Exercise session counts and history now update in real-time via reactive Flow (`observeExerciseSessionCounts()`). History cache invalidation on data change. |
 | 1.7.0 | 2026-02-10 | Exercise list default sort by done times (session count). New SDK API: `getExerciseSessionCounts()`. |
 | 1.5.0 | 2026-02-04 | Refactoring: Split ActiveWorkoutViewModel into TimerManager and SessionStateManager. SDK addExerciseToWorkout. Add exercise during active workout (FAB + library picker). SessionStateManager merge on setWorkout to prevent race with async startWorkout. |
