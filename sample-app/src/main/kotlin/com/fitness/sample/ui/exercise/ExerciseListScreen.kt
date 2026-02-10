@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -36,6 +37,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -52,9 +54,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sample.R
+import com.fitness.sample.ui.util.getMuscleGroupStringRes
 import com.fitness.sdk.domain.model.ExerciseCategory
 import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.ExerciseHistory
@@ -68,6 +73,7 @@ import java.util.Locale
 @Composable
 fun ExerciseListScreen(
     onWorkoutClick: ((Long) -> Unit)? = null,
+    onNavigateToSettings: () -> Unit = {},
     viewModel: ExerciseListViewModel = viewModel()
 ) {
     val exercises by viewModel.exercises.collectAsState()
@@ -84,13 +90,21 @@ fun ExerciseListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Exercises",
+                        text = stringResource(R.string.title_exercises),
                         fontWeight = FontWeight.Bold
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.cd_settings)
+                        )
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -106,7 +120,7 @@ fun ExerciseListScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Search exercises...") },
+                placeholder = { Text(stringResource(R.string.search_exercises_placeholder)) },
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = null)
                 },
@@ -128,7 +142,7 @@ fun ExerciseListScreen(
                     FilterChip(
                         selected = selectedMuscleGroup == null,
                         onClick = { viewModel.onMuscleGroupSelect(null) },
-                        label = { Text("All") },
+                        label = { Text(stringResource(R.string.filter_all)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
                         )
@@ -138,7 +152,7 @@ fun ExerciseListScreen(
                     FilterChip(
                         selected = selectedMuscleGroup == muscle,
                         onClick = { viewModel.onMuscleGroupSelect(muscle) },
-                        label = { Text(formatMuscleGroup(muscle)) },
+                        label = { Text(stringResource(getMuscleGroupStringRes(muscle))) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
                         )
@@ -147,7 +161,7 @@ fun ExerciseListScreen(
             }
 
             Text(
-                text = "${exercises.size} exercises",
+                text = stringResource(R.string.exercises_count_format, exercises.size),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -234,7 +248,7 @@ private fun ExerciseListItem(
                     )
 
                     Text(
-                        text = formatMuscleGroup(exercise.primaryMuscle),
+                        text = stringResource(getMuscleGroupStringRes(exercise.primaryMuscle)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -242,7 +256,7 @@ private fun ExerciseListItem(
 
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (isExpanded) "Collapse" else "Expand"
+                    contentDescription = if (isExpanded) stringResource(R.string.cd_collapse) else stringResource(R.string.cd_expand)
                 )
             }
 
@@ -284,7 +298,7 @@ private fun ExerciseListItem(
                         )
                     } else {
                         Text(
-                            text = "No history yet. Complete workouts with this exercise to see stats.",
+                            text = stringResource(R.string.no_history_message),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 8.dp)
@@ -308,17 +322,17 @@ private fun ExerciseHistoryContent(
     ) {
         StatChip(
             icon = Icons.Default.History,
-            label = "Sessions",
+            label = stringResource(R.string.stat_sessions),
             value = history.totalSessions.toString()
         )
         StatChip(
             icon = Icons.Default.FitnessCenter,
-            label = "Max Weight",
+            label = stringResource(R.string.stat_max_weight),
             value = history.maxWeight?.let { "${it}kg" } ?: "—"
         )
         StatChip(
             icon = Icons.Default.TrendingUp,
-            label = "Est. 1RM",
+            label = stringResource(R.string.stat_est_1rm),
             value = history.estimated1RM?.let { "${String.format("%.1f", it)}kg" } ?: "—"
         )
     }
@@ -326,7 +340,7 @@ private fun ExerciseHistoryContent(
     Spacer(modifier = Modifier.height(16.dp))
 
     Text(
-        text = "History",
+        text = stringResource(R.string.label_history),
         style = MaterialTheme.typography.titleSmall,
         fontWeight = FontWeight.SemiBold,
         color = MaterialTheme.colorScheme.primary
@@ -336,7 +350,7 @@ private fun ExerciseHistoryContent(
 
     if (history.historyByDate.isEmpty()) {
         Text(
-            text = "No recorded sessions",
+            text = stringResource(R.string.no_recorded_sessions),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -403,13 +417,13 @@ private fun SessionHistoryRow(
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "Best: ${session.bestSet} • ${session.setsCount} sets",
+                text = stringResource(R.string.session_best_sets_format, session.bestSet, session.setsCount),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Text(
-            text = "${session.totalVolume.toInt()} kg vol",
+            text = stringResource(R.string.volume_kg_format, session.totalVolume.toInt()),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.primary
         )
@@ -431,21 +445,6 @@ private fun getCategoryEmoji(category: ExerciseCategory) = when (category) {
     ExerciseCategory.FLEXIBILITY -> "🧘"
     ExerciseCategory.PLYOMETRIC -> "⚡"
     ExerciseCategory.BODYWEIGHT -> "💪"
-}
-
-private fun formatMuscleGroup(muscle: MuscleGroup): String = when (muscle) {
-    MuscleGroup.CHEST -> "Chest"
-    MuscleGroup.BACK -> "Back"
-    MuscleGroup.SHOULDERS -> "Shoulders"
-    MuscleGroup.BICEPS -> "Biceps"
-    MuscleGroup.TRICEPS -> "Triceps"
-    MuscleGroup.FOREARMS -> "Forearms"
-    MuscleGroup.QUADRICEPS -> "Quads"
-    MuscleGroup.HAMSTRINGS -> "Hamstrings"
-    MuscleGroup.GLUTES -> "Glutes"
-    MuscleGroup.CALVES -> "Calves"
-    MuscleGroup.CORE -> "Core"
-    MuscleGroup.FULL_BODY -> "Full Body"
 }
 
 private fun formatSessionDate(timestamp: Long): String {

@@ -24,8 +24,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.fitness.sample.R
 import com.fitness.sdk.domain.model.Exercise
 
 @Composable
@@ -45,7 +47,7 @@ fun AddExerciseDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Add Exercise",
+                text = stringResource(R.string.dialog_add_exercise),
                 style = MaterialTheme.typography.titleLarge
             )
         },
@@ -68,7 +70,7 @@ fun AddExerciseDialog(
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        Text("Select from Library")
+                        Text(stringResource(R.string.btn_select_from_library))
                     }
 
                     Row(
@@ -77,7 +79,7 @@ fun AddExerciseDialog(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "— or enter manually —",
+                            text = stringResource(R.string.or_enter_manually),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -89,8 +91,8 @@ fun AddExerciseDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Exercise Name") },
-                    placeholder = { Text("e.g., Bench Press") },
+                    label = { Text(stringResource(R.string.label_exercise_name)) },
+                    placeholder = { Text(stringResource(R.string.placeholder_exercise_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -102,7 +104,7 @@ fun AddExerciseDialog(
                     OutlinedTextField(
                         value = sets,
                         onValueChange = { sets = it },
-                        label = { Text("Sets") },
+                        label = { Text(stringResource(R.string.label_sets)) },
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true
@@ -111,7 +113,7 @@ fun AddExerciseDialog(
                     OutlinedTextField(
                         value = reps,
                         onValueChange = { reps = it },
-                        label = { Text("Reps") },
+                        label = { Text(stringResource(R.string.label_reps)) },
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true
@@ -125,7 +127,7 @@ fun AddExerciseDialog(
                     OutlinedTextField(
                         value = weight,
                         onValueChange = { weight = it },
-                        label = { Text("Weight (kg)") },
+                        label = { Text(stringResource(R.string.label_weight_kg)) },
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         singleLine = true
@@ -134,7 +136,7 @@ fun AddExerciseDialog(
                     OutlinedTextField(
                         value = rest,
                         onValueChange = { rest = it },
-                        label = { Text("Rest (sec)") },
+                        label = { Text(stringResource(R.string.label_rest_sec)) },
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true
@@ -144,7 +146,7 @@ fun AddExerciseDialog(
                 OutlinedTextField(
                     value = duration,
                     onValueChange = { duration = it },
-                    label = { Text("Duration (sec) - for timed exercises") },
+                    label = { Text(stringResource(R.string.label_duration_sec)) },
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true
@@ -168,14 +170,13 @@ fun AddExerciseDialog(
                 },
                 enabled = name.isNotBlank()
             ) {
-                Text("Add")
+                Text(stringResource(R.string.btn_add))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.btn_cancel))
             }
         }
     )
 }
-

@@ -38,9 +38,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sample.R
 import com.fitness.sample.ui.components.ExerciseItem
 import com.fitness.sample.ui.exercise.AddExerciseDialog
 import com.fitness.sdk.domain.model.Exercise
@@ -96,13 +98,16 @@ fun AddWorkoutScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(if (uiState.isEditing) "Edit Workout" else "New Workout")
+                    Text(
+                        if (uiState.isEditing) stringResource(R.string.title_edit_workout)
+                        else stringResource(R.string.title_new_workout)
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 }
@@ -112,7 +117,7 @@ fun AddWorkoutScreen(
             FloatingActionButton(
                 onClick = { showAddExerciseDialog = true }
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Exercise")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_add_exercise))
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -129,8 +134,8 @@ fun AddWorkoutScreen(
             OutlinedTextField(
                 value = uiState.name,
                 onValueChange = viewModel::updateName,
-                label = { Text("Workout Name") },
-                placeholder = { Text("e.g., Morning Run") },
+                label = { Text(stringResource(R.string.label_workout_name)) },
+                placeholder = { Text(stringResource(R.string.placeholder_workout_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -150,7 +155,7 @@ fun AddWorkoutScreen(
                 OutlinedTextField(
                     value = uiState.durationMinutes,
                     onValueChange = viewModel::updateDuration,
-                    label = { Text("Duration (min)") },
+                    label = { Text(stringResource(R.string.label_duration_min)) },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true
@@ -159,7 +164,7 @@ fun AddWorkoutScreen(
                 OutlinedTextField(
                     value = uiState.caloriesBurned,
                     onValueChange = viewModel::updateCalories,
-                    label = { Text("Calories") },
+                    label = { Text(stringResource(R.string.label_calories)) },
                     modifier = Modifier.weight(1f),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     singleLine = true
@@ -170,7 +175,7 @@ fun AddWorkoutScreen(
             OutlinedTextField(
                 value = uiState.notes,
                 onValueChange = viewModel::updateNotes,
-                label = { Text("Notes (optional)") },
+                label = { Text(stringResource(R.string.label_notes_optional)) },
                 modifier = Modifier.fillMaxWidth(),
                 minLines = 2,
                 maxLines = 4
@@ -180,7 +185,7 @@ fun AddWorkoutScreen(
             if (exercises.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Exercises (${exercises.size})",
+                    text = stringResource(R.string.label_exercises_count, exercises.size),
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -198,7 +203,8 @@ fun AddWorkoutScreen(
                 enabled = !uiState.isLoading
             ) {
                 Text(
-                    text = if (uiState.isLoading) "Saving..." else "Save Workout"
+                    text = if (uiState.isLoading) stringResource(R.string.btn_saving)
+                    else stringResource(R.string.btn_save_workout)
                 )
             }
 
@@ -242,7 +248,7 @@ fun WorkoutTypeDropdown(
             value = selectedType.name.lowercase().replaceFirstChar { it.uppercase() },
             onValueChange = {},
             readOnly = true,
-            label = { Text("Workout Type") },
+            label = { Text(stringResource(R.string.label_workout_type)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()

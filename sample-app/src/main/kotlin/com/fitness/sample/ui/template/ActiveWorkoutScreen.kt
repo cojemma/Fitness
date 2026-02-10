@@ -62,12 +62,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sample.R
 import com.fitness.sdk.domain.model.ExerciseDefinition
 
 /**
@@ -94,7 +96,7 @@ fun ActiveWorkoutScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val workoutCompleted by viewModel.workoutCompleted.collectAsState()
-    
+
     val savedWorkoutId by viewModel.savedWorkoutId.collectAsState()
     val templateSaved by viewModel.templateSaved.collectAsState()
 
@@ -102,7 +104,7 @@ fun ActiveWorkoutScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var showSaveAsTemplateDialog by remember { mutableStateOf(false) }
     var templateNameInput by remember { mutableStateOf("") }
-    
+
     // Check if workout was started from a template
     val originalTemplateId = viewModel.getOriginalTemplateId()
     var showCreateNewDialog by remember { mutableStateOf(false) }
@@ -128,9 +130,10 @@ fun ActiveWorkoutScreen(
     }
 
     // Handle template saved - navigate after dialog closes
+    val templateSavedMessage = stringResource(R.string.snackbar_template_saved)
     LaunchedEffect(templateSaved) {
         if (templateSaved) {
-            snackbarHostState.showSnackbar("Template saved!")
+            snackbarHostState.showSnackbar(templateSavedMessage)
             showSaveAsTemplateDialog = false
             showCreateNewDialog = false
             onWorkoutComplete()
@@ -161,7 +164,7 @@ fun ActiveWorkoutScreen(
             },
             title = {
                 Text(
-                    text = "Workout Complete! 🎉",
+                    text = stringResource(R.string.dialog_workout_complete),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -169,12 +172,12 @@ fun ActiveWorkoutScreen(
             text = {
                 Column {
                     Text(
-                        text = "Great workout! What would you like to do with it?",
+                        text = stringResource(R.string.dialog_what_to_do),
                         style = MaterialTheme.typography.bodyMedium
                     )
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     // Option 1: Replace Original Template (only if started from template)
                     if (originalTemplateId != null) {
                         Button(
@@ -184,11 +187,11 @@ fun ActiveWorkoutScreen(
                             modifier = Modifier.fillMaxWidth(),
                             enabled = savedWorkoutId != null
                         ) {
-                            Text("Update Original Template")
+                            Text(stringResource(R.string.btn_update_original_template))
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                     }
-                    
+
                     // Option 2: Create New Template
                     OutlinedButton(
                         onClick = {
@@ -196,11 +199,11 @@ fun ActiveWorkoutScreen(
                         },
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Save as New Template")
+                        Text(stringResource(R.string.btn_save_as_new_template))
                     }
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     // Option 3: Skip
                     OutlinedButton(
                         onClick = {
@@ -212,7 +215,7 @@ fun ActiveWorkoutScreen(
                             contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     ) {
-                        Text("Skip")
+                        Text(stringResource(R.string.btn_skip))
                     }
                 }
             },
@@ -220,9 +223,10 @@ fun ActiveWorkoutScreen(
             dismissButton = {}
         )
     }
-    
+
     // Create New Template Dialog (name input)
     if (showCreateNewDialog) {
+        val myTemplatePlaceholder = stringResource(R.string.placeholder_my_template)
         AlertDialog(
             onDismissRequest = {
                 showCreateNewDialog = false
@@ -231,7 +235,7 @@ fun ActiveWorkoutScreen(
             },
             title = {
                 Text(
-                    text = "New Template Name",
+                    text = stringResource(R.string.dialog_new_template_name),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -241,8 +245,8 @@ fun ActiveWorkoutScreen(
                     OutlinedTextField(
                         value = templateNameInput,
                         onValueChange = { templateNameInput = it },
-                        label = { Text("Template Name") },
-                        placeholder = { Text(workout?.name ?: "My Template") },
+                        label = { Text(stringResource(R.string.label_template_name)) },
+                        placeholder = { Text(workout?.name ?: myTemplatePlaceholder) },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
@@ -251,12 +255,12 @@ fun ActiveWorkoutScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        val name = templateNameInput.ifBlank { workout?.name ?: "My Template" }
+                        val name = templateNameInput.ifBlank { workout?.name ?: myTemplatePlaceholder }
                         viewModel.saveAsTemplate(name)
                     },
                     enabled = savedWorkoutId != null
                 ) {
-                    Text("Create")
+                    Text(stringResource(R.string.btn_create))
                 }
             },
             dismissButton = {
@@ -265,7 +269,7 @@ fun ActiveWorkoutScreen(
                         showCreateNewDialog = false
                     }
                 ) {
-                    Text("Back")
+                    Text(stringResource(R.string.cd_back))
                 }
             }
         )
@@ -277,7 +281,7 @@ fun ActiveWorkoutScreen(
                 title = {
                     Column {
                         Text(
-                            text = workout?.name ?: "Workout",
+                            text = workout?.name ?: stringResource(R.string.label_workout_fallback),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -292,7 +296,7 @@ fun ActiveWorkoutScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Cancel workout"
+                            contentDescription = stringResource(R.string.cd_cancel_workout)
                         )
                     }
                 },
@@ -311,7 +315,7 @@ fun ActiveWorkoutScreen(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Finish")
+                        Text(stringResource(R.string.btn_finish))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -328,7 +332,7 @@ fun ActiveWorkoutScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add Exercise"
+                    contentDescription = stringResource(R.string.cd_add_exercise)
                 )
             }
         }
@@ -344,7 +348,7 @@ fun ActiveWorkoutScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator()
                         Spacer(modifier = Modifier.height(16.dp))
-                        Text("Starting workout...")
+                        Text(stringResource(R.string.loading_starting_workout))
                     }
                 }
             }
@@ -355,7 +359,7 @@ fun ActiveWorkoutScreen(
                         .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("No exercises in this workout")
+                    Text(stringResource(R.string.no_exercises_in_workout))
                 }
             }
             else -> {
@@ -377,7 +381,7 @@ fun ActiveWorkoutScreen(
                     // Superset Info
                     val currentSupersetId = currentExercise.supersetGroupId
                     if (currentSupersetId != null) {
-                        val otherExercisesInSuperset = workout?.exercises?.filterIndexed { index, ex -> 
+                        val otherExercisesInSuperset = workout?.exercises?.filterIndexed { index, ex ->
                              ex.supersetGroupId == currentSupersetId && index != currentExerciseIndex
                         } ?: emptyList()
 
@@ -431,7 +435,7 @@ fun ActiveWorkoutScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text("Previous")
+                            Text(stringResource(R.string.btn_previous))
                         }
 
                         OutlinedButton(
@@ -439,7 +443,7 @@ fun ActiveWorkoutScreen(
                             enabled = currentExerciseIndex < exerciseCount - 1,
                             shape = RoundedCornerShape(12.dp)
                         ) {
-                            Text("Next")
+                            Text(stringResource(R.string.btn_next))
                             Spacer(modifier = Modifier.width(4.dp))
                             Icon(
                                 imageVector = Icons.Default.ArrowForward,
@@ -473,18 +477,18 @@ private fun ExerciseProgress(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Exercise ${currentIndex + 1} of $totalCount",
+                text = stringResource(R.string.exercise_progress_format, currentIndex + 1, totalCount),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
-        
+
         val progress by animateFloatAsState(
             targetValue = (currentIndex + 1).toFloat() / totalCount.toFloat(),
             label = "progress"
         )
-        
+
         LinearProgressIndicator(
             progress = progress,
             modifier = Modifier
@@ -510,7 +514,9 @@ private fun CurrentExerciseCard(
     modifier: Modifier = Modifier
 ) {
     var repsInput by remember(exerciseName, currentSet) { mutableStateOf(targetReps.toString()) }
-    var weightInput by remember(exerciseName, currentSet) { mutableStateOf(targetWeight?.toString() ?: "") }
+    var weightInput by remember(exerciseName, currentSet) {
+        mutableStateOf(targetWeight?.let { if (it % 1f == 0f) it.toInt().toString() else "%.1f".format(it) } ?: "")
+    }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -537,7 +543,7 @@ private fun CurrentExerciseCard(
 
             // Set indicator
             Text(
-                text = "Set $currentSet of $totalSets",
+                text = stringResource(R.string.set_of_format, currentSet, totalSets),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -550,7 +556,7 @@ private fun CurrentExerciseCard(
                     color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
                 ) {
                     Text(
-                        text = "Last: $lastSetInfo",
+                        text = stringResource(R.string.last_set_prefix, lastSetInfo),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onTertiaryContainer,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -568,7 +574,7 @@ private fun CurrentExerciseCard(
                 // Reps input
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Reps",
+                        text = stringResource(R.string.label_reps_input),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
@@ -586,7 +592,7 @@ private fun CurrentExerciseCard(
                 }
 
                 Text(
-                    text = "×",
+                    text = "\u00d7",
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
@@ -594,7 +600,7 @@ private fun CurrentExerciseCard(
                 // Weight input
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Weight (kg)",
+                        text = stringResource(R.string.label_weight_kg_input),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
@@ -608,9 +614,9 @@ private fun CurrentExerciseCard(
                         textStyle = MaterialTheme.typography.titleLarge.copy(
                             textAlign = TextAlign.Center
                         ),
-                        placeholder = { 
+                        placeholder = {
                             Text(
-                                "—",
+                                "\u2014",
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -640,7 +646,7 @@ private fun CurrentExerciseCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Complete Set",
+                    text = stringResource(R.string.btn_complete_set),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -688,13 +694,13 @@ private fun RestTimerCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "REST",
+                text = stringResource(R.string.label_rest),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onTertiaryContainer
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = formatTime(remainingSeconds),
                 style = MaterialTheme.typography.displayMedium,
@@ -714,7 +720,7 @@ private fun RestTimerCard(
                     modifier = Modifier.size(18.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Skip Rest")
+                Text(stringResource(R.string.btn_skip_rest))
             }
         }
     }
@@ -740,7 +746,7 @@ private fun CompletedSetsSummary(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Completed Sets",
+                text = stringResource(R.string.label_completed_sets),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -755,11 +761,14 @@ private fun CompletedSetsSummary(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Set ${entry.setNumber}",
+                        text = stringResource(R.string.set_number_format, entry.setNumber),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "${entry.reps} reps" + (entry.weight?.let { " × ${it}kg" } ?: ""),
+                        text = entry.weight?.let {
+                            val weightStr = if (it % 1f == 0f) it.toInt().toString() else "%.1f".format(it)
+                            stringResource(R.string.reps_weight_format, entry.reps, weightStr)
+                        } ?: stringResource(R.string.reps_only_format, entry.reps),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -796,19 +805,19 @@ private fun SupersetInfoCard(
         ) {
             Icon(
                 imageVector = Icons.Default.Link,
-                contentDescription = "Superset",
+                contentDescription = stringResource(R.string.label_superset),
                 tint = MaterialTheme.colorScheme.tertiary
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    text = "Superset",
+                    text = stringResource(R.string.label_superset),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.tertiary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Paired with: ${otherExercises.joinToString { it.name }}",
+                    text = stringResource(R.string.paired_with_format, otherExercises.joinToString { it.name }),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )

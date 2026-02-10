@@ -37,9 +37,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sample.R
 import com.fitness.sample.ui.components.ExerciseItem
 import com.fitness.sample.ui.components.WorkoutTypeIcon
 
@@ -78,12 +80,12 @@ fun WorkoutDetailsScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Workout Details") },
+                title = { Text(stringResource(R.string.title_workout_details)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 },
@@ -91,7 +93,7 @@ fun WorkoutDetailsScreen(
                     IconButton(onClick = { onEditWorkout(workoutId) }) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit"
+                            contentDescription = stringResource(R.string.cd_edit)
                         )
                     }
                     IconButton(
@@ -99,7 +101,7 @@ fun WorkoutDetailsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete",
+                            contentDescription = stringResource(R.string.cd_delete),
                             tint = MaterialTheme.colorScheme.error
                         )
                     }
@@ -140,7 +142,7 @@ fun WorkoutDetailsScreen(
                                     .padding(start = 16.dp)
                             ) {
                                 Text(
-                                    text = uiState.name.ifBlank { "Workout" },
+                                    text = uiState.name.ifBlank { stringResource(R.string.label_workout_fallback) },
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -170,13 +172,13 @@ fun WorkoutDetailsScreen(
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Text(
-                                    text = "${uiState.durationMinutes.ifBlank { "0" }} min",
+                                    text = stringResource(R.string.duration_min_format, uiState.durationMinutes.ifBlank { "0" }),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                                 Text(
-                                    text = "Duration",
+                                    text = stringResource(R.string.label_duration),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                 )
@@ -197,7 +199,7 @@ fun WorkoutDetailsScreen(
                                     color = MaterialTheme.colorScheme.onPrimaryContainer
                                 )
                                 Text(
-                                    text = "Calories",
+                                    text = stringResource(R.string.label_calories_detail),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                 )
@@ -212,7 +214,7 @@ fun WorkoutDetailsScreen(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                                 Text(
-                                    text = "Exercises",
+                                    text = stringResource(R.string.label_exercises),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                                 )
@@ -231,7 +233,7 @@ fun WorkoutDetailsScreen(
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "Notes",
+                                text = stringResource(R.string.label_notes),
                                 style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -249,7 +251,7 @@ fun WorkoutDetailsScreen(
             if (exercises.isNotEmpty()) {
                 item {
                     Text(
-                        text = "Exercises",
+                        text = stringResource(R.string.label_exercises),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(top = 8.dp)

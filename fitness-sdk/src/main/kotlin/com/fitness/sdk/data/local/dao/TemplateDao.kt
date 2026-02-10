@@ -59,7 +59,7 @@ interface TemplateDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertExercise(exercise: TemplateExerciseEntity): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertExercises(exercises: List<TemplateExerciseEntity>): List<Long>
 
     @Update
@@ -79,7 +79,7 @@ interface TemplateDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertSet(set: TemplateSetEntity): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertSets(sets: List<TemplateSetEntity>): List<Long>
 
     @Update

@@ -1,7 +1,7 @@
 package com.fitness.sample
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -32,11 +33,11 @@ import com.fitness.sample.navigation.FitnessNavGraph
 import com.fitness.sample.navigation.Screen
 import com.fitness.sample.ui.theme.FitnessTheme
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        
+
         setContent {
             FitnessTheme {
                 MainScreen()
@@ -55,19 +56,19 @@ fun MainScreen() {
     val bottomNavItems = listOf(
         BottomNavItem(
             route = Screen.Home.route,
-            title = "Workouts",
+            title = stringResource(R.string.nav_workouts),
             selectedIcon = Icons.Filled.DateRange,
             unselectedIcon = Icons.Outlined.DateRange
         ),
         BottomNavItem(
             route = Screen.Exercises.route,
-            title = "Exercises",
+            title = stringResource(R.string.nav_exercises),
             selectedIcon = Icons.Filled.FitnessCenter,
             unselectedIcon = Icons.Outlined.FitnessCenter
         ),
         BottomNavItem(
             route = Screen.Templates.route,
-            title = "Templates",
+            title = stringResource(R.string.nav_templates),
             selectedIcon = Icons.Filled.PlayArrow,
             unselectedIcon = Icons.Outlined.PlayArrow
         )
@@ -81,7 +82,8 @@ fun MainScreen() {
         Screen.ExercisePicker.route,
         Screen.AddTemplate.route,
         Screen.EditTemplate.route,
-        Screen.ActiveWorkout.route
+        Screen.ActiveWorkout.route,
+        Screen.Settings.route
     )
 
     val shouldShowBottomNav = currentDestination?.route?.let { route ->
@@ -95,8 +97,8 @@ fun MainScreen() {
             if (shouldShowBottomNav) {
                 NavigationBar {
                     bottomNavItems.forEach { item ->
-                        val isSelected = currentDestination?.hierarchy?.any { 
-                            it.route == item.route 
+                        val isSelected = currentDestination?.hierarchy?.any {
+                            it.route == item.route
                         } == true
 
                         NavigationBarItem(

@@ -11,9 +11,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -28,9 +30,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sample.R
 import com.fitness.sample.ui.components.EmptyState
 import com.fitness.sample.ui.components.StatsSummary
 import com.fitness.sample.ui.components.WorkoutCard
@@ -40,6 +44,7 @@ import com.fitness.sample.ui.components.WorkoutCard
 fun HomeScreen(
     onAddWorkout: () -> Unit,
     onWorkoutClick: (Long) -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
     val workouts by viewModel.workouts.collectAsState()
@@ -60,13 +65,21 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "My Workouts",
+                        text = stringResource(R.string.title_my_workouts),
                         fontWeight = FontWeight.Bold
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.cd_settings)
+                        )
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -76,7 +89,7 @@ fun HomeScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add Workout"
+                    contentDescription = stringResource(R.string.cd_add_workout)
                 )
             }
         },
@@ -90,8 +103,8 @@ fun HomeScreen(
                 contentAlignment = Alignment.Center
             ) {
                 EmptyState(
-                    title = "No workouts yet",
-                    subtitle = "Tap the + button to add your first workout"
+                    title = stringResource(R.string.empty_workouts_title),
+                    subtitle = stringResource(R.string.empty_workouts_subtitle)
                 )
             }
         } else {

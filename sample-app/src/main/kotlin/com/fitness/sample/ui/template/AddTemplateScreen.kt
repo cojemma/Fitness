@@ -45,10 +45,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sample.R
 import com.fitness.sample.ui.components.TemplateExerciseCard
+import com.fitness.sample.ui.util.getMuscleGroupStringRes
 import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.MuscleGroup
 
@@ -73,7 +76,7 @@ fun AddTemplateScreen(
     val isSaving by viewModel.isSaving.collectAsState()
     val error by viewModel.error.collectAsState()
     val saveSuccess by viewModel.saveSuccess.collectAsState()
-    
+
     val snackbarHostState = remember { SnackbarHostState() }
     val isEditMode = templateId != null
 
@@ -119,7 +122,7 @@ fun AddTemplateScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (isEditMode) "Edit Template" else "New Template",
+                        text = if (isEditMode) stringResource(R.string.title_edit_template) else stringResource(R.string.title_new_template),
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -127,7 +130,7 @@ fun AddTemplateScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
                 },
@@ -151,7 +154,7 @@ fun AddTemplateScreen(
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.size(4.dp))
-                            Text("Save")
+                            Text(stringResource(R.string.btn_save))
                         }
                     }
                 },
@@ -174,8 +177,8 @@ fun AddTemplateScreen(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { viewModel.updateName(it) },
-                    label = { Text("Template Name") },
-                    placeholder = { Text("e.g., Push Day A") },
+                    label = { Text(stringResource(R.string.label_template_name)) },
+                    placeholder = { Text(stringResource(R.string.placeholder_template_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -186,8 +189,8 @@ fun AddTemplateScreen(
                 OutlinedTextField(
                     value = description,
                     onValueChange = { viewModel.updateDescription(it) },
-                    label = { Text("Description (optional)") },
-                    placeholder = { Text("Notes about this template") },
+                    label = { Text(stringResource(R.string.label_description_optional)) },
+                    placeholder = { Text(stringResource(R.string.placeholder_template_notes)) },
                     modifier = Modifier.fillMaxWidth(),
                     minLines = 2,
                     maxLines = 4
@@ -198,7 +201,7 @@ fun AddTemplateScreen(
             item {
                 Column {
                     Text(
-                        text = "Target Muscle Groups",
+                        text = stringResource(R.string.label_target_muscle_groups),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Medium
                     )
@@ -211,9 +214,9 @@ fun AddTemplateScreen(
                             FilterChip(
                                 selected = targetMuscleGroups.contains(muscleGroup),
                                 onClick = { viewModel.toggleMuscleGroup(muscleGroup) },
-                                label = { 
+                                label = {
                                     Text(
-                                        text = formatMuscleGroupName(muscleGroup),
+                                        text = stringResource(getMuscleGroupStringRes(muscleGroup)),
                                         style = MaterialTheme.typography.labelMedium
                                     )
                                 },
@@ -234,11 +237,11 @@ fun AddTemplateScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Exercises",
+                        text = stringResource(R.string.label_exercises),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    
+
                     OutlinedButton(
                         onClick = {
                             swapTargetIndex = null // Ensure we are in adding mode
@@ -252,7 +255,7 @@ fun AddTemplateScreen(
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.size(4.dp))
-                        Text("Add Exercise")
+                        Text(stringResource(R.string.btn_add_exercise))
                     }
                 }
             }
@@ -261,7 +264,7 @@ fun AddTemplateScreen(
             if (exercises.isEmpty()) {
                 item {
                     Text(
-                        text = "No exercises added yet. Tap 'Add Exercise' to get started.",
+                        text = stringResource(R.string.empty_exercises_message),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         modifier = Modifier.padding(vertical = 16.dp)
@@ -305,11 +308,4 @@ fun AddTemplateScreen(
             }
         }
     }
-}
-
-private fun formatMuscleGroupName(muscleGroup: MuscleGroup): String {
-    return muscleGroup.name
-        .lowercase()
-        .replaceFirstChar { it.uppercase() }
-        .replace("_", " ")
 }

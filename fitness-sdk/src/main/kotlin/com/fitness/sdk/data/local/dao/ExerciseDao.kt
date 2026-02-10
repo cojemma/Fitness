@@ -14,10 +14,10 @@ import com.fitness.sdk.data.local.entity.ExerciseSetEntity
 @Dao
 interface ExerciseDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertExercise(exercise: ExerciseEntity): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertExercises(exercises: List<ExerciseEntity>): List<Long>
 
     @Query("DELETE FROM exercises WHERE workoutId = :workoutId")
@@ -28,10 +28,10 @@ interface ExerciseDao {
 
     // ExerciseSet operations
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertExerciseSet(exerciseSet: ExerciseSetEntity): Long
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insertExerciseSets(exerciseSets: List<ExerciseSetEntity>)
 
     @Query("DELETE FROM exercise_sets WHERE exerciseId = :exerciseId")

@@ -42,9 +42,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.fitness.sample.R
 import com.fitness.sample.ui.template.TemplateExerciseState
 import com.fitness.sample.ui.template.TemplateSetState
 
@@ -71,7 +73,7 @@ fun TemplateExerciseCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSuperset) MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f) 
+            containerColor = if (isSuperset) MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
                            else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         )
     ) {
@@ -93,7 +95,7 @@ fun TemplateExerciseCard(
                     if (isSuperset) {
                         Icon(
                             imageVector = Icons.Default.Link,
-                            contentDescription = "Superset",
+                            contentDescription = stringResource(R.string.label_superset),
                             tint = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.size(20.dp)
                         )
@@ -112,7 +114,7 @@ fun TemplateExerciseCard(
                     IconButton(onClick = { showMenu = true }) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Options"
+                            contentDescription = stringResource(R.string.cd_options)
                         )
                     }
 
@@ -121,47 +123,47 @@ fun TemplateExerciseCard(
                         onDismissRequest = { showMenu = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Move Up") },
-                            onClick = { 
+                            text = { Text(stringResource(R.string.menu_move_up)) },
+                            onClick = {
                                 onMoveUp()
-                                showMenu = false 
+                                showMenu = false
                             },
                             leadingIcon = { Icon(Icons.Default.KeyboardArrowUp, null) }
                         )
                         DropdownMenuItem(
-                            text = { Text("Move Down") },
-                            onClick = { 
+                            text = { Text(stringResource(R.string.menu_move_down)) },
+                            onClick = {
                                 onMoveDown()
-                                showMenu = false 
+                                showMenu = false
                             },
                             leadingIcon = { Icon(Icons.Default.KeyboardArrowDown, null) }
                         )
                         DropdownMenuItem(
-                            text = { Text("Swap Exercise") },
-                            onClick = { 
+                            text = { Text(stringResource(R.string.menu_swap_exercise)) },
+                            onClick = {
                                 onSwapExercise()
-                                showMenu = false 
+                                showMenu = false
                             },
                             leadingIcon = { Icon(Icons.Default.Refresh, null) }
                         )
                         DropdownMenuItem(
-                            text = { Text(if (isSuperset) "Unlink Superset" else "Link to Next (Superset)") },
-                            onClick = { 
+                            text = { Text(if (isSuperset) stringResource(R.string.menu_unlink_superset) else stringResource(R.string.menu_link_superset)) },
+                            onClick = {
                                 onSuperset()
-                                showMenu = false 
+                                showMenu = false
                             },
                             leadingIcon = { Icon(Icons.Default.Link, null) }
                         )
                     }
                 }
-                
+
                 IconButton(
                     onClick = onRemoveExercise,
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Remove exercise",
+                        contentDescription = stringResource(R.string.cd_remove_exercise),
                         tint = MaterialTheme.colorScheme.error
                     )
                 }
@@ -177,25 +179,25 @@ fun TemplateExerciseCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Set",
+                    text = stringResource(R.string.header_set),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.width(40.dp)
                 )
                 Text(
-                    text = "Reps",
+                    text = stringResource(R.string.header_reps),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.width(70.dp)
                 )
                 Text(
-                    text = "Weight (kg)",
+                    text = stringResource(R.string.header_weight_kg),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.width(90.dp)
                 )
                 Text(
-                    text = "Warm-up",
+                    text = stringResource(R.string.header_warmup),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier.width(70.dp)
@@ -227,7 +229,7 @@ fun TemplateExerciseCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = "Add set",
+                        contentDescription = stringResource(R.string.cd_add_set),
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -242,10 +244,10 @@ fun TemplateExerciseCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Rest between sets",
+                    text = stringResource(R.string.label_rest_between_sets),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                
+
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -321,7 +323,7 @@ private fun SetRow(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             textStyle = MaterialTheme.typography.bodyMedium,
-            placeholder = { Text("—", style = MaterialTheme.typography.bodyMedium) }
+            placeholder = { Text("\u2014", style = MaterialTheme.typography.bodyMedium) }
         )
 
         // Warm-up checkbox
@@ -339,7 +341,7 @@ private fun SetRow(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove set",
+                    contentDescription = stringResource(R.string.cd_remove_set),
                     tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
                     modifier = Modifier.size(18.dp)
                 )
@@ -360,7 +362,7 @@ private fun RestTimerChip(
     Surface(
         modifier = modifier.clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp),
-        color = if (isSelected) MaterialTheme.colorScheme.primary 
+        color = if (isSelected) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.surfaceVariant
     ) {
         Text(

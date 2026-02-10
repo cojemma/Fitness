@@ -34,8 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fitness.sample.R
 import com.fitness.sample.ui.theme.CardioColor
 import com.fitness.sample.ui.theme.FlexibilityColor
 import com.fitness.sample.ui.theme.HIITColor
@@ -104,7 +106,7 @@ fun WorkoutCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${workout.durationMinutes} min",
+                            text = stringResource(R.string.workout_min_format, workout.durationMinutes),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -119,7 +121,7 @@ fun WorkoutCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "${workout.caloriesBurned} cal",
+                            text = stringResource(R.string.workout_cal_format, workout.caloriesBurned),
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -127,7 +129,7 @@ fun WorkoutCard(
                     // Exercises count
                     if (workout.exercises.isNotEmpty()) {
                         Text(
-                            text = "${workout.exercises.size} exercises",
+                            text = stringResource(R.string.workout_exercises_format, workout.exercises.size),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.primary
                         )
@@ -139,7 +141,7 @@ fun WorkoutCard(
             IconButton(onClick = onDelete) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
+                    contentDescription = stringResource(R.string.cd_delete),
                     tint = MaterialTheme.colorScheme.error
                 )
             }
@@ -182,6 +184,6 @@ fun getWorkoutTypeIconAndColor(type: WorkoutType): Pair<ImageVector, Color> {
 }
 
 private fun formatDate(timestamp: Long): String {
-    val sdf = SimpleDateFormat("MMM dd, yyyy • HH:mm", Locale.getDefault())
+    val sdf = SimpleDateFormat("MMM dd, yyyy \u2022 HH:mm", Locale.getDefault())
     return sdf.format(Date(timestamp))
 }

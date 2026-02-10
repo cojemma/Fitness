@@ -32,9 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.fitness.sample.R
+import com.fitness.sample.ui.util.getMuscleGroupStringRes
 import com.fitness.sdk.domain.model.MuscleGroup
 import com.fitness.sdk.domain.model.WorkoutTemplate
 
@@ -79,14 +82,14 @@ fun TemplateCard(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
-                
+
                 IconButton(
                     onClick = onDelete,
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete template",
+                        contentDescription = stringResource(R.string.cd_delete_template),
                         tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
                         modifier = Modifier.size(20.dp)
                     )
@@ -139,16 +142,16 @@ fun TemplateCard(
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     StatBadge(
-                        label = "Exercises",
+                        label = stringResource(R.string.template_stat_exercises),
                         value = template.getTotalExercises().toString()
                     )
                     StatBadge(
-                        label = "Sets",
+                        label = stringResource(R.string.template_stat_sets),
                         value = template.getTotalWorkingSets().toString()
                     )
                     if (template.estimatedDurationMinutes > 0) {
                         StatBadge(
-                            label = "Minutes",
+                            label = stringResource(R.string.template_stat_minutes),
                             value = template.estimatedDurationMinutes.toString()
                         )
                     }
@@ -165,7 +168,7 @@ fun TemplateCard(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Start")
+                    Text(stringResource(R.string.btn_start))
                 }
             }
         }
@@ -202,7 +205,7 @@ fun MuscleGroupChip(
     modifier: Modifier = Modifier
 ) {
     val color = getMuscleGroupColor(muscleGroup)
-    
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(8.dp),
@@ -220,20 +223,13 @@ fun MuscleGroupChip(
                     .background(color)
             )
             Text(
-                text = formatMuscleGroupName(muscleGroup),
+                text = stringResource(getMuscleGroupStringRes(muscleGroup)),
                 style = MaterialTheme.typography.labelSmall,
                 color = color,
                 fontWeight = FontWeight.Medium
             )
         }
     }
-}
-
-private fun formatMuscleGroupName(muscleGroup: MuscleGroup): String {
-    return muscleGroup.name
-        .lowercase()
-        .replaceFirstChar { it.uppercase() }
-        .replace("_", " ")
 }
 
 private fun getMuscleGroupColor(muscleGroup: MuscleGroup): Color {

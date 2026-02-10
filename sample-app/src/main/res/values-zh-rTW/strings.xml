@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">健身範例</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_workouts">訓練紀錄</string>
+    <string name="nav_exercises">動作</string>
+    <string name="nav_templates">範本</string>
+
+    <!-- Settings -->
+    <string name="title_settings">設定</string>
+    <string name="setting_language">語言</string>
+    <string name="language_english">English</string>
+    <string name="language_traditional_chinese">繁體中文</string>
+    <string name="cd_settings">設定</string>
+    <string name="cd_back">返回</string>
+
+    <!-- Home Screen -->
+    <string name="title_my_workouts">我的訓練</string>
+    <string name="cd_add_workout">新增訓練</string>
+    <string name="empty_workouts_title">還沒有訓練紀錄</string>
+    <string name="empty_workouts_subtitle">點擊 + 按鈕新增你的第一筆訓練</string>
+
+    <!-- Template List Screen -->
+    <string name="title_my_templates">我的範本</string>
+    <string name="cd_add_template">新增範本</string>
+    <string name="empty_templates_title">還沒有範本</string>
+    <string name="empty_templates_subtitle">建立範本來儲存你喜歡的訓練動作</string>
+
+    <!-- Exercise List Screen -->
+    <string name="title_exercises">動作</string>
+    <string name="search_exercises_placeholder">搜尋動作…</string>
+    <string name="filter_all">全部</string>
+    <string name="exercises_count_format">%d 個動作</string>
+    <string name="cd_expand">展開</string>
+    <string name="cd_collapse">收合</string>
+    <string name="no_history_message">尚無紀錄。使用此動作完成訓練即可查看統計。</string>
+    <string name="stat_sessions">訓練次數</string>
+    <string name="stat_max_weight">最大重量</string>
+    <string name="stat_est_1rm">預估 1RM</string>
+    <string name="label_history">歷史紀錄</string>
+    <string name="no_recorded_sessions">無訓練紀錄</string>
+    <string name="session_best_sets_format">最佳: %1$s \u2022 %2$d 組</string>
+    <string name="volume_kg_format">%d 公斤總量</string>
+
+    <!-- Muscle Groups -->
+    <string name="muscle_chest">胸</string>
+    <string name="muscle_back">背</string>
+    <string name="muscle_shoulders">肩</string>
+    <string name="muscle_biceps">二頭肌</string>
+    <string name="muscle_triceps">三頭肌</string>
+    <string name="muscle_forearms">前臂</string>
+    <string name="muscle_quads">股四頭肌</string>
+    <string name="muscle_hamstrings">腿後側肌群</string>
+    <string name="muscle_glutes">臀部</string>
+    <string name="muscle_calves">小腿</string>
+    <string name="muscle_core">核心</string>
+    <string name="muscle_full_body">全身</string>
+
+    <!-- Exercise Picker Screen -->
+    <string name="title_select_exercise">選擇動作</string>
+    <string name="cd_clear">清除</string>
+    <string name="exercise_default_sets_reps">預設: %1$d 組 \u00d7 %2$d 下</string>
+    <string name="exercise_default_sets_seconds">預設: %1$d 組 \u00d7 %2$d 秒</string>
+
+    <!-- Add Exercise Dialog -->
+    <string name="dialog_add_exercise">新增動作</string>
+    <string name="btn_select_from_library">從動作庫選擇</string>
+    <string name="or_enter_manually">\u2014 或手動輸入 \u2014</string>
+    <string name="label_exercise_name">動作名稱</string>
+    <string name="placeholder_exercise_name">例如：臥推</string>
+    <string name="label_sets">組數</string>
+    <string name="label_reps">次數</string>
+    <string name="label_weight_kg">重量（公斤）</string>
+    <string name="label_rest_sec">休息（秒）</string>
+    <string name="label_duration_sec">時間（秒）- 計時動作</string>
+    <string name="btn_add">新增</string>
+    <string name="btn_cancel">取消</string>
+
+    <!-- Add Workout Screen -->
+    <string name="title_edit_workout">編輯訓練</string>
+    <string name="title_new_workout">新增訓練</string>
+    <string name="label_workout_name">訓練名稱</string>
+    <string name="placeholder_workout_name">例如：晨跑</string>
+    <string name="label_workout_type">訓練類型</string>
+    <string name="label_duration_min">時間（分鐘）</string>
+    <string name="label_calories">卡路里</string>
+    <string name="label_notes_optional">備註（選填）</string>
+    <string name="label_exercises_count">動作（%d）</string>
+    <string name="btn_saving">儲存中…</string>
+    <string name="btn_save_workout">儲存訓練</string>
+    <string name="cd_add_exercise">新增動作</string>
+
+    <!-- Workout Details Screen -->
+    <string name="title_workout_details">訓練詳情</string>
+    <string name="cd_edit">編輯</string>
+    <string name="cd_delete">刪除</string>
+    <string name="label_duration">時間</string>
+    <string name="label_calories_detail">卡路里</string>
+    <string name="label_exercises">動作</string>
+    <string name="label_notes">備註</string>
+    <string name="duration_min_format">%s 分鐘</string>
+    <string name="label_workout_fallback">訓練</string>
+
+    <!-- Active Workout Screen -->
+    <string name="cd_cancel_workout">取消訓練</string>
+    <string name="btn_finish">完成</string>
+    <string name="loading_starting_workout">正在開始訓練…</string>
+    <string name="no_exercises_in_workout">此訓練沒有動作</string>
+    <string name="exercise_progress_format">動作 %1$d / %2$d</string>
+    <string name="set_of_format">第 %1$d 組 / 共 %2$d 組</string>
+    <string name="last_set_prefix">上次: %s</string>
+    <string name="label_reps_input">次數</string>
+    <string name="label_weight_kg_input">重量（公斤）</string>
+    <string name="btn_complete_set">完成此組</string>
+    <string name="label_rest">休息</string>
+    <string name="btn_skip_rest">跳過休息</string>
+    <string name="btn_previous">上一個</string>
+    <string name="btn_next">下一個</string>
+    <string name="label_completed_sets">已完成組數</string>
+    <string name="set_number_format">第 %d 組</string>
+    <string name="reps_weight_format">%1$d 下 \u00d7 %2$s 公斤</string>
+    <string name="reps_only_format">%d 下</string>
+    <string name="dialog_workout_complete">訓練完成！</string>
+    <string name="dialog_what_to_do">很棒的訓練！你想怎麼處理？</string>
+    <string name="btn_update_original_template">更新原始範本</string>
+    <string name="btn_save_as_new_template">另存為新範本</string>
+    <string name="btn_skip">跳過</string>
+    <string name="dialog_new_template_name">新範本名稱</string>
+    <string name="label_template_name">範本名稱</string>
+    <string name="placeholder_my_template">我的範本</string>
+    <string name="btn_create">建立</string>
+    <string name="label_superset">超級組</string>
+    <string name="paired_with_format">搭配: %s</string>
+    <string name="snackbar_template_saved">範本已儲存！</string>
+
+    <!-- Add Template Screen -->
+    <string name="title_edit_template">編輯範本</string>
+    <string name="title_new_template">新增範本</string>
+    <string name="placeholder_template_name">例如：推的訓練 A</string>
+    <string name="label_description_optional">說明（選填）</string>
+    <string name="placeholder_template_notes">關於此範本的備註</string>
+    <string name="label_target_muscle_groups">目標肌群</string>
+    <string name="btn_save">儲存</string>
+    <string name="btn_add_exercise">新增動作</string>
+    <string name="empty_exercises_message">尚未新增動作。點擊「新增動作」開始。</string>
+
+    <!-- Stats Summary -->
+    <string name="stats_this_week">本週</string>
+    <string name="stats_workouts">訓練次數</string>
+    <string name="stats_calories">卡路里</string>
+    <string name="stats_duration">時間</string>
+    <string name="stats_min_format">%d 分鐘</string>
+
+    <!-- Workout Card -->
+    <string name="workout_min_format">%d 分鐘</string>
+    <string name="workout_cal_format">%d 卡</string>
+    <string name="workout_exercises_format">%d 個動作</string>
+
+    <!-- Template Card -->
+    <string name="cd_delete_template">刪除範本</string>
+    <string name="template_stat_exercises">動作</string>
+    <string name="template_stat_sets">組數</string>
+    <string name="template_stat_minutes">分鐘</string>
+    <string name="btn_start">開始</string>
+
+    <!-- Exercise Item -->
+    <string name="exercise_sets_reps_format">%1$d \u00d7 %2$d 下</string>
+    <string name="exercise_sets_timed_format">%1$d \u00d7 %2$d 秒</string>
+    <string name="exercise_kg_format">%d 公斤</string>
+    <string name="exercise_sets_completed">已完成 %d 組</string>
+
+    <!-- Template Exercise Card -->
+    <string name="cd_options">選項</string>
+    <string name="menu_move_up">上移</string>
+    <string name="menu_move_down">下移</string>
+    <string name="menu_swap_exercise">替換動作</string>
+    <string name="menu_link_superset">與下一個連結（超級組）</string>
+    <string name="menu_unlink_superset">取消超級組連結</string>
+    <string name="cd_remove_exercise">移除動作</string>
+    <string name="header_set">組</string>
+    <string name="header_reps">次數</string>
+    <string name="header_weight_kg">重量（公斤）</string>
+    <string name="header_warmup">暖身組</string>
+    <string name="cd_add_set">新增組</string>
+    <string name="cd_remove_set">移除組</string>
+    <string name="label_rest_between_sets">組間休息</string>
+</resources>

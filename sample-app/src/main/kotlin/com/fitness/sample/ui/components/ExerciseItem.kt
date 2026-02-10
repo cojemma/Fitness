@@ -20,8 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fitness.sample.R
 import com.fitness.sdk.domain.model.Exercise
 
 @Composable
@@ -69,14 +71,14 @@ fun ExerciseItem(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "${exercise.sets} × ${exercise.durationSeconds}s",
+                                    text = stringResource(R.string.exercise_sets_timed_format, exercise.sets, exercise.durationSeconds),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         } else {
                             Text(
-                                text = "${exercise.sets} × ${exercise.reps} reps",
+                                text = stringResource(R.string.exercise_sets_reps_format, exercise.sets, exercise.reps),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -84,7 +86,7 @@ fun ExerciseItem(
 
                         exercise.weight?.let { weight ->
                             Text(
-                                text = "${weight.toInt()} kg",
+                                text = stringResource(R.string.exercise_kg_format, weight.toInt()),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Medium
@@ -93,7 +95,7 @@ fun ExerciseItem(
                     }
                 } else {
                     Text(
-                        text = "${exercise.setRecords.size} sets completed",
+                        text = stringResource(R.string.exercise_sets_completed, exercise.setRecords.size),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -104,7 +106,7 @@ fun ExerciseItem(
         // Show individual set records if available
         if (exercise.setRecords.isNotEmpty()) {
             Spacer(modifier = Modifier.height(12.dp))
-            
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -124,12 +126,12 @@ fun ExerciseItem(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Set ${setRecord.setNumber}",
+                                text = stringResource(R.string.set_number_format, setRecord.setNumber),
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            
+
                             Text(
                                 text = setRecord.getDisplayString(),
                                 style = MaterialTheme.typography.bodySmall,
@@ -143,4 +145,3 @@ fun ExerciseItem(
         }
     }
 }
-

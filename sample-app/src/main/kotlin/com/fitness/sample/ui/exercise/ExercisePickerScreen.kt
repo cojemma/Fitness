@@ -42,10 +42,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sample.R
+import com.fitness.sample.ui.util.getMuscleGroupStringRes
 import com.fitness.sdk.domain.model.ExerciseCategory
 import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.MuscleGroup
@@ -64,10 +67,10 @@ fun ExercisePickerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Select Exercise") },
+                title = { Text(stringResource(R.string.title_select_exercise)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -88,14 +91,14 @@ fun ExercisePickerScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
-                placeholder = { Text("Search exercises...") },
+                placeholder = { Text(stringResource(R.string.search_exercises_placeholder)) },
                 leadingIcon = {
                     Icon(Icons.Default.Search, contentDescription = null)
                 },
                 trailingIcon = {
                     if (searchQuery.isNotEmpty()) {
                         IconButton(onClick = { viewModel.onSearchQueryChange("") }) {
-                            Icon(Icons.Default.Close, contentDescription = "Clear")
+                            Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_clear))
                         }
                     }
                 },
@@ -117,7 +120,7 @@ fun ExercisePickerScreen(
                     FilterChip(
                         selected = selectedMuscleGroup == null,
                         onClick = { viewModel.onMuscleGroupSelect(null) },
-                        label = { Text("All") },
+                        label = { Text(stringResource(R.string.filter_all)) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
                         )
@@ -127,7 +130,7 @@ fun ExercisePickerScreen(
                     FilterChip(
                         selected = selectedMuscleGroup == muscle,
                         onClick = { viewModel.onMuscleGroupSelect(muscle) },
-                        label = { Text(formatMuscleGroup(muscle)) },
+                        label = { Text(stringResource(getMuscleGroupStringRes(muscle))) },
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
                         )
@@ -137,7 +140,7 @@ fun ExercisePickerScreen(
 
             // Exercise count
             Text(
-                text = "${exercises.size} exercises",
+                text = stringResource(R.string.exercises_count_format, exercises.size),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
@@ -164,6 +167,10 @@ fun ExerciseLibraryItem(
     exercise: ExerciseDefinition,
     onClick: () -> Unit
 ) {
+    val sets = exercise.defaultSets ?: 3
+    val reps = exercise.defaultReps ?: 10
+    val duration = exercise.defaultDurationSeconds ?: 30
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -205,7 +212,7 @@ fun ExerciseLibraryItem(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = formatMuscleGroup(exercise.primaryMuscle),
+                    text = stringResource(getMuscleGroupStringRes(exercise.primaryMuscle)),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -225,9 +232,9 @@ fun ExerciseLibraryItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = if (exercise.isTimeBased) {
-                        "Default: ${exercise.defaultSets ?: 3} sets × ${exercise.defaultDurationSeconds ?: 30}s"
+                        stringResource(R.string.exercise_default_sets_seconds, sets, duration)
                     } else {
-                        "Default: ${exercise.defaultSets ?: 3} sets × ${exercise.defaultReps ?: 10} reps"
+                        stringResource(R.string.exercise_default_sets_reps, sets, reps)
                     },
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
@@ -252,19 +259,4 @@ private fun getCategoryEmoji(category: ExerciseCategory) = when (category) {
     ExerciseCategory.FLEXIBILITY -> "🧘"
     ExerciseCategory.PLYOMETRIC -> "⚡"
     ExerciseCategory.BODYWEIGHT -> "💪"
-}
-
-private fun formatMuscleGroup(muscle: MuscleGroup): String = when (muscle) {
-    MuscleGroup.CHEST -> "Chest"
-    MuscleGroup.BACK -> "Back"
-    MuscleGroup.SHOULDERS -> "Shoulders"
-    MuscleGroup.BICEPS -> "Biceps"
-    MuscleGroup.TRICEPS -> "Triceps"
-    MuscleGroup.FOREARMS -> "Forearms"
-    MuscleGroup.QUADRICEPS -> "Quads"
-    MuscleGroup.HAMSTRINGS -> "Hamstrings"
-    MuscleGroup.GLUTES -> "Glutes"
-    MuscleGroup.CALVES -> "Calves"
-    MuscleGroup.CORE -> "Core"
-    MuscleGroup.FULL_BODY -> "Full Body"
 }

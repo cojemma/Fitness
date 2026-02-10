@@ -11,10 +11,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -29,9 +31,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.fitness.sample.R
 import com.fitness.sample.ui.components.EmptyState
 import com.fitness.sample.ui.components.TemplateCard
 
@@ -44,6 +48,7 @@ fun TemplateListScreen(
     onAddTemplate: () -> Unit,
     onTemplateClick: (Long) -> Unit,
     onStartWorkout: (Long) -> Unit,
+    onNavigateToSettings: () -> Unit,
     viewModel: TemplateListViewModel = viewModel()
 ) {
     val templates by viewModel.templates.collectAsState()
@@ -63,13 +68,21 @@ fun TemplateListScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "My Templates",
+                        text = stringResource(R.string.title_my_templates),
                         fontWeight = FontWeight.Bold
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.cd_settings)
+                        )
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -79,7 +92,7 @@ fun TemplateListScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add Template"
+                    contentDescription = stringResource(R.string.cd_add_template)
                 )
             }
         },
@@ -104,8 +117,8 @@ fun TemplateListScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     EmptyState(
-                        title = "No templates yet",
-                        subtitle = "Create a template to save your favorite workout routines"
+                        title = stringResource(R.string.empty_templates_title),
+                        subtitle = stringResource(R.string.empty_templates_subtitle)
                     )
                 }
             }

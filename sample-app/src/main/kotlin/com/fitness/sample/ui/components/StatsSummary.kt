@@ -23,8 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.fitness.sample.R
 
 @Composable
 fun StatsSummary(
@@ -44,7 +46,7 @@ fun StatsSummary(
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "This Week",
+                text = stringResource(R.string.stats_this_week),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -58,21 +60,21 @@ fun StatsSummary(
                 StatItem(
                     icon = Icons.Default.FitnessCenter,
                     value = totalWorkouts.toString(),
-                    label = "Workouts",
+                    label = stringResource(R.string.stats_workouts),
                     color = MaterialTheme.colorScheme.primary
                 )
 
                 StatItem(
                     icon = Icons.Default.LocalFireDepartment,
                     value = totalCalories.toString(),
-                    label = "Calories",
+                    label = stringResource(R.string.stats_calories),
                     color = Color(0xFFFF5722)
                 )
 
                 StatItem(
                     icon = Icons.Default.TrendingUp,
-                    value = "$totalMinutes min",
-                    label = "Duration",
+                    value = stringResource(R.string.stats_min_format, totalMinutes),
+                    label = stringResource(R.string.stats_duration),
                     color = Color(0xFF4CAF50)
                 )
             }

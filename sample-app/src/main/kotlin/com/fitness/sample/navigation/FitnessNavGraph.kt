@@ -16,6 +16,7 @@ import androidx.navigation.navArgument
 import com.fitness.sample.ui.exercise.ExerciseListScreen
 import com.fitness.sample.ui.exercise.ExercisePickerScreen
 import com.fitness.sample.ui.home.HomeScreen
+import com.fitness.sample.ui.settings.SettingsScreen
 import com.fitness.sample.ui.template.ActiveWorkoutScreen
 import com.fitness.sample.ui.template.ActiveWorkoutViewModel
 import com.fitness.sample.ui.template.AddTemplateScreen
@@ -52,6 +53,9 @@ sealed class Screen(val route: String) {
     object ActiveWorkout : Screen("active_workout/{templateId}") {
         fun createRoute(templateId: Long) = "active_workout/$templateId"
     }
+
+    // Settings
+    object Settings : Screen("settings")
 }
 
 @Composable
@@ -73,7 +77,7 @@ fun FitnessNavGraph(
         startDestination = startDestination
     ) {
         // ========== Workout Routes ==========
-        
+
         // Home screen (Workout history)
         composable(Screen.Home.route) {
             HomeScreen(
@@ -84,6 +88,9 @@ fun FitnessNavGraph(
                 },
                 onWorkoutClick = { workoutId ->
                     navController.navigate(Screen.WorkoutDetails.createRoute(workoutId))
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
@@ -203,6 +210,9 @@ fun FitnessNavGraph(
             ExerciseListScreen(
                 onWorkoutClick = { workoutId ->
                     navController.navigate(Screen.WorkoutDetails.createRoute(workoutId))
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
@@ -220,6 +230,9 @@ fun FitnessNavGraph(
                 },
                 onStartWorkout = { templateId ->
                     navController.navigate(Screen.ActiveWorkout.createRoute(templateId))
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
@@ -326,6 +339,15 @@ fun FitnessNavGraph(
                     pendingExerciseSource = null
                 },
                 viewModel = activeWorkoutViewModel
+            )
+        }
+
+        // ========== Settings Route ==========
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }

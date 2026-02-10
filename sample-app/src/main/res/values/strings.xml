@@ -1,4 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Fitness Sample</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_workouts">Workouts</string>
+    <string name="nav_exercises">Exercises</string>
+    <string name="nav_templates">Templates</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Settings</string>
+    <string name="setting_language">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_traditional_chinese">繁體中文</string>
+    <string name="cd_settings">Settings</string>
+    <string name="cd_back">Back</string>
+
+    <!-- Home Screen -->
+    <string name="title_my_workouts">My Workouts</string>
+    <string name="cd_add_workout">Add Workout</string>
+    <string name="empty_workouts_title">No workouts yet</string>
+    <string name="empty_workouts_subtitle">Tap the + button to add your first workout</string>
+
+    <!-- Template List Screen -->
+    <string name="title_my_templates">My Templates</string>
+    <string name="cd_add_template">Add Template</string>
+    <string name="empty_templates_title">No templates yet</string>
+    <string name="empty_templates_subtitle">Create a template to save your favorite workout routines</string>
+
+    <!-- Exercise List Screen -->
+    <string name="title_exercises">Exercises</string>
+    <string name="search_exercises_placeholder">Search exercises…</string>
+    <string name="filter_all">All</string>
+    <string name="exercises_count_format">%d exercises</string>
+    <string name="cd_expand">Expand</string>
+    <string name="cd_collapse">Collapse</string>
+    <string name="no_history_message">No history yet. Complete workouts with this exercise to see stats.</string>
+    <string name="stat_sessions">Sessions</string>
+    <string name="stat_max_weight">Max Weight</string>
+    <string name="stat_est_1rm">Est. 1RM</string>
+    <string name="label_history">History</string>
+    <string name="no_recorded_sessions">No recorded sessions</string>
+    <string name="session_best_sets_format">Best: %1$s \u2022 %2$d sets</string>
+    <string name="volume_kg_format">%d kg vol</string>
+
+    <!-- Muscle Groups -->
+    <string name="muscle_chest">Chest</string>
+    <string name="muscle_back">Back</string>
+    <string name="muscle_shoulders">Shoulders</string>
+    <string name="muscle_biceps">Biceps</string>
+    <string name="muscle_triceps">Triceps</string>
+    <string name="muscle_forearms">Forearms</string>
+    <string name="muscle_quads">Quads</string>
+    <string name="muscle_hamstrings">Hamstrings</string>
+    <string name="muscle_glutes">Glutes</string>
+    <string name="muscle_calves">Calves</string>
+    <string name="muscle_core">Core</string>
+    <string name="muscle_full_body">Full Body</string>
+
+    <!-- Exercise Picker Screen -->
+    <string name="title_select_exercise">Select Exercise</string>
+    <string name="cd_clear">Clear</string>
+    <string name="exercise_default_sets_reps">Default: %1$d sets \u00d7 %2$d reps</string>
+    <string name="exercise_default_sets_seconds">Default: %1$d sets \u00d7 %2$ds</string>
+
+    <!-- Add Exercise Dialog -->
+    <string name="dialog_add_exercise">Add Exercise</string>
+    <string name="btn_select_from_library">Select from Library</string>
+    <string name="or_enter_manually">\u2014 or enter manually \u2014</string>
+    <string name="label_exercise_name">Exercise Name</string>
+    <string name="placeholder_exercise_name">e.g., Bench Press</string>
+    <string name="label_sets">Sets</string>
+    <string name="label_reps">Reps</string>
+    <string name="label_weight_kg">Weight (kg)</string>
+    <string name="label_rest_sec">Rest (sec)</string>
+    <string name="label_duration_sec">Duration (sec) - for timed exercises</string>
+    <string name="btn_add">Add</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <!-- Add Workout Screen -->
+    <string name="title_edit_workout">Edit Workout</string>
+    <string name="title_new_workout">New Workout</string>
+    <string name="label_workout_name">Workout Name</string>
+    <string name="placeholder_workout_name">e.g., Morning Run</string>
+    <string name="label_workout_type">Workout Type</string>
+    <string name="label_duration_min">Duration (min)</string>
+    <string name="label_calories">Calories</string>
+    <string name="label_notes_optional">Notes (optional)</string>
+    <string name="label_exercises_count">Exercises (%d)</string>
+    <string name="btn_saving">Saving…</string>
+    <string name="btn_save_workout">Save Workout</string>
+    <string name="cd_add_exercise">Add Exercise</string>
+
+    <!-- Workout Details Screen -->
+    <string name="title_workout_details">Workout Details</string>
+    <string name="cd_edit">Edit</string>
+    <string name="cd_delete">Delete</string>
+    <string name="label_duration">Duration</string>
+    <string name="label_calories_detail">Calories</string>
+    <string name="label_exercises">Exercises</string>
+    <string name="label_notes">Notes</string>
+    <string name="duration_min_format">%s min</string>
+    <string name="label_workout_fallback">Workout</string>
+
+    <!-- Active Workout Screen -->
+    <string name="cd_cancel_workout">Cancel workout</string>
+    <string name="btn_finish">Finish</string>
+    <string name="loading_starting_workout">Starting workout…</string>
+    <string name="no_exercises_in_workout">No exercises in this workout</string>
+    <string name="exercise_progress_format">Exercise %1$d of %2$d</string>
+    <string name="set_of_format">Set %1$d of %2$d</string>
+    <string name="last_set_prefix">Last: %s</string>
+    <string name="label_reps_input">Reps</string>
+    <string name="label_weight_kg_input">Weight (kg)</string>
+    <string name="btn_complete_set">Complete Set</string>
+    <string name="label_rest">REST</string>
+    <string name="btn_skip_rest">Skip Rest</string>
+    <string name="btn_previous">Previous</string>
+    <string name="btn_next">Next</string>
+    <string name="label_completed_sets">Completed Sets</string>
+    <string name="set_number_format">Set %d</string>
+    <string name="reps_weight_format">%1$d reps \u00d7 %2$skg</string>
+    <string name="reps_only_format">%d reps</string>
+    <string name="dialog_workout_complete">Workout Complete!</string>
+    <string name="dialog_what_to_do">Great workout! What would you like to do with it?</string>
+    <string name="btn_update_original_template">Update Original Template</string>
+    <string name="btn_save_as_new_template">Save as New Template</string>
+    <string name="btn_skip">Skip</string>
+    <string name="dialog_new_template_name">New Template Name</string>
+    <string name="label_template_name">Template Name</string>
+    <string name="placeholder_my_template">My Template</string>
+    <string name="btn_create">Create</string>
+    <string name="label_superset">Superset</string>
+    <string name="paired_with_format">Paired with: %s</string>
+    <string name="snackbar_template_saved">Template saved!</string>
+
+    <!-- Add Template Screen -->
+    <string name="title_edit_template">Edit Template</string>
+    <string name="title_new_template">New Template</string>
+    <string name="placeholder_template_name">e.g., Push Day A</string>
+    <string name="label_description_optional">Description (optional)</string>
+    <string name="placeholder_template_notes">Notes about this template</string>
+    <string name="label_target_muscle_groups">Target Muscle Groups</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_add_exercise">Add Exercise</string>
+    <string name="empty_exercises_message">No exercises added yet. Tap \'Add Exercise\' to get started.</string>
+
+    <!-- Stats Summary -->
+    <string name="stats_this_week">This Week</string>
+    <string name="stats_workouts">Workouts</string>
+    <string name="stats_calories">Calories</string>
+    <string name="stats_duration">Duration</string>
+    <string name="stats_min_format">%d min</string>
+
+    <!-- Workout Card -->
+    <string name="workout_min_format">%d min</string>
+    <string name="workout_cal_format">%d cal</string>
+    <string name="workout_exercises_format">%d exercises</string>
+
+    <!-- Template Card -->
+    <string name="cd_delete_template">Delete template</string>
+    <string name="template_stat_exercises">Exercises</string>
+    <string name="template_stat_sets">Sets</string>
+    <string name="template_stat_minutes">Minutes</string>
+    <string name="btn_start">Start</string>
+
+    <!-- Exercise Item -->
+    <string name="exercise_sets_reps_format">%1$d \u00d7 %2$d reps</string>
+    <string name="exercise_sets_timed_format">%1$d \u00d7 %2$ds</string>
+    <string name="exercise_kg_format">%d kg</string>
+    <string name="exercise_sets_completed">%d sets completed</string>
+
+    <!-- Template Exercise Card -->
+    <string name="cd_options">Options</string>
+    <string name="menu_move_up">Move Up</string>
+    <string name="menu_move_down">Move Down</string>
+    <string name="menu_swap_exercise">Swap Exercise</string>
+    <string name="menu_link_superset">Link to Next (Superset)</string>
+    <string name="menu_unlink_superset">Unlink Superset</string>
+    <string name="cd_remove_exercise">Remove exercise</string>
+    <string name="header_set">Set</string>
+    <string name="header_reps">Reps</string>
+    <string name="header_weight_kg">Weight (kg)</string>
+    <string name="header_warmup">Warm-up</string>
+    <string name="cd_add_set">Add set</string>
+    <string name="cd_remove_set">Remove set</string>
+    <string name="label_rest_between_sets">Rest between sets</string>
 </resources>
