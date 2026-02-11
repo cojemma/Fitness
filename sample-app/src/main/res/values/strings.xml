@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Fitness Sample</string>
+    <string name="app_name">FitTrack</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_workouts">Workouts</string>
@@ -133,6 +133,10 @@
     <string name="label_superset">Superset</string>
     <string name="paired_with_format">Paired with: %s</string>
     <string name="snackbar_template_saved">Template saved!</string>
+    <string name="cd_reorder_exercises">Reorder exercises</string>
+    <string name="exercise_sets_progress_format">%1$d/%2$d</string>
+    <string name="label_reorder">Reorder</string>
+    <string name="label_drag_to_reorder">Hold and drag to reorder exercises</string>
 
     <!-- Add Template Screen -->
     <string name="title_edit_template">Edit Template</string>

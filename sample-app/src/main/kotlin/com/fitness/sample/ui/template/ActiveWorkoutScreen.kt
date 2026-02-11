@@ -102,6 +102,7 @@ fun ActiveWorkoutScreen(
 
     // Navigation state
     val snackbarHostState = remember { SnackbarHostState() }
+    var showReorderSheet by remember { mutableStateOf(false) }
     var showSaveAsTemplateDialog by remember { mutableStateOf(false) }
     var templateNameInput by remember { mutableStateOf("") }
 
@@ -376,7 +377,18 @@ fun ActiveWorkoutScreen(
                         totalCount = exerciseCount
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Exercise navigator rail
+                    ExerciseNavigatorRail(
+                        exercises = workout?.exercises ?: emptyList(),
+                        currentExerciseIndex = currentExerciseIndex,
+                        completedSets = completedSets,
+                        onExerciseSelected = { index -> viewModel.goToExercise(index) },
+                        onReorderClicked = { showReorderSheet = true }
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Superset Info
                     val currentSupersetId = currentExercise.supersetGroupId
@@ -461,6 +473,21 @@ fun ActiveWorkoutScreen(
                     )
                 }
             }
+        }
+
+        // Exercise reorder bottom sheet
+        if (showReorderSheet) {
+            ExerciseReorderSheet(
+                exercises = workout?.exercises ?: emptyList(),
+                currentExerciseIndex = currentExerciseIndex,
+                completedSets = completedSets,
+                onDismiss = { showReorderSheet = false },
+                onReorder = { from, to -> viewModel.reorderExercises(from, to) },
+                onExerciseSelected = { index ->
+                    viewModel.goToExercise(index)
+                    showReorderSheet = false
+                }
+            )
         }
     }
 }

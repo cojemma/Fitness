@@ -209,6 +209,8 @@ src/main/kotlin/com/fitness/sample/
     │   ├── TemplateListScreen.kt     # List of templates
     │   ├── AddTemplateScreen.kt      # Create/edit template
     │   ├── ActiveWorkoutScreen.kt    # Active session UI (timer, set logging, add exercise FAB)
+    │   ├── ExerciseNavigatorRail.kt  # Horizontal exercise chip rail for quick navigation
+    │   ├── ExerciseReorderSheet.kt   # Bottom sheet for drag-to-reorder exercises
     │   ├── TemplateViewModel.kt      # Template editor state
     │   ├── TemplateListViewModel.kt  # Template list state
     │   ├── ActiveWorkoutViewModel.kt # Active session state (Coordinator)
@@ -239,7 +241,7 @@ src/main/kotlin/com/fitness/sample/
 | Templates | `templates` | List of reusable workout templates |
 | Add Template | `add_template` | Create new template |
 | Edit Template | `edit_template/{id}` | Edit existing template |
-| Active Workout | `active_workout/{templateId}` | Active training session with timer, set logging, and add-exercise from library |
+| Active Workout | `active_workout/{templateId}` | Active training session with timer, set logging, exercise navigator rail, reorder, and add-exercise from library |
 | Create Custom Exercise | `create_custom_exercise` | Form to create user-defined exercises |
 | Settings | `settings` | Language and calendar view preferences |
 

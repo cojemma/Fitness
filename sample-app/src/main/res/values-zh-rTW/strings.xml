@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">健身範例</string>
+    <string name="app_name">FitTrack</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_workouts">訓練紀錄</string>
@@ -133,6 +133,10 @@
     <string name="label_superset">超級組</string>
     <string name="paired_with_format">搭配: %s</string>
     <string name="snackbar_template_saved">範本已儲存！</string>
+    <string name="cd_reorder_exercises">重新排列動作</string>
+    <string name="exercise_sets_progress_format">%1$d/%2$d</string>
+    <string name="label_reorder">排列</string>
+    <string name="label_drag_to_reorder">長按拖曳來重新排列動作</string>
 
     <!-- Add Template Screen -->
     <string name="title_edit_template">編輯範本</string>

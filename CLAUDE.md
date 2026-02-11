@@ -120,6 +120,14 @@ FitnessSDK.getTemplateManager()         // Template management
 - **ViewModel:** `HomeViewModel` extends `AndroidViewModel` (needs app context for `PreferencesManager`). `refreshCalendarViewType()` re-reads preference on screen resume (e.g., after returning from Settings).
 - **Settings integration:** `SettingsScreen.kt` — "Calendar View" row with `CalendarMonth` icon + `CalendarViewPickerDialog` (3 radio options).
 
+## Exercise Navigator & Reorder (Active Workout)
+
+- **Navigator Rail:** `ExerciseNavigatorRail.kt` — horizontal `LazyRow` of exercise chips placed between progress bar and current exercise card during active workout. Each chip shows exercise number (or checkmark if complete), truncated name, and set progress (e.g., "2/4"). Tapping jumps to that exercise. Trailing reorder button opens bottom sheet.
+- **Reorder Sheet:** `ExerciseReorderSheet.kt` — `ModalBottomSheet` with draggable exercise list. Long-press + drag to reorder; tap to jump to exercise.
+- **State:** `SessionStateManager.goToExercise(index)` jumps to exercise and resumes at next uncompleted set. `reorderExercises(fromIndex, toIndex)` moves exercise, remaps `completedSets` keys (index-based `Map<Int, List<SetLogEntry>>`), and adjusts `currentExerciseIndex` to follow the viewed exercise.
+- **ViewModel:** `ActiveWorkoutViewModel.goToExercise()` and `reorderExercises()` delegate to SessionStateManager; `goToExercise` also cancels rest timer.
+- **No `finishWorkout()` changes needed:** It already uses `mapIndexed` on the synced exercise list + completedSets map.
+
 ## Git Conventions
 
 - **Branch:** `master`

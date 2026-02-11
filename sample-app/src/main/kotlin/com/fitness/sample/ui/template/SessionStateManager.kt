@@ -129,6 +129,58 @@ class SessionStateManager {
     }
 
     /**
+     * Jumps to a specific exercise by index.
+     * Resumes at the next uncompleted set if the exercise was partially done.
+     */
+    fun goToExercise(index: Int) {
+        val workout = _workout.value ?: return
+        if (index in workout.exercises.indices) {
+            _currentExerciseIndex.value = index
+            val completedCount = _completedSets.value[index]?.size ?: 0
+            val totalSets = workout.exercises[index].sets
+            _currentSetIndex.value = completedCount.coerceAtMost(totalSets - 1)
+        }
+    }
+
+    /**
+     * Reorders exercises by moving one from [fromIndex] to [toIndex].
+     * Remaps completedSets keys and adjusts currentExerciseIndex to follow the viewed exercise.
+     */
+    fun reorderExercises(fromIndex: Int, toIndex: Int) {
+        val currentWorkout = _workout.value ?: return
+        val exercises = currentWorkout.exercises.toMutableList()
+        if (fromIndex !in exercises.indices || toIndex !in exercises.indices || fromIndex == toIndex) return
+
+        val movedExercise = exercises.removeAt(fromIndex)
+        exercises.add(toIndex, movedExercise)
+        _workout.value = currentWorkout.copy(exercises = exercises)
+
+        // Remap completedSets: build old-index-to-new-index mapping
+        val oldSets = _completedSets.value
+        val newSets = mutableMapOf<Int, List<SetLogEntry>>()
+        for (newIdx in exercises.indices) {
+            val oldIdx = when {
+                newIdx == toIndex -> fromIndex
+                fromIndex < toIndex && newIdx in fromIndex until toIndex -> newIdx + 1
+                fromIndex > toIndex && newIdx in (toIndex + 1)..fromIndex -> newIdx - 1
+                else -> newIdx
+            }
+            oldSets[oldIdx]?.let { newSets[newIdx] = it }
+        }
+        _completedSets.value = newSets
+
+        // Adjust currentExerciseIndex to follow the exercise the user was viewing
+        val currentIdx = _currentExerciseIndex.value
+        val newCurrentIdx = when {
+            currentIdx == fromIndex -> toIndex
+            fromIndex < toIndex && currentIdx in (fromIndex + 1)..toIndex -> currentIdx - 1
+            fromIndex > toIndex && currentIdx in toIndex until fromIndex -> currentIdx + 1
+            else -> currentIdx
+        }
+        _currentExerciseIndex.value = newCurrentIdx
+    }
+
+    /**
      * Adds an exercise to the current workout.
      * The exercise is appended to the end of the exercise list.
      */

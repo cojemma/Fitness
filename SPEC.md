@@ -46,7 +46,7 @@ A reference implementation using the SDK.
 
 ### Current State
 
-**Version 1.9.0**
+**Version 1.10.0**
 
 - **Core CRUD**: Workouts and Exercises can be created, read, updated, and deleted.
 - **Exercise Library**: Pre-loaded library of 55+ exercises with categorization.
@@ -67,6 +67,7 @@ A reference implementation using the SDK.
 - **Dynamic Exercise Addition**: Users can add exercises to an active workout session via FloatingActionButton, selecting from the exercise library. Exercises are added to the in-memory workout and immediately available for logging sets.
 - **Calendar View**: Home screen supports optional Weekly or Monthly calendar overlay above the workout list. Calendar days with workouts show dot indicators; tapping a day filters the workout list to that date (tap again to deselect). Calendar type (None/Weekly/Monthly) is configurable in Settings and persisted via `SharedPreferences`. Built with pure Compose (no 3rd-party calendar library). `HomeViewModel` extends `AndroidViewModel` for access to `PreferencesManager`.
 - **Settings Screen**: `SettingsScreen` with language picker (English/Traditional Chinese via `AppCompatDelegate.setApplicationLocales()`) and calendar view type picker. Accessible via gear icon in Home screen TopAppBar.
+- **Exercise Navigator & Reorder**: During active workout, a horizontal exercise navigator rail (`ExerciseNavigatorRail`) displays all exercises as scrollable chips with completion status. Tapping a chip jumps to that exercise (resuming at next uncompleted set). A reorder button opens `ExerciseReorderSheet` (ModalBottomSheet) where exercises can be long-press-dragged to reorder. Reordering remaps the `completedSets` index-keyed map and adjusts `currentExerciseIndex` to follow the viewed exercise.
 
 ### Active Development (Next Steps)
 
@@ -74,7 +75,7 @@ A reference implementation using the SDK.
 2. **UX Improvements**: "Swipe to Delete" for workout cards.
 3. **Search & Filter**: Global search for workouts and advanced filtering.
 4. **Visualization**: Charts and graphs for progress tracking (Volume, 1RM stats).
-5. **In-Workout Tools**: Superset support (referenced in PRD).
+5. **In-Workout Tools**: Further superset support improvements.
 
 ## Handover Readiness
 

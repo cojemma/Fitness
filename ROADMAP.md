@@ -68,7 +68,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Exercise picker | ✅ | Browse and select from exercise library |
 | Template list | ✅ | List of saved workout templates |
 | Add template | ✅ | Create/Edit workout template |
-| Active workout | ✅ | Session view with timer, set logging, and add exercise from library (FAB) |
+| Active workout | ✅ | Session view with timer, set logging, exercise navigator rail, drag-to-reorder, and add exercise from library (FAB) |
 | Create custom exercise | ✅ | Form to create user-defined exercises (name, category, muscles, defaults) |
 | Settings | ✅ | Language picker and calendar view type preference |
 
@@ -85,6 +85,8 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Muscle group filter chips | ✅ | Filter exercises by muscle group |
 | Template card | ✅ | Card with muscle groups and start button |
 | Template exercise card | ✅ | Editor for template sets and rests |
+| Exercise navigator rail | ✅ | Horizontal scrollable exercise chips for quick jump during active workout |
+| Exercise reorder sheet | ✅ | Bottom sheet with drag-to-reorder exercises during active workout |
 | Workout calendar | ✅ | Weekly/Monthly calendar views with workout dot indicators |
 
 ### App - To Develop
@@ -130,6 +132,7 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.10.0 | 2026-02-11 | Exercise navigator rail and reorder during active workout: Horizontal scrollable exercise chips for quick navigation, tap to jump to any exercise, drag-to-reorder via bottom sheet with completed sets remapping. |
 | 1.9.0 | 2026-02-11 | Calendar view on Home screen: Weekly and Monthly calendar modes with workout dot indicators and tap-to-filter. Switchable via Settings (None/Weekly/Monthly). Preferences persisted with SharedPreferences. Settings screen now includes calendar view picker alongside language picker. |
 | 1.8.0 | 2026-02-10 | Custom exercises: Create, save, delete user-defined exercises. New SDK APIs: `saveCustomExercise()`, `deleteCustomExercise()`, `observeAllExercises()`. CompositeExerciseLibraryProvider merges predefined + custom. New CreateCustomExerciseScreen with full form. Custom badge and delete action in exercise list. |
 | 1.7.1 | 2026-02-10 | Fix: Exercise session counts and history now update in real-time via reactive Flow (`observeExerciseSessionCounts()`). History cache invalidation on data change. |

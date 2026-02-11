@@ -99,6 +99,15 @@ class ActiveWorkoutViewModel : ViewModel() {
         timerManager.skipRest()
     }
 
+    fun goToExercise(index: Int) {
+        sessionStateManager.goToExercise(index)
+        timerManager.skipRest()
+    }
+
+    fun reorderExercises(fromIndex: Int, toIndex: Int) {
+        sessionStateManager.reorderExercises(fromIndex, toIndex)
+    }
+
     fun previousExercise() {
         sessionStateManager.previousExercise()
         timerManager.skipRest() // Cancel rest if navigating
