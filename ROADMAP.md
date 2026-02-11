@@ -60,7 +60,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 
 | Screen | Status | Description |
 |--------|--------|-------------|
-| Home screen | ✅ | Workout list with weekly stats summary |
+| Home screen | ✅ | Workout list with weekly stats summary and optional calendar view (weekly/monthly) |
 | Add workout | ✅ | Form to create new workout |
 | Workout details | ✅ | View workout info and exercises |
 | Edit workout | ✅ | Modify existing workout |
@@ -70,6 +70,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Add template | ✅ | Create/Edit workout template |
 | Active workout | ✅ | Session view with timer, set logging, and add exercise from library (FAB) |
 | Create custom exercise | ✅ | Form to create user-defined exercises (name, category, muscles, defaults) |
+| Settings | ✅ | Language picker and calendar view type preference |
 
 ### UI Components
 
@@ -84,6 +85,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Muscle group filter chips | ✅ | Filter exercises by muscle group |
 | Template card | ✅ | Card with muscle groups and start button |
 | Template exercise card | ✅ | Editor for template sets and rests |
+| Workout calendar | ✅ | Weekly/Monthly calendar views with workout dot indicators |
 
 ### App - To Develop
 
@@ -91,11 +93,11 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 |---------|--------|----------|-------------|
 | Swipe to delete | 📋 | High | Swipe gesture on workout cards |
 | Search workouts | 📋 | High | Search by name or type |
-| Calendar view | 📋 | Medium | View workouts on calendar |
+| Calendar view | ✅ | Medium | Weekly/Monthly calendar on Home screen with workout dots and date filtering |
 | Charts/graphs | 📋 | Medium | Visualize progress over time |
 | Workout timer | ✅ | Medium | Built-in rest timer (Managed by TimerManager) |
 | Exercise sort by done times | ✅ | High | Default sort exercises by session count (most-performed first) |
-| Settings screen | 📋 | Low | App preferences |
+| Settings screen | ✅ | Low | Language picker and calendar view preferences |
 | Dark mode toggle | 📋 | Low | Manual theme switching |
 | Onboarding | 💡 | Low | First-time user guide |
 | Notifications | 💡 | Low | Workout reminders |
@@ -128,6 +130,7 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.9.0 | 2026-02-11 | Calendar view on Home screen: Weekly and Monthly calendar modes with workout dot indicators and tap-to-filter. Switchable via Settings (None/Weekly/Monthly). Preferences persisted with SharedPreferences. Settings screen now includes calendar view picker alongside language picker. |
 | 1.8.0 | 2026-02-10 | Custom exercises: Create, save, delete user-defined exercises. New SDK APIs: `saveCustomExercise()`, `deleteCustomExercise()`, `observeAllExercises()`. CompositeExerciseLibraryProvider merges predefined + custom. New CreateCustomExerciseScreen with full form. Custom badge and delete action in exercise list. |
 | 1.7.1 | 2026-02-10 | Fix: Exercise session counts and history now update in real-time via reactive Flow (`observeExerciseSessionCounts()`). History cache invalidation on data change. |
 | 1.7.0 | 2026-02-10 | Exercise list default sort by done times (session count). New SDK API: `getExerciseSessionCounts()`. |

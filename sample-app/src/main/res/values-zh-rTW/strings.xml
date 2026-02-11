@@ -186,6 +186,12 @@
     <string name="cd_remove_set">移除組</string>
     <string name="label_rest_between_sets">組間休息</string>
 
+    <!-- Calendar View -->
+    <string name="setting_calendar_view">行事曆檢視</string>
+    <string name="calendar_none">無</string>
+    <string name="calendar_weekly">週曆</string>
+    <string name="calendar_monthly">月曆</string>
+
     <!-- Custom Exercise -->
     <string name="title_create_custom_exercise">建立自訂動作</string>
     <string name="cd_create_custom_exercise">建立自訂動作</string>

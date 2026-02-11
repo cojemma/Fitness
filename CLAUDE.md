@@ -82,7 +82,7 @@ FitnessSDK.getTemplateManager()         // Template management
 - **Manifest:** `AppLocalesMetadataHolderService` with `autoStoreLocales=true` for pre-Android 13 persistence
 - **Theme:** Must use `Theme.AppCompat.*` in AndroidManifest (not `Theme.Material.*`) — Compose layers Material 3 on top
 - **Shared utility:** `StringResUtil.kt` — `getMuscleGroupStringRes()` for muscle group name localization
-- **Settings screen:** `ui/settings/SettingsScreen.kt` — language picker dialog, accessible via gear icon in TopAppBar
+- **Settings screen:** `ui/settings/SettingsScreen.kt` — language picker and calendar view picker dialogs, accessible via gear icon in TopAppBar
 
 ## Room DAO Guidelines
 
@@ -107,6 +107,18 @@ FitnessSDK.getTemplateManager()         // Template management
 - **SDK API:** `ExerciseLibraryManager.saveCustomExercise()`, `deleteCustomExercise()`, `observeAllExercises()`.
 - **UI:** `CreateCustomExerciseScreen` — full form (name, category dropdown, primary muscle dropdown, secondary muscle chips, description, instructions, time-based toggle, default sets/reps/duration). FAB on Exercise List and "+" button on Exercise Picker navigate to this screen. Custom exercises show "Custom" badge and delete button in lists.
 - **Database version:** v5 (added `CustomExerciseDefinitionEntity`, destructive migration).
+
+## Calendar View (Home Screen)
+
+- **Settings:** `CalendarViewType` enum (`NONE`, `WEEKLY`, `MONTHLY`) persisted via `SharedPreferences` in `PreferencesManager`.
+- **Preference key:** `"calendar_view_type"` in `"fitness_sample_prefs"` SharedPreferences file.
+- **Default:** `NONE` (no calendar, preserves original workout list behavior).
+- **UI components:** `WeeklyCalendarView` and `MonthlyCalendarView` in `ui/components/WorkoutCalendar.kt` — pure Compose, no 3rd-party calendar library.
+- **Weekly view:** Single-row 7-day layout (Sun–Sat) with left/right week navigation. Dot indicators on days with workouts. Tap to filter workout list by date.
+- **Monthly view:** Full month grid with month navigation. Same dot indicators and tap-to-filter behavior.
+- **Date filtering:** `HomeViewModel.selectedDate` (nullable `LocalDate`). Tap a day to filter; tap again to deselect. `filteredWorkouts` StateFlow combines `workouts` + `selectedDate` via `combine`. Weekly stats always use unfiltered workouts.
+- **ViewModel:** `HomeViewModel` extends `AndroidViewModel` (needs app context for `PreferencesManager`). `refreshCalendarViewType()` re-reads preference on screen resume (e.g., after returning from Settings).
+- **Settings integration:** `SettingsScreen.kt` — "Calendar View" row with `CalendarMonth` icon + `CalendarViewPickerDialog` (3 radio options).
 
 ## Git Conventions
 

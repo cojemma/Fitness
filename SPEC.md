@@ -37,15 +37,16 @@ Encapsulates all business logic and data persistence.
 
 A reference implementation using the SDK.
 
-- **UI Layer**: Jetpack Compose screens (`HomeScreen`, `WorkoutDetailsScreen`, `TemplateListScreen`, `CreateCustomExerciseScreen`).
+- **UI Layer**: Jetpack Compose screens (`HomeScreen`, `WorkoutDetailsScreen`, `TemplateListScreen`, `CreateCustomExerciseScreen`, `SettingsScreen`).
 - **ViewModels**: State management for screens, interacting with SDK Managers.
+- **Data Layer**: `PreferencesManager` wrapping `SharedPreferences` for app-level settings (e.g., calendar view type).
 - **Navigation**: `FitnessNavGraph` managing screen transitions.
 
 ## The Feature Loop
 
 ### Current State
 
-**Version 1.8.0**
+**Version 1.9.0**
 
 - **Core CRUD**: Workouts and Exercises can be created, read, updated, and deleted.
 - **Exercise Library**: Pre-loaded library of 55+ exercises with categorization.
@@ -64,6 +65,8 @@ A reference implementation using the SDK.
   - **Active Workout**: Split logic into `ActiveWorkoutViewModel` (Coordination), `TimerManager` (Time tracking), and `SessionStateManager` (Exercise/Set logic) for better maintainability.
   - **SDK**: Added `addExerciseToWorkout` capability for dynamic workout modification.
 - **Dynamic Exercise Addition**: Users can add exercises to an active workout session via FloatingActionButton, selecting from the exercise library. Exercises are added to the in-memory workout and immediately available for logging sets.
+- **Calendar View**: Home screen supports optional Weekly or Monthly calendar overlay above the workout list. Calendar days with workouts show dot indicators; tapping a day filters the workout list to that date (tap again to deselect). Calendar type (None/Weekly/Monthly) is configurable in Settings and persisted via `SharedPreferences`. Built with pure Compose (no 3rd-party calendar library). `HomeViewModel` extends `AndroidViewModel` for access to `PreferencesManager`.
+- **Settings Screen**: `SettingsScreen` with language picker (English/Traditional Chinese via `AppCompatDelegate.setApplicationLocales()`) and calendar view type picker. Accessible via gear icon in Home screen TopAppBar.
 
 ### Active Development (Next Steps)
 

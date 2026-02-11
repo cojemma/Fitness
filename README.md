@@ -181,6 +181,8 @@ val exercise = benchPress?.toExercise(sets = 4, reps = 8, weight = 80f)
 src/main/kotlin/com/fitness/sample/
 ├── MainActivity.kt            # Compose entry point
 ├── SampleApplication.kt       # SDK initialization
+├── data/
+│   └── PreferencesManager.kt  # SharedPreferences wrapper (CalendarViewType)
 ├── navigation/
 │   └── FitnessNavGraph.kt     # Navigation routes
 └── ui/
@@ -194,7 +196,8 @@ src/main/kotlin/com/fitness/sample/
     │   ├── StatsSummary.kt    # Weekly stats card
     │   ├── EmptyState.kt      # Empty list placeholder
     │   ├── TemplateCard.kt          # Template list item
-    │   └── TemplateExerciseCard.kt  # Template editor card
+    │   ├── TemplateExerciseCard.kt  # Template editor card
+    │   └── WorkoutCalendar.kt      # Weekly/Monthly calendar views with workout dots
     ├── home/
     │   ├── HomeScreen.kt      # Main workout list
     │   └── HomeViewModel.kt   # Home screen state
@@ -212,6 +215,8 @@ src/main/kotlin/com/fitness/sample/
     │   ├── TimerManager.kt           # Workout/Rest timer logic
     │   ├── SessionStateManager.kt    # Exercise/Set session logic (merge on setWorkout for race safety)
     │   └── SetLogEntry.kt            # Logging data model
+    ├── settings/
+    │   └── SettingsScreen.kt      # Language and calendar view settings
     └── exercise/
         ├── AddExerciseDialog.kt              # Add exercise modal
         ├── ExercisePickerScreen.kt           # Browse exercise library
@@ -226,7 +231,7 @@ src/main/kotlin/com/fitness/sample/
 
 | Screen | Route | Description |
 |--------|-------|-------------|
-| Home | `home` | Workout list with weekly stats |
+| Home | `home` | Workout list with weekly stats and optional calendar view (weekly/monthly) |
 | Add Workout | `add_workout` | Create new workout form |
 | Workout Details | `workout/{id}` | View workout and exercises |
 | Edit Workout | `edit_workout/{id}` | Edit existing workout |
@@ -236,6 +241,7 @@ src/main/kotlin/com/fitness/sample/
 | Edit Template | `edit_template/{id}` | Edit existing template |
 | Active Workout | `active_workout/{templateId}` | Active training session with timer, set logging, and add-exercise from library |
 | Create Custom Exercise | `create_custom_exercise` | Form to create user-defined exercises |
+| Settings | `settings` | Language and calendar view preferences |
 
 ### Navigation
 
@@ -251,6 +257,7 @@ sealed class Screen(val route: String) {
     object EditTemplate : Screen("edit_template/{templateId}")
     object ActiveWorkout : Screen("active_workout/{templateId}")
     object CreateCustomExercise : Screen("create_custom_exercise")
+    object Settings : Screen("settings")
 }
 ```
 

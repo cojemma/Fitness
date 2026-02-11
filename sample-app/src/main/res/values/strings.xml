@@ -186,6 +186,12 @@
     <string name="cd_remove_set">Remove set</string>
     <string name="label_rest_between_sets">Rest between sets</string>
 
+    <!-- Calendar View -->
+    <string name="setting_calendar_view">Calendar View</string>
+    <string name="calendar_none">None</string>
+    <string name="calendar_weekly">Weekly</string>
+    <string name="calendar_monthly">Monthly</string>
+
     <!-- Custom Exercise -->
     <string name="title_create_custom_exercise">Create Custom Exercise</string>
     <string name="cd_create_custom_exercise">Create custom exercise</string>

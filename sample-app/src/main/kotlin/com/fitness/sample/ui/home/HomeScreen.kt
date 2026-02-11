@@ -35,8 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fitness.sample.R
+import com.fitness.sample.data.CalendarViewType
 import com.fitness.sample.ui.components.EmptyState
+import com.fitness.sample.ui.components.MonthlyCalendarView
 import com.fitness.sample.ui.components.StatsSummary
+import com.fitness.sample.ui.components.WeeklyCalendarView
 import com.fitness.sample.ui.components.WorkoutCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,8 +51,16 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel()
 ) {
     val workouts by viewModel.workouts.collectAsState()
+    val filteredWorkouts by viewModel.filteredWorkouts.collectAsState()
+    val calendarViewType by viewModel.calendarViewType.collectAsState()
+    val selectedDate by viewModel.selectedDate.collectAsState()
     val error by viewModel.error.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Refresh calendar type when returning from settings
+    LaunchedEffect(Unit) {
+        viewModel.refreshCalendarViewType()
+    }
 
     LaunchedEffect(error) {
         error?.let {
@@ -95,7 +106,7 @@ fun HomeScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        if (workouts.isEmpty()) {
+        if (workouts.isEmpty() && calendarViewType == CalendarViewType.NONE) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -126,17 +137,60 @@ fun HomeScreen(
                     )
                 }
 
-                // Workout list
-                items(
-                    items = workouts,
-                    key = { it.id }
-                ) { workout ->
-                    WorkoutCard(
-                        workout = workout,
-                        onClick = { onWorkoutClick(workout.id) },
-                        onDelete = { viewModel.deleteWorkout(workout.id) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                // Calendar view
+                when (calendarViewType) {
+                    CalendarViewType.WEEKLY -> {
+                        item {
+                            WeeklyCalendarView(
+                                workouts = workouts,
+                                selectedDate = selectedDate,
+                                onDateSelected = { viewModel.selectDate(it) },
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                    }
+                    CalendarViewType.MONTHLY -> {
+                        item {
+                            MonthlyCalendarView(
+                                workouts = workouts,
+                                selectedDate = selectedDate,
+                                onDateSelected = { viewModel.selectDate(it) },
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                        }
+                    }
+                    CalendarViewType.NONE -> { /* No calendar */ }
+                }
+
+                // Workout list (filtered when a date is selected)
+                val displayWorkouts = if (selectedDate != null) filteredWorkouts else workouts
+
+                if (displayWorkouts.isEmpty() && selectedDate != null) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            EmptyState(
+                                title = stringResource(R.string.empty_workouts_title),
+                                subtitle = stringResource(R.string.empty_workouts_subtitle)
+                            )
+                        }
+                    }
+                } else {
+                    items(
+                        items = displayWorkouts,
+                        key = { it.id }
+                    ) { workout ->
+                        WorkoutCard(
+                            workout = workout,
+                            onClick = { onWorkoutClick(workout.id) },
+                            onDelete = { viewModel.deleteWorkout(workout.id) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
