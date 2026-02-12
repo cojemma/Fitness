@@ -241,7 +241,7 @@ src/main/kotlin/com/fitness/sample/
 | Templates | `templates` | List of reusable workout templates |
 | Add Template | `add_template` | Create new template |
 | Edit Template | `edit_template/{id}` | Edit existing template |
-| Active Workout | `active_workout/{templateId}` | Active training session with timer, set logging, exercise navigator rail, reorder, and add-exercise from library |
+| Active Workout | `active_workout/{templateId}` | Active training session with timer, fluent set logging (steppers), exercise navigator rail, reorder, and add-exercise from library |
 | Create Custom Exercise | `create_custom_exercise` | Form to create user-defined exercises |
 | Settings | `settings` | Language and calendar view preferences |
 

@@ -46,6 +46,15 @@ A reference implementation using the SDK.
 
 ### Current State
 
+**Version 1.11.0**
+
+- **Number Input UX**:
+  - **Fluent Typing**: Replaced `String` state with `TextFieldValue` and `TextRange` in `ActiveWorkoutScreen` and `TemplateExerciseCard` to prevent cursor jumping during editing.
+  - **Steppers (Active Workout)**: Added +/− buttons for quick adjustments (Reps ±1, Weight ±2.5kg) in active workout session.
+  - **Input Filtering**: Regex-based validation restricts non-numeric input.
+  - **Layout Improvements**: Optimized input rows for varying screen widths; "SpaceEvenly" layout for active workout; compact single-row layout for template editing.
+  - **Warmup Toggle**: Restored compact "W" column in template editor.
+
 **Version 1.10.0**
 
 - **Core CRUD**: Workouts and Exercises can be created, read, updated, and deleted.

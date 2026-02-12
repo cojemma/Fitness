@@ -43,8 +43,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.fitness.sample.R
 import com.fitness.sample.ui.template.TemplateExerciseState
@@ -176,33 +179,38 @@ fun TemplateExerciseCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = stringResource(R.string.header_set),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.width(40.dp)
+                    modifier = Modifier.width(24.dp)
                 )
                 Text(
                     text = stringResource(R.string.header_reps),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.width(70.dp)
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
                 )
                 Text(
                     text = stringResource(R.string.header_weight_kg),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.width(90.dp)
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
                 )
                 Text(
-                    text = stringResource(R.string.header_warmup),
+                    text = "W",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.width(70.dp)
+                    modifier = Modifier.width(24.dp),
+                    textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.width(40.dp))
+                // Spacer for delete button column
+                Spacer(modifier = Modifier.width(28.dp))
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -273,6 +281,21 @@ private fun SetRow(
     canRemove: Boolean,
     modifier: Modifier = Modifier
 ) {
+    // Local text state decoupled from the model — avoids "jumping" on partial input
+    var repsText by remember(set.setNumber, set.targetReps) {
+        val t = set.targetReps.toString()
+        mutableStateOf(TextFieldValue(t, TextRange(t.length)))
+    }
+    var weightText by remember(set.setNumber, set.targetWeight) {
+        val t = set.targetWeight?.let {
+            if (it % 1f == 0f) it.toInt().toString() else "%.1f".format(it)
+        } ?: ""
+        mutableStateOf(TextFieldValue(t, TextRange(t.length)))
+    }
+
+    val repsRegex = remember { Regex("^\\d{0,3}$") }
+    val weightRegex = remember { Regex("^\\d{0,4}(\\.\\d{0,1})?$") }
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -281,8 +304,8 @@ private fun SetRow(
                 else MaterialTheme.colorScheme.surface,
                 RoundedCornerShape(8.dp)
             )
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(vertical = 4.dp, horizontal = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Set number
@@ -290,64 +313,79 @@ private fun SetRow(
             text = "${set.setNumber}",
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.width(40.dp)
+            modifier = Modifier.width(24.dp)
         )
 
         // Reps input
         OutlinedTextField(
-            value = set.targetReps.toString(),
-            onValueChange = { value ->
-                value.toIntOrNull()?.let { reps ->
-                    if (reps > 0) onUpdateSet(set.copy(targetReps = reps))
+            value = repsText,
+            onValueChange = { newValue ->
+                if (newValue.text.isEmpty() || newValue.text.matches(repsRegex)) {
+                    repsText = newValue
+                    newValue.text.toIntOrNull()?.let { reps ->
+                        if (reps > 0) onUpdateSet(set.copy(targetReps = reps))
+                    }
                 }
             },
-            modifier = Modifier.width(70.dp),
+            modifier = Modifier.weight(1f),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            textStyle = MaterialTheme.typography.bodyMedium
+            textStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+            shape = RoundedCornerShape(10.dp)
         )
 
         // Weight input
         OutlinedTextField(
-            value = set.targetWeight?.toString() ?: "",
-            onValueChange = { value ->
-                if (value.isBlank()) {
-                    onUpdateSet(set.copy(targetWeight = null))
-                } else {
-                    value.toFloatOrNull()?.let { weight ->
-                        if (weight >= 0) onUpdateSet(set.copy(targetWeight = weight))
+            value = weightText,
+            onValueChange = { newValue ->
+                if (newValue.text.isEmpty() || newValue.text.matches(weightRegex)) {
+                    weightText = newValue
+                    if (newValue.text.isBlank()) {
+                        onUpdateSet(set.copy(targetWeight = null))
+                    } else {
+                        newValue.text.toFloatOrNull()?.let { weight ->
+                            if (weight >= 0) onUpdateSet(set.copy(targetWeight = weight))
+                        }
                     }
                 }
             },
-            modifier = Modifier.width(90.dp),
+            modifier = Modifier.weight(1f),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            textStyle = MaterialTheme.typography.bodyMedium,
-            placeholder = { Text("\u2014", style = MaterialTheme.typography.bodyMedium) }
+            textStyle = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
+            shape = RoundedCornerShape(10.dp),
+            placeholder = {
+                Text(
+                    "\u2014",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         )
 
         // Warm-up checkbox
         Checkbox(
             checked = set.isWarmupSet,
             onCheckedChange = { onUpdateSet(set.copy(isWarmupSet = it)) },
-            modifier = Modifier.width(70.dp)
+            modifier = Modifier.size(24.dp)
         )
 
         // Remove button
         if (canRemove) {
             IconButton(
                 onClick = onRemoveSet,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(28.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = stringResource(R.string.cd_remove_set),
                     tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(16.dp)
                 )
             }
         } else {
-            Spacer(modifier = Modifier.width(40.dp))
+            Spacer(modifier = Modifier.width(28.dp))
         }
     }
 }

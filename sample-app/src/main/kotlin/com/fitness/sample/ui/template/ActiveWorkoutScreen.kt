@@ -63,8 +63,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -538,10 +540,18 @@ private fun CurrentExerciseCard(
     onLogSet: (Int, Float?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var repsInput by remember(exerciseName, currentSet) { mutableStateOf(targetReps.toString()) }
-    var weightInput by remember(exerciseName, currentSet) {
-        mutableStateOf(targetWeight?.let { if (it % 1f == 0f) it.toInt().toString() else "%.1f".format(it) } ?: "")
+    // Local TextFieldValue state — decoupled from model to prevent cursor jumping
+    var repsInput by remember(exerciseName, currentSet) {
+        val t = targetReps.toString()
+        mutableStateOf(TextFieldValue(t, TextRange(t.length)))
     }
+    var weightInput by remember(exerciseName, currentSet) {
+        val initial = targetWeight?.let { if (it % 1f == 0f) it.toInt().toString() else "%.1f".format(it) } ?: ""
+        mutableStateOf(TextFieldValue(initial, TextRange(initial.length)))
+    }
+
+    val repsRegex = remember { Regex("^\\d{0,3}$") }
+    val weightRegex = remember { Regex("^\\d{0,4}(\\.\\d{0,1})?$") }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -591,12 +601,13 @@ private fun CurrentExerciseCard(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Input fields
+            // Input fields with steppers
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Reps input
+                // Reps input group
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(R.string.label_reps_input),
@@ -604,25 +615,42 @@ private fun CurrentExerciseCard(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = repsInput,
-                        onValueChange = { repsInput = it },
-                        modifier = Modifier.width(80.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        textStyle = MaterialTheme.typography.titleLarge.copy(
-                            textAlign = TextAlign.Center
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        WorkoutStepperButton(text = "−") {
+                            val current = repsInput.text.toIntOrNull() ?: targetReps
+                            val next = (current - 1).coerceAtLeast(0)
+                            val t = next.toString()
+                            repsInput = TextFieldValue(t, TextRange(t.length))
+                        }
+                        OutlinedTextField(
+                            value = repsInput,
+                            onValueChange = { newValue ->
+                                if (newValue.text.isEmpty() || newValue.text.matches(repsRegex)) {
+                                    repsInput = newValue
+                                }
+                            },
+                            modifier = Modifier.width(60.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            textStyle = MaterialTheme.typography.titleLarge.copy(
+                                textAlign = TextAlign.Center
+                            ),
+                            shape = RoundedCornerShape(12.dp)
                         )
-                    )
+                        WorkoutStepperButton(text = "+") {
+                            val current = repsInput.text.toIntOrNull() ?: targetReps
+                            val next = (current + 1).coerceAtMost(999)
+                            val t = next.toString()
+                            repsInput = TextFieldValue(t, TextRange(t.length))
+                        }
+                    }
                 }
 
-                Text(
-                    text = "\u00d7",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                )
 
-                // Weight input
+                // Weight input group
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = stringResource(R.string.label_weight_kg_input),
@@ -630,23 +658,45 @@ private fun CurrentExerciseCard(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    OutlinedTextField(
-                        value = weightInput,
-                        onValueChange = { weightInput = it },
-                        modifier = Modifier.width(100.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        textStyle = MaterialTheme.typography.titleLarge.copy(
-                            textAlign = TextAlign.Center
-                        ),
-                        placeholder = {
-                            Text(
-                                "\u2014",
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        WorkoutStepperButton(text = "−") {
+                            val current = weightInput.text.toFloatOrNull() ?: 0f
+                            val next = (current - 2.5f).coerceAtLeast(0f)
+                            val t = if (next % 1f == 0f) next.toInt().toString() else "%.1f".format(next)
+                            weightInput = TextFieldValue(t, TextRange(t.length))
                         }
-                    )
+                        OutlinedTextField(
+                            value = weightInput,
+                            onValueChange = { newValue ->
+                                if (newValue.text.isEmpty() || newValue.text.matches(weightRegex)) {
+                                    weightInput = newValue
+                                }
+                            },
+                            modifier = Modifier.width(80.dp),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            textStyle = MaterialTheme.typography.titleMedium.copy(
+                                textAlign = TextAlign.Center
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            placeholder = {
+                                Text(
+                                    "\u2014",
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        )
+                        WorkoutStepperButton(text = "+") {
+                            val current = weightInput.text.toFloatOrNull() ?: 0f
+                            val next = current + 2.5f
+                            val t = if (next % 1f == 0f) next.toInt().toString() else "%.1f".format(next)
+                            weightInput = TextFieldValue(t, TextRange(t.length))
+                        }
+                    }
                 }
             }
 
@@ -655,8 +705,8 @@ private fun CurrentExerciseCard(
             // Complete set button
             Button(
                 onClick = {
-                    val reps = repsInput.toIntOrNull() ?: targetReps
-                    val weight = weightInput.toFloatOrNull()
+                    val reps = repsInput.text.toIntOrNull() ?: targetReps
+                    val weight = weightInput.text.toFloatOrNull()
                     onLogSet(reps, weight)
                 },
                 modifier = Modifier
@@ -695,6 +745,28 @@ private fun CurrentExerciseCard(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun WorkoutStepperButton(
+    text: String,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier.size(36.dp)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
