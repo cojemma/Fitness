@@ -118,6 +118,7 @@ object FitnessSDK {
 
             // Create repository
             val repository = WorkoutRepositoryImpl(
+                database,
                 database.workoutDao(),
                 database.exerciseDao()
             )

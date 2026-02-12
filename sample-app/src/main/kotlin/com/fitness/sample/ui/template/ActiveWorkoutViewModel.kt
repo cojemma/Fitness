@@ -49,6 +49,9 @@ class ActiveWorkoutViewModel : ViewModel() {
     private val _savedWorkoutId = MutableStateFlow<Long?>(null)
     val savedWorkoutId: StateFlow<Long?> = _savedWorkoutId.asStateFlow()
 
+    /** The finished workout with set records, kept in memory to avoid re-fetching from DB. */
+    private var finishedWorkoutCache: com.fitness.sdk.domain.model.Workout? = null
+
     private val _templateSaved = MutableStateFlow(false)
     val templateSaved: StateFlow<Boolean> = _templateSaved.asStateFlow()
 
@@ -56,17 +59,20 @@ class ActiveWorkoutViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
 
-            // Get last session data first
-            templateManager.getLastSessionData(templateId)
-                .onSuccess { data ->
-                    sessionStateManager.setLastSessionData(data)
-                }
-
-            // Start workout from template
+            // Start workout from template (internally uses last session for weight/rep population)
             templateManager.startWorkout(templateId, preloadLastSession = true)
                 .onSuccess { workout ->
                     sessionStateManager.setWorkout(workout)
                     timerManager.startWorkoutTimer()
+
+                    // Load last session data in background for "Last:" display hints.
+                    // Non-blocking — the workout UI shows immediately.
+                    launch {
+                        templateManager.getLastSessionData(templateId)
+                            .onSuccess { data ->
+                                sessionStateManager.setLastSessionData(data)
+                            }
+                    }
                 }
                 .onFailure { e ->
                     _error.value = e.message ?: "Failed to start workout"
@@ -165,6 +171,7 @@ class ActiveWorkoutViewModel : ViewModel() {
 
             workoutManager.createWorkout(finishedWorkout)
                 .onSuccess { workoutId ->
+                    finishedWorkoutCache = finishedWorkout
                     _savedWorkoutId.value = workoutId
                     _workoutCompleted.value = true
                 }
@@ -192,12 +199,19 @@ class ActiveWorkoutViewModel : ViewModel() {
     }
 
     fun updateOriginalTemplate() {
-        val workoutId = _savedWorkoutId.value ?: return
-        val workout = workout.value ?: return
-        val templateId = workout.templateId ?: return
-        
+        val cachedWorkout = finishedWorkoutCache
+        val templateId = workout.value?.templateId ?: return
+
         viewModelScope.launch {
-            templateManager.updateTemplateFromWorkout(templateId, workoutId)
+            val result = if (cachedWorkout != null) {
+                // Fast path: use in-memory workout, avoids re-fetching from DB
+                templateManager.updateTemplateFromWorkout(templateId, cachedWorkout)
+            } else {
+                // Fallback: fetch from DB (should not normally happen)
+                val workoutId = _savedWorkoutId.value ?: return@launch
+                templateManager.updateTemplateFromWorkout(templateId, workoutId)
+            }
+            result
                 .onSuccess {
                     _templateSaved.value = true
                 }

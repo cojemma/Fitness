@@ -1,5 +1,7 @@
 package com.fitness.sdk.data.repository
 
+import androidx.room.withTransaction
+import com.fitness.sdk.data.local.FitnessDatabase
 import com.fitness.sdk.data.local.dao.ExerciseDao
 import com.fitness.sdk.data.local.dao.WorkoutDao
 import com.fitness.sdk.data.mapper.ExerciseMapper
@@ -21,31 +23,37 @@ import kotlinx.coroutines.withContext
  * Implementation of WorkoutRepository using Room database.
  */
 class WorkoutRepositoryImpl(
+    private val database: FitnessDatabase,
     private val workoutDao: WorkoutDao,
     private val exerciseDao: ExerciseDao
 ) : WorkoutRepository {
 
     override suspend fun saveWorkout(workout: Workout): Long = withContext(Dispatchers.IO) {
-        // Insert workout and get the generated ID
-        val workoutEntity = WorkoutMapper.toEntity(workout)
-        val workoutId = workoutDao.insertWorkout(workoutEntity)
+        database.withTransaction {
+            // Insert workout and get the generated ID
+            val workoutEntity = WorkoutMapper.toEntity(workout)
+            val workoutId = workoutDao.insertWorkout(workoutEntity)
 
-        // Insert exercises with the workout ID
-        if (workout.exercises.isNotEmpty()) {
-            val exerciseEntities = ExerciseMapper.toEntityList(workout.exercises, workoutId)
-            val exerciseIds = exerciseDao.insertExercises(exerciseEntities)
+            // Insert exercises with the workout ID
+            if (workout.exercises.isNotEmpty()) {
+                val exerciseEntities = ExerciseMapper.toEntityList(workout.exercises, workoutId)
+                val exerciseIds = exerciseDao.insertExercises(exerciseEntities)
 
-            // Insert set records for each exercise
-            workout.exercises.forEachIndexed { index, exercise ->
-                if (exercise.setRecords.isNotEmpty()) {
-                    val exerciseId = exerciseIds[index]
-                    val setEntities = ExerciseSetMapper.toEntityList(exercise.setRecords, exerciseId)
-                    exerciseDao.insertExerciseSets(setEntities)
+                // Batch all set records into a single insert
+                val allSets = mutableListOf<com.fitness.sdk.data.local.entity.ExerciseSetEntity>()
+                workout.exercises.forEachIndexed { index, exercise ->
+                    if (exercise.setRecords.isNotEmpty()) {
+                        val exerciseId = exerciseIds[index]
+                        allSets.addAll(ExerciseSetMapper.toEntityList(exercise.setRecords, exerciseId))
+                    }
+                }
+                if (allSets.isNotEmpty()) {
+                    exerciseDao.insertExerciseSets(allSets)
                 }
             }
-        }
 
-        workoutId
+            workoutId
+        }
     }
 
     /**
@@ -83,24 +91,29 @@ class WorkoutRepositoryImpl(
         }
 
     override suspend fun updateWorkout(workout: Workout) = withContext(Dispatchers.IO) {
-        // Update the workout
-        val workoutEntity = WorkoutMapper.toEntity(workout)
-        workoutDao.updateWorkout(workoutEntity)
+        database.withTransaction {
+            // Update the workout
+            val workoutEntity = WorkoutMapper.toEntity(workout)
+            workoutDao.updateWorkout(workoutEntity)
 
-        // Delete existing exercises (set records will cascade delete)
-        exerciseDao.deleteExercisesByWorkoutId(workout.id)
-        
-        // Insert updated exercises with set records
-        if (workout.exercises.isNotEmpty()) {
-            val exerciseEntities = ExerciseMapper.toEntityList(workout.exercises, workout.id)
-            val exerciseIds = exerciseDao.insertExercises(exerciseEntities)
+            // Delete existing exercises (set records will cascade delete)
+            exerciseDao.deleteExercisesByWorkoutId(workout.id)
 
-            // Insert set records for each exercise
-            workout.exercises.forEachIndexed { index, exercise ->
-                if (exercise.setRecords.isNotEmpty()) {
-                    val exerciseId = exerciseIds[index]
-                    val setEntities = ExerciseSetMapper.toEntityList(exercise.setRecords, exerciseId)
-                    exerciseDao.insertExerciseSets(setEntities)
+            // Insert updated exercises with set records
+            if (workout.exercises.isNotEmpty()) {
+                val exerciseEntities = ExerciseMapper.toEntityList(workout.exercises, workout.id)
+                val exerciseIds = exerciseDao.insertExercises(exerciseEntities)
+
+                // Batch all set records into a single insert
+                val allSets = mutableListOf<com.fitness.sdk.data.local.entity.ExerciseSetEntity>()
+                workout.exercises.forEachIndexed { index, exercise ->
+                    if (exercise.setRecords.isNotEmpty()) {
+                        val exerciseId = exerciseIds[index]
+                        allSets.addAll(ExerciseSetMapper.toEntityList(exercise.setRecords, exerciseId))
+                    }
+                }
+                if (allSets.isNotEmpty()) {
+                    exerciseDao.insertExerciseSets(allSets)
                 }
             }
         }

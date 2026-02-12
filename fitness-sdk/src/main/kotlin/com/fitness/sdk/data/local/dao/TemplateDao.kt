@@ -112,16 +112,19 @@ interface TemplateDao {
         // Delete existing exercises and sets (cascade will delete sets)
         deleteExercisesByTemplateId(templateId)
 
-        // Insert exercises with proper templateId
-        exercises.forEachIndexed { index, exercise ->
-            val exerciseWithTemplateId = exercise.copy(templateId = templateId)
-            val exerciseId = insertExercise(exerciseWithTemplateId)
+        // Insert all exercises and collect their generated IDs
+        val exercisesWithTemplateId = exercises.map { it.copy(templateId = templateId) }
+        val exerciseIds = insertExercises(exercisesWithTemplateId)
 
-            // Insert sets for this exercise
+        // Batch all sets into a single insert
+        val allSets = mutableListOf<TemplateSetEntity>()
+        exerciseIds.forEachIndexed { index, exerciseId ->
             setsByExerciseIndex[index]?.let { sets ->
-                val setsWithExerciseId = sets.map { it.copy(templateExerciseId = exerciseId) }
-                insertSets(setsWithExerciseId)
+                allSets.addAll(sets.map { it.copy(templateExerciseId = exerciseId) })
             }
+        }
+        if (allSets.isNotEmpty()) {
+            insertSets(allSets)
         }
 
         return templateId

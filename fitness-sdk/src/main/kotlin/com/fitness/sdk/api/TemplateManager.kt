@@ -111,5 +111,18 @@ interface TemplateManager {
         templateId: Long,
         workoutId: Long
     ): Result<Unit>
+
+    /**
+     * Update an existing template using an in-memory workout object.
+     * Faster than the workoutId overload — avoids re-fetching workout data from DB.
+     *
+     * @param templateId The ID of the template to update
+     * @param workout The workout object already in memory
+     * @return Result indicating success or failure
+     */
+    suspend fun updateTemplateFromWorkout(
+        templateId: Long,
+        workout: Workout
+    ): Result<Unit>
 }
 

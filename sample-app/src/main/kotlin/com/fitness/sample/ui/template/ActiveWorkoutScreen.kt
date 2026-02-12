@@ -130,11 +130,9 @@ fun ActiveWorkoutScreen(
         }
     }
 
-    // Handle template saved - navigate after dialog closes
-    val templateSavedMessage = stringResource(R.string.snackbar_template_saved)
+    // Handle template saved - navigate immediately (don't block on snackbar)
     LaunchedEffect(templateSaved) {
         if (templateSaved) {
-            snackbarHostState.showSnackbar(templateSavedMessage)
             showSaveAsTemplateDialog = false
             showCreateNewDialog = false
             onWorkoutComplete()

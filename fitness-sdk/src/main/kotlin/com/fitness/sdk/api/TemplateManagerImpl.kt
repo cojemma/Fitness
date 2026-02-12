@@ -75,5 +75,12 @@ class TemplateManagerImpl(
     ): Result<Unit> {
         return updateTemplateFromWorkoutUseCase(templateId, workoutId)
     }
+
+    override suspend fun updateTemplateFromWorkout(
+        templateId: Long,
+        workout: Workout
+    ): Result<Unit> {
+        return updateTemplateFromWorkoutUseCase.updateFromWorkout(templateId, workout)
+    }
 }
 
