@@ -1,7 +1,15 @@
 package com.fitness.sample.ui.template
 
+import android.media.AudioManager
+import android.media.ToneGenerator
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -52,6 +60,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -62,6 +71,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -94,6 +104,7 @@ fun ActiveWorkoutScreen(
     val completedSets by viewModel.completedSets.collectAsState()
     val restTimeRemaining by viewModel.restTimeRemaining.collectAsState()
     val isResting by viewModel.isResting.collectAsState()
+    val isCountingDown by viewModel.isCountingDown.collectAsState()
     val elapsedSeconds by viewModel.elapsedSeconds.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -425,6 +436,7 @@ fun ActiveWorkoutScreen(
                     ) {
                         RestTimerCard(
                             remainingSeconds = restTimeRemaining,
+                            isCountingDown = isCountingDown,
                             onSkip = { viewModel.skipRest() }
                         )
                     }
@@ -774,9 +786,56 @@ private fun WorkoutStepperButton(
 @Composable
 private fun RestTimerCard(
     remainingSeconds: Int,
+    isCountingDown: Boolean,
     onSkip: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // --- Audible tick for last 5 seconds ---
+    val toneGenerator = remember {
+        try {
+            ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
+        } catch (_: Exception) {
+            null // Graceful fallback if audio is unavailable
+        }
+    }
+    DisposableEffect(Unit) {
+        onDispose { toneGenerator?.release() }
+    }
+
+    // Play a beep each time remainingSeconds changes while counting down
+    LaunchedEffect(remainingSeconds, isCountingDown) {
+        if (isCountingDown && remainingSeconds in 1..5) {
+            toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+        } else if (isCountingDown && remainingSeconds == 0) {
+            // Distinct "go" tone when rest finishes
+            toneGenerator?.startTone(ToneGenerator.TONE_PROP_BEEP2, 300)
+        }
+    }
+
+    // --- Visual pulse animation ---
+    val timerTextColor by animateColorAsState(
+        targetValue = if (isCountingDown) MaterialTheme.colorScheme.error
+                      else MaterialTheme.colorScheme.onTertiaryContainer,
+        animationSpec = tween(durationMillis = 300),
+        label = "timerColor"
+    )
+
+    val pulseScale = if (isCountingDown) {
+        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+        val scale by infiniteTransition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.15f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(500),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "pulseScale"
+        )
+        scale
+    } else {
+        1f
+    }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -802,7 +861,11 @@ private fun RestTimerCard(
                 text = formatTime(remainingSeconds),
                 style = MaterialTheme.typography.displayMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onTertiaryContainer
+                color = timerTextColor,
+                modifier = Modifier.graphicsLayer {
+                    scaleX = pulseScale
+                    scaleY = pulseScale
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))

@@ -34,6 +34,7 @@ class ActiveWorkoutViewModel : ViewModel() {
 
     val restTimeRemaining: StateFlow<Int> = timerManager.restTimeRemaining
     val isResting: StateFlow<Boolean> = timerManager.isResting
+    val isCountingDown: StateFlow<Boolean> = timerManager.isCountingDown
     val elapsedSeconds: StateFlow<Int> = timerManager.elapsedSeconds
 
     // UI state

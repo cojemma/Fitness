@@ -46,6 +46,10 @@ A reference implementation using the SDK.
 
 ### Current State
 
+**Version 1.12.0**
+
+- **Rest Timer Countdown Alert**: Audible beep (via `ToneGenerator`) and visual cues during the last 5 seconds of the rest timer. Timer text turns red with a pulsing scale animation. A distinct tone plays when rest ends. Beep stops immediately when "Skip Rest" is pressed.
+
 **Version 1.11.0**
 
 - **Number Input UX**:
@@ -80,11 +84,10 @@ A reference implementation using the SDK.
 
 ### Active Development (Next Steps)
 
-1. **Rest Timer Notifications**: Audio/vibration feedback when rest timer completes.
-2. **UX Improvements**: "Swipe to Delete" for workout cards.
-3. **Search & Filter**: Global search for workouts and advanced filtering.
-4. **Visualization**: Charts and graphs for progress tracking (Volume, 1RM stats).
-5. **In-Workout Tools**: Further superset support improvements.
+1. **UX Improvements**: "Swipe to Delete" for workout cards.
+2. **Search & Filter**: Global search for workouts and advanced filtering.
+3. **Visualization**: Charts and graphs for progress tracking (Volume, 1RM stats).
+4. **In-Workout Tools**: Further superset support improvements.
 
 ## Handover Readiness
 

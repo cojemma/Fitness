@@ -20,6 +20,9 @@ class TimerManager(private val scope: CoroutineScope) {
     private val _isResting = MutableStateFlow(false)
     val isResting: StateFlow<Boolean> = _isResting.asStateFlow()
 
+    private val _isCountingDown = MutableStateFlow(false)
+    val isCountingDown: StateFlow<Boolean> = _isCountingDown.asStateFlow()
+
     private var restTimerJob: Job? = null
 
     // Workout timer state
@@ -53,6 +56,7 @@ class TimerManager(private val scope: CoroutineScope) {
             while (_restTimeRemaining.value > 0) {
                 delay(1000)
                 _restTimeRemaining.value--
+                _isCountingDown.value = _restTimeRemaining.value in 1..5
             }
             _isResting.value = false
         }
@@ -62,6 +66,7 @@ class TimerManager(private val scope: CoroutineScope) {
         restTimerJob?.cancel()
         _restTimeRemaining.value = 0
         _isResting.value = false
+        _isCountingDown.value = false
     }
 
     fun cancelAll() {
