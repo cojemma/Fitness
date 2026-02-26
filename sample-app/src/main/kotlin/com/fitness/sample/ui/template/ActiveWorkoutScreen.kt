@@ -793,7 +793,7 @@ private fun RestTimerCard(
     // --- Audible tick for last 5 seconds ---
     val toneGenerator = remember {
         try {
-            ToneGenerator(AudioManager.STREAM_NOTIFICATION, 80)
+            ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME)
         } catch (_: Exception) {
             null // Graceful fallback if audio is unavailable
         }

@@ -56,9 +56,11 @@ class TimerManager(private val scope: CoroutineScope) {
             while (_restTimeRemaining.value > 0) {
                 delay(1000)
                 _restTimeRemaining.value--
-                _isCountingDown.value = _restTimeRemaining.value in 1..5
+                _isCountingDown.value = _restTimeRemaining.value in 0..5
             }
+            delay(500) // Keep 0 visible and give time for the final beep
             _isResting.value = false
+            _isCountingDown.value = false
         }
     }
 
