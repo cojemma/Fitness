@@ -46,6 +46,10 @@ A reference implementation using the SDK.
 
 ### Current State
 
+**Version 1.13.0**
+
+- **Export Workout History (CSV)**: Users can export workout history as a CSV file from the Workouts page via a download icon in the top bar. A date-range picker offers presets (7 days, 30 days, 3 months, all time). The CSV is generated via `ExportWorkoutHistoryCsvUseCase` with one row per exercise set, including date, workout name, type, duration, exercise name, set number, weight, reps, warmup flag, and volume. The file is shared via Android Share Sheet using `FileProvider`. Both English and Traditional Chinese localization are supported.
+
 **Version 1.12.0**
 
 - **Rest Timer Countdown Alert**: Audible beep (via `ToneGenerator`) and visual cues during the last 5 seconds of the rest timer. Timer text turns red with a pulsing scale animation. A distinct tone plays when rest ends. Beep stops immediately when "Skip Rest" is pressed.

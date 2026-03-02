@@ -40,12 +40,13 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Exercise session counts | ✅ | Get per-exercise workout session counts for sorting |
 | Reactive session counts | ✅ | Observe session counts via Flow for real-time UI updates |
 | Custom exercises | ✅ | Create, save, and delete user-defined exercises with full details |
+| Export to CSV | ✅ | Export workout history to CSV with configurable date range |
 
 ### SDK - To Develop
 
 | Feature | Status | Priority | Description |
 |---------|--------|----------|-------------|
-| Export data | 📋 | Medium | Export workouts to JSON/CSV |
+| ~~Export data~~ | ✅ | ~~Medium~~ | ~~Export workouts to JSON/CSV~~ → Completed (CSV export) |
 | Import data | 📋 | Medium | Import workouts from backup |
 | Statistics API | 📋 | Medium | Weekly/monthly stats calculations |
 | Workout history | 📋 | Low | Track workout completion streaks |
@@ -60,7 +61,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 
 | Screen | Status | Description |
 |--------|--------|-------------|
-| Home screen | ✅ | Workout list with weekly stats summary and optional calendar view (weekly/monthly) |
+| Home screen | ✅ | Workout list with weekly stats summary, optional calendar view (weekly/monthly), and CSV export button |
 | Add workout | ✅ | Form to create new workout |
 | Workout details | ✅ | View workout info and exercises |
 | Edit workout | ✅ | Modify existing workout |
@@ -133,6 +134,8 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.13.0 | 2026-03-02 | Export Workout History (CSV): Download icon on Workouts page, date-range picker presets (7d/30d/3mo/all), one-row-per-set CSV format, Android Share Sheet via FileProvider, EN + zh-TW localization. |
+| 1.12.0 | 2026-02-23 | Rest Timer Countdown Alert: Audible beep and visual cues during last 5 seconds of rest, pulsing animation, distinct end tone, immediate stop on Skip Rest. |
 | 1.11.0 | 2026-02-12 | Number Input UX: Fluent typing (no cursor jump), stepper buttons (+/−) in active workout, regex input filtering, optimized layouts for different screens. |
 | 1.10.0 | 2026-02-11 | Exercise navigator rail and reorder during active workout: Horizontal scrollable exercise chips for quick navigation, tap to jump to any exercise, drag-to-reorder via bottom sheet with completed sets remapping. |
 | 1.9.0 | 2026-02-11 | Calendar view on Home screen: Weekly and Monthly calendar modes with workout dot indicators and tap-to-filter. Switchable via Settings (None/Weekly/Monthly). Preferences persisted with SharedPreferences. Settings screen now includes calendar view picker alongside language picker. |
@@ -153,4 +156,4 @@ These features exist for testing or demonstration purposes:
 1. **Swipe to delete** - Better UX for deleting workouts
 2. **Search workouts** - Find workouts quickly
 3. **Charts** - Visualize workout progress
-4. **Rest timer notifications** - Audio/vibration when rest timer completes
+4. **Import data** - Import workouts from CSV backup

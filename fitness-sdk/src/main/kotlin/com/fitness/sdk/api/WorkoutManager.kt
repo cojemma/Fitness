@@ -116,4 +116,13 @@ interface WorkoutManager {
      * @return Flow of exercise name to session count map
      */
     fun observeExerciseSessionCounts(): Flow<Map<String, Int>>
+
+    /**
+     * Export workout history within a date range as CSV text.
+     *
+     * @param startTime Start of the date range (inclusive, milliseconds since epoch)
+     * @param endTime End of the date range (inclusive, milliseconds since epoch)
+     * @return Result containing the CSV content string
+     */
+    suspend fun exportWorkoutHistoryCsv(startTime: Long, endTime: Long): Result<String>
 }

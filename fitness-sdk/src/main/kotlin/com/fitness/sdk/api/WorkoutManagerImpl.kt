@@ -5,6 +5,7 @@ import com.fitness.sdk.domain.model.ExerciseHistory
 import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.model.WorkoutType
 import com.fitness.sdk.domain.usecase.DeleteWorkoutUseCase
+import com.fitness.sdk.domain.usecase.ExportWorkoutHistoryCsvUseCase
 import com.fitness.sdk.domain.usecase.GetExerciseHistoryUseCase
 import com.fitness.sdk.domain.usecase.GetWorkoutByIdUseCase
 import com.fitness.sdk.domain.usecase.GetWorkoutsUseCase
@@ -26,7 +27,8 @@ internal class WorkoutManagerImpl(
     private val deleteWorkoutUseCase: DeleteWorkoutUseCase,
     private val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase,
     private val getExerciseHistoryUseCase: GetExerciseHistoryUseCase,
-    private val getExerciseSessionCountsUseCase: GetExerciseSessionCountsUseCase
+    private val getExerciseSessionCountsUseCase: GetExerciseSessionCountsUseCase,
+    private val exportWorkoutHistoryCsvUseCase: ExportWorkoutHistoryCsvUseCase
 ) : WorkoutManager {
 
     override suspend fun createWorkout(workout: Workout): Result<Long> {
@@ -87,5 +89,13 @@ internal class WorkoutManagerImpl(
 
     override fun observeExerciseSessionCounts(): Flow<Map<String, Int>> {
         return getExerciseSessionCountsUseCase.observe()
+    }
+
+    override suspend fun exportWorkoutHistoryCsv(startTime: Long, endTime: Long): Result<String> {
+        return try {
+            Result.success(exportWorkoutHistoryCsvUseCase(startTime, endTime))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

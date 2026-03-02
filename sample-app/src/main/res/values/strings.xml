@@ -206,4 +206,16 @@
     <string name="label_instructions">Instructions</string>
     <string name="label_time_based">Time-based exercise</string>
     <string name="placeholder_custom_exercise_name">e.g., Cable Lateral Raise</string>
+
+    <!-- Export History -->
+    <string name="setting_export_history">Export Workout History</string>
+    <string name="setting_export_history_subtitle">Export as CSV file</string>
+    <string name="export_select_range">Select Date Range</string>
+    <string name="export_last_7_days">Last 7 Days</string>
+    <string name="export_last_30_days">Last 30 Days</string>
+    <string name="export_last_3_months">Last 3 Months</string>
+    <string name="export_all_time">All Time</string>
+    <string name="export_success">Workout history exported successfully</string>
+    <string name="export_no_data">No workout data found in the selected range</string>
+    <string name="export_error">Failed to export: %s</string>
 </resources>

@@ -71,7 +71,8 @@ src/main/kotlin/com/fitness/sdk/
 │       ├── GetExerciseSessionCountsUseCase.kt
 │       ├── SearchExercisesUseCase.kt
 │       ├── SaveCustomExerciseUseCase.kt
-│       └── DeleteCustomExerciseUseCase.kt
+│       ├── DeleteCustomExerciseUseCase.kt
+│       └── ExportWorkoutHistoryCsvUseCase.kt
 ├── data/
 │   ├── local/
 │   │   ├── FitnessDatabase.kt     # Room database
@@ -143,6 +144,7 @@ workoutManager.deleteWorkout(id)           // Returns Result<Unit>
 workoutManager.addExerciseToWorkout(id, exercise) // Returns Result<Unit>
 workoutManager.getExerciseSessionCounts()         // Returns Result<Map<String, Int>>
 workoutManager.observeExerciseSessionCounts()     // Returns Flow<Map<String, Int>>
+workoutManager.exportWorkoutHistoryCsv(startTime, endTime) // Returns Result<String> (CSV content)
 
 // Template operations
 templateManager.saveTemplate(template)     // Returns Result<Long>
@@ -233,7 +235,7 @@ src/main/kotlin/com/fitness/sample/
 
 | Screen | Route | Description |
 |--------|-------|-------------|
-| Home | `home` | Workout list with weekly stats and optional calendar view (weekly/monthly) |
+| Home | `home` | Workout list with weekly stats, optional calendar view (weekly/monthly), and CSV export button |
 | Add Workout | `add_workout` | Create new workout form |
 | Workout Details | `workout/{id}` | View workout and exercises |
 | Edit Workout | `edit_workout/{id}` | Edit existing workout |

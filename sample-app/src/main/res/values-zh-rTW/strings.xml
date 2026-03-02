@@ -206,4 +206,16 @@
     <string name="label_instructions">動作說明</string>
     <string name="label_time_based">計時動作</string>
     <string name="placeholder_custom_exercise_name">例如：纜繩側平舉</string>
+
+    <!-- Export History -->
+    <string name="setting_export_history">匯出訓練紀錄</string>
+    <string name="setting_export_history_subtitle">匯出為 CSV 檔案</string>
+    <string name="export_select_range">選擇日期範圍</string>
+    <string name="export_last_7_days">最近 7 天</string>
+    <string name="export_last_30_days">最近 30 天</string>
+    <string name="export_last_3_months">最近 3 個月</string>
+    <string name="export_all_time">全部紀錄</string>
+    <string name="export_success">訓練紀錄匯出成功</string>
+    <string name="export_no_data">所選範圍內無訓練紀錄</string>
+    <string name="export_error">匯出失敗：%s</string>
 </resources>
