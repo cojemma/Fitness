@@ -419,8 +419,8 @@ fun ActiveWorkoutScreen(
                         exerciseName = currentExercise.name,
                         currentSet = currentSetIndex + 1,
                         totalSets = currentExercise.sets,
-                        targetReps = currentExercise.reps,
-                        targetWeight = currentExercise.weight,
+                        targetReps = viewModel.getTargetReps(),
+                        targetWeight = viewModel.getTargetWeight(),
                         lastSetInfo = viewModel.getLastSetData(currentExercise.name, currentSetIndex + 1),
                         completedSetsCount = completedSets[currentExerciseIndex]?.size ?: 0,
                         onLogSet = { reps, weight -> viewModel.logSet(reps, weight) }

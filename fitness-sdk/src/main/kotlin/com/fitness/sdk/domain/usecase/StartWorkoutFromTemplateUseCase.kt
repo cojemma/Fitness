@@ -1,6 +1,7 @@
 package com.fitness.sdk.domain.usecase
 
 import com.fitness.sdk.domain.model.Exercise
+import com.fitness.sdk.domain.model.ExerciseSet
 import com.fitness.sdk.domain.model.Workout
 import com.fitness.sdk.domain.model.WorkoutType
 import com.fitness.sdk.domain.repository.TemplateRepository
@@ -45,25 +46,38 @@ class StartWorkoutFromTemplateUseCase(
 
             // Convert template exercises to workout exercises
             val exercises = template.exercises.mapIndexed { index, templateExercise ->
-                // Get last set data for this exercise
+                // Get last session set data for this exercise (list of per-set records)
                 val lastExerciseData = lastSessionData?.getExerciseData(templateExercise.exerciseName)
-                val lastSetData = lastExerciseData?.firstOrNull()
 
-                // Determine the values to use
-                val targetSet = templateExercise.sets.firstOrNull()
-                val targetReps = targetSet?.targetReps ?: 10
-                val targetWeight = lastSetData?.actualWeight 
-                    ?: targetSet?.targetWeight
+                // Build working sets only (exclude warm-up)
+                val workingSets = templateExercise.sets.filter { !it.isWarmupSet }
+
+                // Convert each TemplateSet into an ExerciseSet record.
+                // Priority: template per-set target > last session data > default
+                val setRecords = workingSets.mapIndexed { setIdx, templateSet ->
+                    val lastSetForIndex = lastExerciseData?.getOrNull(setIdx)
+                    ExerciseSet(
+                        setNumber = setIdx + 1,
+                        reps = templateSet.targetReps
+                            ?: lastSetForIndex?.actualReps ?: 10,
+                        weight = templateSet.targetWeight
+                            ?: lastSetForIndex?.actualWeight
+                    )
+                }
+
+                // Fallback aggregate values use the first set
+                val firstRecord = setRecords.firstOrNull()
 
                 Exercise(
                     id = 0,
                     workoutId = 0,
                     name = templateExercise.exerciseName,
-                    sets = templateExercise.getWorkingSets(),
-                    reps = targetReps,
-                    weight = targetWeight,
+                    sets = workingSets.size,
+                    reps = firstRecord?.reps ?: 10,
+                    weight = firstRecord?.weight,
                     restSeconds = templateExercise.restSeconds,
                     notes = templateExercise.notes,
+                    setRecords = setRecords,
                     supersetGroupId = templateExercise.supersetGroupId
                 )
             }

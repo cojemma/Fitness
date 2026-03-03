@@ -46,6 +46,11 @@ A reference implementation using the SDK.
 
 ### Current State
 
+**Version 1.15.0**
+
+- **Template Set Data Adherence**: In the active workout page, the input fields for reps and weight now accurately retrieve their targets from the specific set records defined in the template (e.g., varying weights/reps across sets), instead of defaulting to the exercise's overall aggregate values.
+- **Set Change Propagation**: When a user logs a set with modified reps or weight, all remaining (uncompleted) sets of the same exercise automatically update their targets to match the new values.
+
 **Version 1.14.0**
 
 - **Rest Timer on Last Set & Persistence**: The rest timer is now correctly triggered after the final set of an exercise (unless it's the final set of the entire workout). Additionally, the countdown timer persists and continues running even when the user manually navigates between different exercises (e.g., via the exercise chips or next/previous arrows). This ensures the rest cadence is maintained while preparing for the next movement.
@@ -75,10 +80,12 @@ A reference implementation using the SDK.
 - **Exercise List Page**: "Exercises" tab listing all exercises with expandable history. Each exercise shows total sessions, max weight, estimated 1RM (Epley formula), and session-by-session history. Tap a session to navigate to workout details. **Default sort by done times** (most-performed exercises appear first).
 - **Exercise Session Counts API**: `WorkoutManager.getExerciseSessionCounts()` returns a map of exercise name to workout session count, enabling efficient sorting without loading full history. `observeExerciseSessionCounts()` provides a reactive Flow for real-time UI updates when workout data changes.
 - **Template System**:
-  - Create/Edit templates.
-  - Start active workout from template.
+  - Create/Edit templates with per-set reps/weight targets.
+  - Start active workout from template — each set pre-fills with its own template-defined target.
   - `ActiveWorkoutScreen` with timer and set logging.
-  - **Last Session Data**: Pre-loads previous workout performance for progressive overload tracking using actual per-set records.
+  - **Per-Set Template Targets**: `StartWorkoutFromTemplateUseCase` converts every `TemplateSet` into an `ExerciseSet` record; `SessionStateManager.getTargetReps()`/`getTargetWeight()` read per-set data.
+  - **Set Change Propagation**: When a user modifies reps/weight from the template target, remaining sets auto-update. Unchanged values preserve the original per-set template targets.
+  - **Last Session Data**: Pre-loads previous workout performance for progressive overload tracking using actual per-set records. Used as fallback when template sets have no explicit target.
   - **Save as Template**: Options to replace original template, save as new, or skip after workout completion.
 - **Per-Set Recording**: Individual set records (weight, reps) stored in database via `ExerciseSet` entity.
 - **Data Persistence**: Robust local storage using Room.

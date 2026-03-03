@@ -69,11 +69,23 @@ class SessionStateManager {
     }
 
     fun getTargetReps(): Int {
-        return getCurrentExercise()?.reps ?: 10
+        val exercise = getCurrentExercise() ?: return 10
+        val setIndex = _currentSetIndex.value
+        return if (setIndex < exercise.setRecords.size) {
+            exercise.setRecords[setIndex].reps
+        } else {
+            exercise.reps
+        }
     }
 
     fun getTargetWeight(): Float? {
-        return getCurrentExercise()?.weight
+        val exercise = getCurrentExercise() ?: return null
+        val setIndex = _currentSetIndex.value
+        return if (setIndex < exercise.setRecords.size) {
+            exercise.setRecords[setIndex].weight
+        } else {
+            exercise.weight
+        }
     }
 
     /**
@@ -84,6 +96,10 @@ class SessionStateManager {
     fun logSet(reps: Int, weight: Float?): Boolean {
         val exerciseIndex = _currentExerciseIndex.value
         val setIndex = _currentSetIndex.value
+
+        // Capture current targets BEFORE logging, to detect user changes
+        val targetReps = getTargetReps()
+        val targetWeight = getTargetWeight()
         
         val entry = SetLogEntry(
             setNumber = setIndex + 1,
@@ -97,6 +113,14 @@ class SessionStateManager {
         current[exerciseIndex] = exerciseSets
         _completedSets.value = current
 
+        // Only propagate if the user actually changed the reps or weight from the target.
+        // This avoids overwriting different per-set template targets when nothing was modified.
+        val repsChanged = reps != targetReps
+        val weightChanged = weight != targetWeight
+        if (repsChanged || weightChanged) {
+            propagateToRemainingSets(exerciseIndex, setIndex, reps, weight)
+        }
+
         // Move logic
         val exercise = getCurrentExercise()
         val workout = _workout.value
@@ -108,6 +132,35 @@ class SessionStateManager {
             nextExercise()
             return !isLastExercise // Rest if we are moving to the next exercise, don't rest if finished workout
         }
+    }
+
+    /**
+     * After a user logs a set with modified values, update all remaining (future)
+     * setRecords of the same exercise to use the newly logged reps and weight.
+     * Only called when the user actually changed a value from the template target.
+     */
+    private fun propagateToRemainingSets(exerciseIndex: Int, loggedSetIndex: Int, reps: Int, weight: Float?) {
+        val currentWorkout = _workout.value ?: return
+        val exercise = currentWorkout.exercises.getOrNull(exerciseIndex) ?: return
+
+        val updatedRecords = exercise.setRecords.mapIndexed { idx, setRecord ->
+            if (idx > loggedSetIndex) {
+                setRecord.copy(reps = reps, weight = weight)
+            } else {
+                setRecord
+            }
+        }
+
+        // Also update the exercise-level fallback values so sets beyond setRecords range pick them up
+        val updatedExercise = exercise.copy(
+            setRecords = updatedRecords,
+            reps = reps,
+            weight = weight
+        )
+
+        val exercises = currentWorkout.exercises.toMutableList()
+        exercises[exerciseIndex] = updatedExercise
+        _workout.value = currentWorkout.copy(exercises = exercises)
     }
 
     fun previousExercise() {

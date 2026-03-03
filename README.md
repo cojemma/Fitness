@@ -149,7 +149,7 @@ workoutManager.exportWorkoutHistoryCsv(startTime, endTime) // Returns Result<Str
 // Template operations
 templateManager.saveTemplate(template)     // Returns Result<Long>
 templateManager.getTemplates()             // Returns Flow<List<WorkoutTemplate>>
-templateManager.startWorkout(templateId)   // Returns Result<Workout> (active session)
+templateManager.startWorkout(templateId)   // Returns Result<Workout> (active session with per-set targets)
 templateManager.saveWorkoutAsTemplate(workoutId, name) // Create template from workout
 templateManager.updateTemplateFromWorkout(templateId, workoutId) // Update existing template
 
@@ -243,7 +243,7 @@ src/main/kotlin/com/fitness/sample/
 | Templates | `templates` | List of reusable workout templates |
 | Add Template | `add_template` | Create new template |
 | Edit Template | `edit_template/{id}` | Edit existing template |
-| Active Workout | `active_workout/{templateId}` | Active training session with timer, fluent set logging (steppers), exercise navigator rail, reorder, and add-exercise from library |
+| Active Workout | `active_workout/{templateId}` | Active training session with timer, per-set template targets, set change propagation, fluent set logging (steppers), exercise navigator rail, reorder, and add-exercise from library |
 | Create Custom Exercise | `create_custom_exercise` | Form to create user-defined exercises |
 | Settings | `settings` | Language and calendar view preferences |
 

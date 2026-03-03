@@ -36,6 +36,8 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Workout templates | ✅ | Save and reuse workout routines, update from completed workouts |
 | Per-set recording | ✅ | Store individual set records (weight, reps) per exercise |
 | Last Session Data | ✅ | Pre-load previous performance data for progressive overload |
+| Per-set template targets | ✅ | Each set in a template can have its own reps/weight target |
+| Set change propagation | ✅ | Modified reps/weight propagate to remaining sets during active workout |
 | Add exercise to workout | ✅ | Add an exercise to an existing workout |
 | Exercise session counts | ✅ | Get per-exercise workout session counts for sorting |
 | Reactive session counts | ✅ | Observe session counts via Flow for real-time UI updates |
@@ -69,7 +71,7 @@ This document tracks all features in the Fitness SDK and Sample App, including t
 | Exercise picker | ✅ | Browse and select from exercise library |
 | Template list | ✅ | List of saved workout templates |
 | Add template | ✅ | Create/Edit workout template |
-| Active workout | ✅ | Session view with timer, set logging, exercise navigator rail, drag-to-reorder, and add exercise from library (FAB) |
+| Active workout | ✅ | Session view with timer, per-set template targets, set change propagation, exercise navigator rail, drag-to-reorder, and add exercise from library (FAB) |
 | Create custom exercise | ✅ | Form to create user-defined exercises (name, category, muscles, defaults) |
 | Settings | ✅ | Language picker and calendar view type preference |
 
@@ -134,6 +136,8 @@ These features exist for testing or demonstration purposes:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.15.0 | 2026-03-03 | Per-Set Template Targets: Each set in a workout follows its own template-defined reps/weight. Set Change Propagation: User-modified reps/weight auto-propagate to remaining sets (only when changed from template target). |
+| 1.14.0 | 2026-03-03 | Rest Timer on Last Set & Persistence: Timer triggers after final set of non-last exercise. Timer persists across manual exercise navigation. |
 | 1.13.0 | 2026-03-02 | Export Workout History (CSV): Download icon on Workouts page, date-range picker presets (7d/30d/3mo/all), one-row-per-set CSV format, Android Share Sheet via FileProvider, EN + zh-TW localization. |
 | 1.12.0 | 2026-02-23 | Rest Timer Countdown Alert: Audible beep and visual cues during last 5 seconds of rest, pulsing animation, distinct end tone, immediate stop on Skip Rest. |
 | 1.11.0 | 2026-02-12 | Number Input UX: Fluent typing (no cursor jump), stepper buttons (+/−) in active workout, regex input filtering, optimized layouts for different screens. |
