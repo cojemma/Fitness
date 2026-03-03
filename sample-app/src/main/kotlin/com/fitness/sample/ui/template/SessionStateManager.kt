@@ -99,12 +99,14 @@ class SessionStateManager {
 
         // Move logic
         val exercise = getCurrentExercise()
+        val workout = _workout.value
         if (exercise != null && setIndex + 1 < exercise.sets) {
             _currentSetIndex.value++
             return true // Should rest
         } else {
+            val isLastExercise = workout != null && exerciseIndex >= workout.exercises.size - 1
             nextExercise()
-            return false // Moved to next exercise
+            return !isLastExercise // Rest if we are moving to the next exercise, don't rest if finished workout
         }
     }
 

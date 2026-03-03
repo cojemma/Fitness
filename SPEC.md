@@ -46,6 +46,10 @@ A reference implementation using the SDK.
 
 ### Current State
 
+**Version 1.14.0**
+
+- **Rest Timer on Last Set & Persistence**: The rest timer is now correctly triggered after the final set of an exercise (unless it's the final set of the entire workout). Additionally, the countdown timer persists and continues running even when the user manually navigates between different exercises (e.g., via the exercise chips or next/previous arrows). This ensures the rest cadence is maintained while preparing for the next movement.
+
 **Version 1.13.0**
 
 - **Export Workout History (CSV)**: Users can export workout history as a CSV file from the Workouts page via a download icon in the top bar. A date-range picker offers presets (7 days, 30 days, 3 months, all time). The CSV is generated via `ExportWorkoutHistoryCsvUseCase` with one row per exercise set, including date, workout name, type, duration, exercise name, set number, weight, reps, warmup flag, and volume. The file is shared via Android Share Sheet using `FileProvider`. Both English and Traditional Chinese localization are supported.

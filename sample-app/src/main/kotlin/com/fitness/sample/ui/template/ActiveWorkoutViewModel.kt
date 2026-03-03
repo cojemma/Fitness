@@ -90,14 +90,14 @@ class ActiveWorkoutViewModel : ViewModel() {
         sessionStateManager.getLastSetData(exerciseName, setNumber)
 
     fun logSet(reps: Int, weight: Float?) {
+        val currentExercise = sessionStateManager.getCurrentExercise()
         val shouldRest = sessionStateManager.logSet(reps, weight)
         if (shouldRest) {
-            val exercise = sessionStateManager.getCurrentExercise()
-            if (exercise != null) {
-                timerManager.startRestTimer(exercise.restSeconds)
+            if (currentExercise != null) {
+                timerManager.startRestTimer(currentExercise.restSeconds)
             }
         } else {
-            // Moved to next exercise without rest (or last set of last exercise)
+            // Finished workout or navigating without rest
             timerManager.skipRest() 
         }
     }
@@ -108,7 +108,6 @@ class ActiveWorkoutViewModel : ViewModel() {
 
     fun goToExercise(index: Int) {
         sessionStateManager.goToExercise(index)
-        timerManager.skipRest()
     }
 
     fun reorderExercises(fromIndex: Int, toIndex: Int) {
@@ -117,12 +116,10 @@ class ActiveWorkoutViewModel : ViewModel() {
 
     fun previousExercise() {
         sessionStateManager.previousExercise()
-        timerManager.skipRest() // Cancel rest if navigating
     }
 
     fun nextExercise() {
         sessionStateManager.nextExercise()
-        timerManager.skipRest() // Cancel rest if navigating
     }
 
     fun finishWorkout() {
