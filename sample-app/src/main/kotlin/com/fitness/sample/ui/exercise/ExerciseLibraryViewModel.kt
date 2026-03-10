@@ -9,11 +9,13 @@ import com.fitness.sdk.domain.model.MuscleGroup
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ExerciseLibraryViewModel : ViewModel() {
 
     private val exerciseLibrary = FitnessSDK.getExerciseLibraryManager()
+    private val workoutManager = FitnessSDK.getWorkoutManager()
 
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
@@ -27,9 +29,13 @@ class ExerciseLibraryViewModel : ViewModel() {
     /** All exercises (predefined + custom), kept in sync via Flow */
     private var allExercises: List<ExerciseDefinition> = emptyList()
 
+    /** Exercise name -> session count, used for default sorting (most-performed first) */
+    private var sessionCounts: Map<String, Int> = emptyMap()
+
     init {
         loadAllExercises()
         observeExercises()
+        loadSessionCounts()
     }
 
     private fun loadAllExercises() {
@@ -43,6 +49,22 @@ class ExerciseLibraryViewModel : ViewModel() {
                 allExercises = exercises
                 updateExerciseList()
             }
+        }
+    }
+
+    private fun loadSessionCounts() {
+        viewModelScope.launch {
+            workoutManager.observeExerciseSessionCounts()
+                .collect { counts ->
+                    sessionCounts = counts
+                    sortExercises()
+                }
+        }
+    }
+
+    private fun sortExercises() {
+        _exercises.update { list ->
+            list.sortedByDescending { sessionCounts[it.name] ?: 0 }
         }
     }
 
@@ -68,7 +90,7 @@ class ExerciseLibraryViewModel : ViewModel() {
                 it.primaryMuscle == muscleGroup || muscleGroup in it.secondaryMuscles
             }
             else -> allExercises
-        }
+        }.sortedByDescending { sessionCounts[it.name] ?: 0 }
     }
 
     fun getExercisesByCategory(category: ExerciseCategory): List<ExerciseDefinition> {

@@ -46,6 +46,10 @@ A reference implementation using the SDK.
 
 ### Current State
 
+**Version 1.16.0**
+
+- **Exercise Picker Sort by Done Times**: The exercise selection screens (used when creating/editing a workout template and when adding exercises during an active workout) now sort exercises by session count descending — matching the default sort on the Exercises tab. `ExerciseLibraryViewModel` observes `WorkoutManager.observeExerciseSessionCounts()` and applies `sortedByDescending` to all filtered results.
+
 **Version 1.15.0**
 
 - **Template Set Data Adherence**: In the active workout page, the input fields for reps and weight now accurately retrieve their targets from the specific set records defined in the template (e.g., varying weights/reps across sets), instead of defaulting to the exercise's overall aggregate values.
