@@ -82,7 +82,7 @@ class ExerciseLibraryViewModel : ViewModel() {
         val query = _searchQuery.value
         val muscleGroup = _selectedMuscleGroup.value
 
-        _exercises.value = when {
+        val filtered = when {
             query.isNotBlank() -> allExercises.filter {
                 it.name.lowercase().contains(query.lowercase())
             }
@@ -90,7 +90,16 @@ class ExerciseLibraryViewModel : ViewModel() {
                 it.primaryMuscle == muscleGroup || muscleGroup in it.secondaryMuscles
             }
             else -> allExercises
-        }.sortedByDescending { sessionCounts[it.name] ?: 0 }
+        }
+
+        _exercises.value = if (muscleGroup != null && query.isBlank()) {
+            filtered.sortedWith(
+                compareByDescending<ExerciseDefinition> { it.primaryMuscle == muscleGroup }
+                    .thenByDescending { sessionCounts[it.name] ?: 0 }
+            )
+        } else {
+            filtered.sortedByDescending { sessionCounts[it.name] ?: 0 }
+        }
     }
 
     fun getExercisesByCategory(category: ExerciseCategory): List<ExerciseDefinition> {

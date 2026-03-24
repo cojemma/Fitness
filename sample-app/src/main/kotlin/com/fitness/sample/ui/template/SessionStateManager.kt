@@ -237,7 +237,7 @@ class SessionStateManager {
 
     /**
      * Adds an exercise to the current workout.
-     * The exercise is appended to the end of the exercise list.
+     * The exercise is inserted immediately following the current active exercise.
      */
     fun addExercise(exercise: Exercise) {
         val currentWorkout = _workout.value
@@ -246,6 +246,30 @@ class SessionStateManager {
             return
         }
 
-        _workout.value = currentWorkout.copy(exercises = currentWorkout.exercises + exercise)
+        val currentIndex = _currentExerciseIndex.value
+        val insertIndex = if (currentWorkout.exercises.isNotEmpty()) {
+            (currentIndex + 1).coerceAtMost(currentWorkout.exercises.size)
+        } else {
+            0
+        }
+
+        val exercises = currentWorkout.exercises.toMutableList()
+        exercises.add(insertIndex, exercise)
+
+        // Shift completedSets mapping for exercises after insertion point
+        val currentSets = _completedSets.value
+        if (currentSets.isNotEmpty()) {
+            val newSets = mutableMapOf<Int, List<SetLogEntry>>()
+            for ((index, sets) in currentSets) {
+                if (index >= insertIndex) {
+                    newSets[index + 1] = sets
+                } else {
+                    newSets[index] = sets
+                }
+            }
+            _completedSets.value = newSets
+        }
+
+        _workout.value = currentWorkout.copy(exercises = exercises)
     }
 }

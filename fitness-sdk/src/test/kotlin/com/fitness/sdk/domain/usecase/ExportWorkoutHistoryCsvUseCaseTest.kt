@@ -72,7 +72,7 @@ class ExportWorkoutHistoryCsvUseCaseTest {
     }
 
     @Test
-    fun `csv uses summary row when no set records`() = runTest {
+    fun `csv skips exercise when no set records`() = runTest {
         val workout = Workout(
             id = 1,
             name = "Quick Workout",
@@ -94,8 +94,7 @@ class ExportWorkoutHistoryCsvUseCaseTest {
         val csv = useCase(0L, System.currentTimeMillis())
         val lines = csv.trim().lines()
 
-        assertEquals(2, lines.size)
-        assertTrue(lines[1].contains("Push-ups,1-3,0.0,20,No,0.0"))
+        assertEquals(1, lines.size) // Only header row should be present
     }
 
     @Test

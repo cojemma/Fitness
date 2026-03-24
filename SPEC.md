@@ -46,9 +46,14 @@ A reference implementation using the SDK.
 
 ### Current State
 
+**Version 1.16.1**
+
+- **Filter Prioritizes Primary Muscle**: When filtering exercises by muscle part, exercises where the selected muscle is the primary muscle now correctly appear before exercises where it is only a secondary muscle.
+
 **Version 1.16.0**
 
 - **Exercise Picker Sort by Done Times**: The exercise selection screens (used when creating/editing a workout template and when adding exercises during an active workout) now sort exercises by session count descending — matching the default sort on the Exercises tab. `ExerciseLibraryViewModel` observes `WorkoutManager.observeExerciseSessionCounts()` and applies `sortedByDescending` to all filtered results.
+- **Active Workout Exercise Insertion**: When adding a new exercise to an active workout, it now inserts immediately after the currently active exercise rather than at the end of the workout list.
 
 **Version 1.15.0**
 
@@ -61,7 +66,7 @@ A reference implementation using the SDK.
 
 **Version 1.13.0**
 
-- **Export Workout History (CSV)**: Users can export workout history as a CSV file from the Workouts page via a download icon in the top bar. A date-range picker offers presets (7 days, 30 days, 3 months, all time). The CSV is generated via `ExportWorkoutHistoryCsvUseCase` with one row per exercise set, including date, workout name, type, duration, exercise name, set number, weight, reps, warmup flag, and volume. The file is shared via Android Share Sheet using `FileProvider`. Both English and Traditional Chinese localization are supported.
+- **Export Workout History (CSV)**: Users can export workout history as a CSV file from the Workouts page via a download icon in the top bar. A date-range picker offers presets (7 days, 30 days, 3 months, all time). The CSV is generated via `ExportWorkoutHistoryCsvUseCase` with one row per completed exercise set, including date, workout name, type, duration, exercise name, set number, weight, reps, warmup flag, and volume. Uncompleted exercises are excluded from the CSV export. The file is shared via Android Share Sheet using `FileProvider`. Both English and Traditional Chinese localization are supported.
 
 **Version 1.12.0**
 

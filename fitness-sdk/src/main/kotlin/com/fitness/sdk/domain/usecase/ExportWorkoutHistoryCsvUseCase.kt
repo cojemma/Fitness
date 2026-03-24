@@ -57,11 +57,6 @@ class ExportWorkoutHistoryCsvUseCase(
                         val warmup = if (set.isWarmupSet) "Yes" else "No"
                         sb.appendLine("$date,$workoutName,$workoutType,$duration,$exerciseName,${set.setNumber},$weight,${set.reps},$warmup,$volume")
                     }
-                } else if (exercise.sets > 0) {
-                    // Fallback: single summary row from aggregate fields
-                    val weight = exercise.weight ?: 0f
-                    val volume = exercise.calculateVolume()
-                    sb.appendLine("$date,$workoutName,$workoutType,$duration,$exerciseName,1-${exercise.sets},$weight,${exercise.reps},No,$volume")
                 }
             }
         }
