@@ -56,7 +56,21 @@ class ActiveWorkoutViewModel : ViewModel() {
     private val _templateSaved = MutableStateFlow(false)
     val templateSaved: StateFlow<Boolean> = _templateSaved.asStateFlow()
 
+    /**
+     * Guards against re-loading the workout when the screen re-enters composition
+     * (e.g. returning from the exercise picker). Re-running startWorkout() would reset
+     * the workout to the template's exercise list while completedSets still maps to the
+     * previous order, scrambling logged sets and progress.
+     */
+    private var workoutStarted = false
+
     fun startWorkout(templateId: Long) {
+        if (workoutStarted) {
+            // Already loaded; the screen merely re-entered composition. Keep current session state.
+            _isLoading.value = false
+            return
+        }
+        workoutStarted = true
         viewModelScope.launch {
             _isLoading.value = true
 
@@ -76,6 +90,7 @@ class ActiveWorkoutViewModel : ViewModel() {
                     }
                 }
                 .onFailure { e ->
+                    workoutStarted = false
                     _error.value = e.message ?: "Failed to start workout"
                 }
 
