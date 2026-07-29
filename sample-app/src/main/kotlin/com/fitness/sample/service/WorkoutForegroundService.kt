@@ -44,6 +44,10 @@ class WorkoutForegroundService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
+        // Explicit, in case a stray notify() from WorkoutSessionNotifier races with teardown —
+        // guarantees the notification is gone and the NotificationManager reference is released.
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        getSystemService(NotificationManager::class.java)?.cancel(NOTIFICATION_ID)
         serviceScope.cancel()
         super.onDestroy()
     }

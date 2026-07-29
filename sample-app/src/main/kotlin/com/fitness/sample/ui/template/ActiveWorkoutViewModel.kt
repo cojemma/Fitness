@@ -10,6 +10,7 @@ import com.fitness.sdk.domain.model.Exercise
 import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.LastSessionData
 import com.fitness.sdk.domain.model.Workout
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -70,9 +71,13 @@ class ActiveWorkoutViewModel(application: Application) : AndroidViewModel(applic
      */
     private var workoutStarted = false
 
+    // Kept so finishWorkout()/onCleared() can stop this before it re-derives a stale
+    // Info from timer state changes (e.g. skipRest() during finish) and undoes the null-out.
+    private val notifierSyncJob: Job
+
     init {
         // Keep the notification's rest countdown / current-vs-next exercise in sync with session state.
-        combine(
+        notifierSyncJob = combine(
             sessionStateManager.workout,
             sessionStateManager.currentExerciseIndex,
             sessionStateManager.currentSetIndex,
@@ -174,9 +179,11 @@ class ActiveWorkoutViewModel(application: Application) : AndroidViewModel(applic
 
     fun finishWorkout() {
         viewModelScope.launch {
+            // Stop syncing notification state first — otherwise skipRest() below flips
+            // isResting and re-derives a live Info that overwrites the null we're about to set.
+            stopWorkoutNotification()
             timerManager.stopWorkoutTimer()
             timerManager.skipRest()
-            stopWorkoutNotification()
 
             val workout = workout.value ?: return@launch
             val setsMap = completedSets.value
@@ -319,6 +326,7 @@ class ActiveWorkoutViewModel(application: Application) : AndroidViewModel(applic
     }
 
     private fun stopWorkoutNotification() {
+        notifierSyncJob.cancel()
         WorkoutSessionNotifier.update(null)
         WorkoutForegroundService.stop(getApplication())
     }
