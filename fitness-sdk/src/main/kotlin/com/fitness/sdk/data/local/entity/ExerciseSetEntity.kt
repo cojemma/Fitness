@@ -31,5 +31,6 @@ data class ExerciseSetEntity(
     val reps: Int,
     val weight: Float?,
     val isWarmupSet: Boolean,
-    val completedAt: Long
+    val completedAt: Long,
+    val restSeconds: Int = 0
 )

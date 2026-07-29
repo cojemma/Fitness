@@ -29,7 +29,7 @@ import com.fitness.sdk.data.local.entity.WorkoutTemplateEntity
         TemplateSetEntity::class,
         CustomExerciseDefinitionEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 abstract class FitnessDatabase : RoomDatabase() {

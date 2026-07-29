@@ -105,20 +105,22 @@ class ActiveWorkoutViewModel : ViewModel() {
         sessionStateManager.getLastSetData(exerciseName, setNumber)
 
     fun logSet(reps: Int, weight: Float?) {
+        val exerciseIndex = sessionStateManager.currentExerciseIndex.value
         val currentExercise = sessionStateManager.getCurrentExercise()
-        val shouldRest = sessionStateManager.logSet(reps, weight)
-        if (shouldRest) {
-            if (currentExercise != null) {
-                timerManager.startRestTimer(currentExercise.restSeconds)
+        sessionStateManager.logSet(reps, weight)
+        if (currentExercise != null) {
+            timerManager.startRestTimer(currentExercise.restSeconds) { actualRestSeconds ->
+                sessionStateManager.recordRestForSet(exerciseIndex, actualRestSeconds)
             }
-        } else {
-            // Finished workout or navigating without rest
-            timerManager.skipRest() 
         }
     }
 
     fun skipRest() {
         timerManager.skipRest()
+    }
+
+    fun adjustRestTime(deltaSeconds: Int) {
+        timerManager.adjustRestTime(deltaSeconds)
     }
 
     fun goToExercise(index: Int) {
@@ -156,7 +158,8 @@ class ActiveWorkoutViewModel : ViewModel() {
                         reps = entry.reps,
                         weight = entry.weight,
                         isWarmupSet = false,
-                        completedAt = System.currentTimeMillis()
+                        completedAt = System.currentTimeMillis(),
+                        restSeconds = entry.restSeconds
                     )
                 }
 

@@ -90,17 +90,23 @@ class SessionStateManager {
 
     /**
      * Logs a completed set.
-     * @return true if the user should rest (i.e., more sets remain in this exercise),
-     *         false if moved to next exercise or finished.
+     *
+     * Normal forward progression is unchanged: once the last planned set of the current
+     * exercise ([Exercise.sets]) is logged, this auto-advances to the next exercise.
+     *
+     * If the user manually returns to an exercise that was already completed (via
+     * [goToExercise] / the navigator rail / reorder sheet) and logs another set there,
+     * this does NOT re-trigger auto-advance — it just keeps accumulating additional sets
+     * on that same exercise, since the exercise is no longer "mid-plan".
      */
-    fun logSet(reps: Int, weight: Float?): Boolean {
+    fun logSet(reps: Int, weight: Float?) {
         val exerciseIndex = _currentExerciseIndex.value
         val setIndex = _currentSetIndex.value
 
         // Capture current targets BEFORE logging, to detect user changes
         val targetReps = getTargetReps()
         val targetWeight = getTargetWeight()
-        
+
         val entry = SetLogEntry(
             setNumber = setIndex + 1,
             reps = reps,
@@ -109,6 +115,7 @@ class SessionStateManager {
 
         val current = _completedSets.value.toMutableMap()
         val exerciseSets = current[exerciseIndex]?.toMutableList() ?: mutableListOf()
+        val completedCountBeforeLog = exerciseSets.size
         exerciseSets.add(entry)
         current[exerciseIndex] = exerciseSets
         _completedSets.value = current
@@ -121,17 +128,33 @@ class SessionStateManager {
             propagateToRemainingSets(exerciseIndex, setIndex, reps, weight)
         }
 
-        // Move logic
         val exercise = getCurrentExercise()
-        val workout = _workout.value
-        if (exercise != null && setIndex + 1 < exercise.sets) {
-            _currentSetIndex.value++
-            return true // Should rest
+        if (exercise != null && completedCountBeforeLog < exercise.sets) {
+            // Still progressing through the originally planned sets.
+            if (setIndex + 1 < exercise.sets) {
+                _currentSetIndex.value++
+            } else {
+                nextExercise()
+            }
         } else {
-            val isLastExercise = workout != null && exerciseIndex >= workout.exercises.size - 1
-            nextExercise()
-            return !isLastExercise // Rest if we are moving to the next exercise, don't rest if finished workout
+            // Exercise was already completed before this log call (a deliberate revisit
+            // to add extra sets) — keep accumulating on it instead of auto-advancing again.
+            _currentSetIndex.value++
         }
+    }
+
+    /**
+     * Records the actual rest duration taken after a previously logged set.
+     * Called once the rest timer for that set ends (naturally or via skip/adjustment).
+     */
+    fun recordRestForSet(exerciseIndex: Int, restSeconds: Int) {
+        val current = _completedSets.value.toMutableMap()
+        val exerciseSets = current[exerciseIndex]?.toMutableList() ?: return
+        if (exerciseSets.isEmpty()) return
+        val lastIndex = exerciseSets.size - 1
+        exerciseSets[lastIndex] = exerciseSets[lastIndex].copy(restSeconds = restSeconds)
+        current[exerciseIndex] = exerciseSets
+        _completedSets.value = current
     }
 
     /**
@@ -192,8 +215,7 @@ class SessionStateManager {
         if (index in workout.exercises.indices) {
             _currentExerciseIndex.value = index
             val completedCount = _completedSets.value[index]?.size ?: 0
-            val totalSets = workout.exercises[index].sets
-            _currentSetIndex.value = completedCount.coerceAtMost(totalSets - 1)
+            _currentSetIndex.value = completedCount
         }
     }
 

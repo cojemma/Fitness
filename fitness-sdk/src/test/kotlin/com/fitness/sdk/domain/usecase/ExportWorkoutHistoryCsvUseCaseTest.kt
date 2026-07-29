@@ -33,7 +33,7 @@ class ExportWorkoutHistoryCsvUseCaseTest {
 
         assertEquals(1, lines.size)
         assertEquals(
-            "Date,Workout Name,Workout Type,Duration (min),Exercise Name,Set #,Weight (kg),Reps,Warmup,Volume (kg)",
+            "Date,Workout Name,Workout Type,Duration (min),Exercise Name,Set #,Weight (kg),Reps,Warmup,Volume (kg),Rest (sec)",
             lines[0]
         )
     }
@@ -159,5 +159,36 @@ class ExportWorkoutHistoryCsvUseCaseTest {
     @Test(expected = IllegalArgumentException::class)
     fun `throws when startTime greater than endTime`() = runTest {
         useCase(2000L, 1000L)
+    }
+
+    @Test
+    fun `csv includes rest seconds per set`() = runTest {
+        val workout = Workout(
+            id = 1,
+            name = "Rest Test",
+            type = WorkoutType.STRENGTH,
+            startTime = 1709337600000L,
+            durationMinutes = 45,
+            exercises = listOf(
+                Exercise(
+                    name = "Bench Press",
+                    sets = 2,
+                    reps = 8,
+                    weight = 60f,
+                    setRecords = listOf(
+                        ExerciseSet(setNumber = 1, reps = 8, weight = 60f, restSeconds = 90),
+                        ExerciseSet(setNumber = 2, reps = 8, weight = 60f, restSeconds = 120)
+                    )
+                )
+            )
+        )
+        coEvery { repository.getWorkoutsByDateRange(any(), any()) } returns listOf(workout)
+
+        val csv = useCase(0L, System.currentTimeMillis())
+        val lines = csv.trim().lines()
+
+        assertEquals(3, lines.size)
+        assertTrue(lines[1].endsWith(",90"))
+        assertTrue(lines[2].endsWith(",120"))
     }
 }

@@ -6,5 +6,6 @@ package com.fitness.sample.ui.template
 data class SetLogEntry(
     val setNumber: Int,
     val reps: Int,
-    val weight: Float?
+    val weight: Float?,
+    val restSeconds: Int = 0
 )

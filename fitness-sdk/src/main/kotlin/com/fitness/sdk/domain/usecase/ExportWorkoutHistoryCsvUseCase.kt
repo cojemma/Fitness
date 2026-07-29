@@ -17,7 +17,7 @@ class ExportWorkoutHistoryCsvUseCase(
 
     companion object {
         private const val CSV_HEADER =
-            "Date,Workout Name,Workout Type,Duration (min),Exercise Name,Set #,Weight (kg),Reps,Warmup,Volume (kg)"
+            "Date,Workout Name,Workout Type,Duration (min),Exercise Name,Set #,Weight (kg),Reps,Warmup,Volume (kg),Rest (sec)"
 
         private val DATE_FORMAT = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US)
     }
@@ -55,7 +55,7 @@ class ExportWorkoutHistoryCsvUseCase(
                         val weight = set.weight ?: 0f
                         val volume = set.calculateVolume()
                         val warmup = if (set.isWarmupSet) "Yes" else "No"
-                        sb.appendLine("$date,$workoutName,$workoutType,$duration,$exerciseName,${set.setNumber},$weight,${set.reps},$warmup,$volume")
+                        sb.appendLine("$date,$workoutName,$workoutType,$duration,$exerciseName,${set.setNumber},$weight,${set.reps},$warmup,$volume,${set.restSeconds}")
                     }
                 }
             }

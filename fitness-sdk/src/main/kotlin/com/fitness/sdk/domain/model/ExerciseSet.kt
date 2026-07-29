@@ -11,6 +11,7 @@ package com.fitness.sdk.domain.model
  * @property weight Weight used in kilograms (null for bodyweight exercises)
  * @property isWarmupSet Whether this is a warm-up set
  * @property completedAt Timestamp when this set was completed
+ * @property restSeconds Actual rest time taken after this set, in seconds
  */
 data class ExerciseSet(
     val id: Long = 0,
@@ -19,7 +20,8 @@ data class ExerciseSet(
     val reps: Int,
     val weight: Float? = null,
     val isWarmupSet: Boolean = false,
-    val completedAt: Long = System.currentTimeMillis()
+    val completedAt: Long = System.currentTimeMillis(),
+    val restSeconds: Int = 0
 ) {
     /**
      * Calculate the volume (reps × weight) for this set.

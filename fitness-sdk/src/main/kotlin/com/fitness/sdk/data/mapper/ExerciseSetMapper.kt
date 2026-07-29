@@ -19,7 +19,8 @@ object ExerciseSetMapper {
             reps = exerciseSet.reps,
             weight = exerciseSet.weight,
             isWarmupSet = exerciseSet.isWarmupSet,
-            completedAt = exerciseSet.completedAt
+            completedAt = exerciseSet.completedAt,
+            restSeconds = exerciseSet.restSeconds
         )
     }
 
@@ -34,7 +35,8 @@ object ExerciseSetMapper {
             reps = entity.reps,
             weight = entity.weight,
             isWarmupSet = entity.isWarmupSet,
-            completedAt = entity.completedAt
+            completedAt = entity.completedAt,
+            restSeconds = entity.restSeconds
         )
     }
 

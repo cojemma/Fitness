@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 ## Project Overview
 
@@ -127,14 +127,6 @@ FitnessSDK.getTemplateManager()         // Template management
 - **State:** `SessionStateManager.goToExercise(index)` jumps to exercise and resumes at next uncompleted set. `reorderExercises(fromIndex, toIndex)` moves exercise, remaps `completedSets` keys (index-based `Map<Int, List<SetLogEntry>>`), and adjusts `currentExerciseIndex` to follow the viewed exercise.
 - **ViewModel:** `ActiveWorkoutViewModel.goToExercise()` and `reorderExercises()` delegate to SessionStateManager; `goToExercise` also cancels rest timer.
 - **No `finishWorkout()` changes needed:** It already uses `mapIndexed` on the synced exercise list + completedSets map.
-
-## Set Logging Beyond Planned Count & Rest Timer
-
-- **Auto-advance preserved, revisit accumulates:** `SessionStateManager.logSet()` still auto-advances to the next exercise the first time the planned `Exercise.sets` target is reached (unchanged default behavior). But if the user manually returns to an already-completed exercise (`goToExercise()` / navigator rail / reorder sheet — these resume at `currentSetIndex = completedCount`, uncapped by `totalSets`) and logs another set there, it does NOT re-trigger auto-advance — the set counter just keeps accumulating on that exercise instead of getting stuck redisplaying the last planned set. Detection: `logSet()` compares the exercise's completed-set count *before* this call against `Exercise.sets` — only mid-plan completions (`completedCountBeforeLog < exercise.sets`) trigger the advance-on-target-reached logic; a revisit (`completedCountBeforeLog >= exercise.sets`) just increments. `finishWorkout()` persists the actual logged count (`loggedSets.size`), not the original target.
-- **Rest timer always starts:** `ActiveWorkoutViewModel.logSet()` starts the rest timer (`TimerManager.startRestTimer`) after every logged set, using `Exercise.restSeconds`, independent of whether more sets are planned.
-- **Live rest adjustment:** `TimerManager.adjustRestTime(deltaSeconds)` adds/subtracts from the running countdown (`RestTimerCard` in `ActiveWorkoutScreen.kt` exposes `-30s`/`-10s`/`+10s`/`+30s` buttons). Reducing remaining time to ≤0 ends the rest via `skipRest()`.
-- **Rest time recorded per set:** `TimerManager.startRestTimer(seconds, onRestEnded)` tracks actual elapsed rest seconds (independent of `adjustRestTime` changes to the countdown) and reports them via `onRestEnded` when rest ends (naturally, skipped, or superseded by a new rest starting first). `ActiveWorkoutViewModel` wires this to `SessionStateManager.recordRestForSet(exerciseIndex, restSeconds)`, which updates the `restSeconds` field on the most recently logged `SetLogEntry` for that exercise.
-- **Persisted & exported:** `SetLogEntry.restSeconds` flows into `ExerciseSet.restSeconds` (domain model) → `ExerciseSetEntity.restSeconds` (Room, `exercise_sets` table) via `ExerciseSetMapper`. `ExportWorkoutHistoryCsvUseCase` appends a trailing `Rest (sec)` CSV column. **Database version bumped to v6** (destructive migration, per existing convention — no real `Migration` objects exist in this project).
 
 ## Git Conventions
 

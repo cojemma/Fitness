@@ -437,7 +437,8 @@ fun ActiveWorkoutScreen(
                         RestTimerCard(
                             remainingSeconds = restTimeRemaining,
                             isCountingDown = isCountingDown,
-                            onSkip = { viewModel.skipRest() }
+                            onSkip = { viewModel.skipRest() },
+                            onAdjust = { delta -> viewModel.adjustRestTime(delta) }
                         )
                     }
 
@@ -744,7 +745,8 @@ private fun CurrentExerciseCard(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    repeat(totalSets) { index ->
+                    // Show extra dots when the user has logged more sets than originally planned.
+                    repeat(maxOf(totalSets, completedSetsCount)) { index ->
                         Box(
                             modifier = Modifier
                                 .size(12.dp)
@@ -788,6 +790,7 @@ private fun RestTimerCard(
     remainingSeconds: Int,
     isCountingDown: Boolean,
     onSkip: () -> Unit,
+    onAdjust: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // --- Audible tick for last 5 seconds ---
@@ -870,6 +873,19 @@ private fun RestTimerCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Rest time adjustment controls (+/- 10s and 30s)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RestAdjustButton(text = "-30s") { onAdjust(-30) }
+                RestAdjustButton(text = "-10s") { onAdjust(-10) }
+                RestAdjustButton(text = "+10s") { onAdjust(10) }
+                RestAdjustButton(text = "+30s") { onAdjust(30) }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
             FilledTonalButton(
                 onClick = onSkip,
                 shape = RoundedCornerShape(12.dp)
@@ -883,6 +899,26 @@ private fun RestTimerCard(
                 Text(stringResource(R.string.btn_skip_rest))
             }
         }
+    }
+}
+
+@Composable
+private fun RestAdjustButton(
+    text: String,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(10.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+        )
     }
 }
 
