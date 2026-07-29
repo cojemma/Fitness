@@ -125,4 +125,13 @@ interface WorkoutManager {
      * @return Result containing the CSV content string
      */
     suspend fun exportWorkoutHistoryCsv(startTime: Long, endTime: Long): Result<String>
+
+    /**
+     * Get the most recently performed sets/reps/weight for an exercise by name.
+     * Used to prefill a newly swapped-in exercise during an active workout.
+     *
+     * @param exerciseName The display name of the exercise (must match stored exercise names)
+     * @return Result containing the last performed exercise, or null if never performed
+     */
+    suspend fun getLastExercisePerformance(exerciseName: String): Result<Exercise?>
 }

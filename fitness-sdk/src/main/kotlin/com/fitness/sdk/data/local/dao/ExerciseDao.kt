@@ -77,5 +77,19 @@ interface ExerciseDao {
         GROUP BY e.name
     """)
     fun observeExerciseSessionCounts(): Flow<List<ExerciseSessionCount>>
+
+    /**
+     * Get the most recently performed instance of an exercise by name (from the latest
+     * workout it appeared in). Used to prefill sets/reps/weight when swapping in an
+     * exercise during an active workout.
+     */
+    @Query("""
+        SELECT e.* FROM exercises e
+        INNER JOIN workouts w ON e.workoutId = w.id
+        WHERE e.name = :exerciseName
+        ORDER BY w.startTime DESC
+        LIMIT 1
+    """)
+    suspend fun getMostRecentExerciseByName(exerciseName: String): ExerciseEntity?
 }
 

@@ -13,6 +13,7 @@ import com.fitness.sdk.domain.usecase.SaveWorkoutUseCase
 import com.fitness.sdk.domain.usecase.UpdateWorkoutUseCase
 import com.fitness.sdk.domain.usecase.AddExerciseToWorkoutUseCase
 import com.fitness.sdk.domain.usecase.GetExerciseSessionCountsUseCase
+import com.fitness.sdk.domain.usecase.GetLastExercisePerformanceUseCase
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -28,7 +29,8 @@ internal class WorkoutManagerImpl(
     private val addExerciseToWorkoutUseCase: AddExerciseToWorkoutUseCase,
     private val getExerciseHistoryUseCase: GetExerciseHistoryUseCase,
     private val getExerciseSessionCountsUseCase: GetExerciseSessionCountsUseCase,
-    private val exportWorkoutHistoryCsvUseCase: ExportWorkoutHistoryCsvUseCase
+    private val exportWorkoutHistoryCsvUseCase: ExportWorkoutHistoryCsvUseCase,
+    private val getLastExercisePerformanceUseCase: GetLastExercisePerformanceUseCase
 ) : WorkoutManager {
 
     override suspend fun createWorkout(workout: Workout): Result<Long> {
@@ -94,6 +96,14 @@ internal class WorkoutManagerImpl(
     override suspend fun exportWorkoutHistoryCsv(startTime: Long, endTime: Long): Result<String> {
         return try {
             Result.success(exportWorkoutHistoryCsvUseCase(startTime, endTime))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getLastExercisePerformance(exerciseName: String): Result<Exercise?> {
+        return try {
+            Result.success(getLastExercisePerformanceUseCase(exerciseName))
         } catch (e: Exception) {
             Result.failure(e)
         }

@@ -250,6 +250,40 @@ class ActiveWorkoutViewModel : ViewModel() {
         sessionStateManager.addExercise(exercise)
     }
 
+    /**
+     * Replaces the exercise at [index] with [exerciseDefinition] (e.g. swapping "Barbell Bench
+     * Press" for "Dumbbell Bench Press" mid-workout). Sets/reps/weight are prefilled from the
+     * new exercise's most recent performance; if it's never been performed before, falls back
+     * to the sets/reps/weight of the exercise being replaced.
+     */
+    fun replaceExercise(index: Int, exerciseDefinition: ExerciseDefinition) {
+        val originalExercise = sessionStateManager.workout.value?.exercises?.getOrNull(index)
+        viewModelScope.launch {
+            val lastPerformance = workoutManager.getLastExercisePerformance(exerciseDefinition.name)
+                .getOrNull()
+
+            val newExercise = when {
+                lastPerformance != null -> exerciseDefinition.toExercise(
+                    sets = lastPerformance.sets,
+                    reps = lastPerformance.reps,
+                    weight = lastPerformance.weight,
+                    durationSeconds = lastPerformance.durationSeconds,
+                    restSeconds = originalExercise?.restSeconds ?: 60
+                )
+                originalExercise != null -> exerciseDefinition.toExercise(
+                    sets = originalExercise.sets,
+                    reps = originalExercise.reps,
+                    weight = originalExercise.weight,
+                    durationSeconds = originalExercise.durationSeconds,
+                    restSeconds = originalExercise.restSeconds
+                )
+                else -> exerciseDefinition.toExercise()
+            }
+
+            sessionStateManager.replaceExercise(index, newExercise)
+        }
+    }
+
     override fun onCleared() {
         super.onCleared()
         timerManager.cancelAll()

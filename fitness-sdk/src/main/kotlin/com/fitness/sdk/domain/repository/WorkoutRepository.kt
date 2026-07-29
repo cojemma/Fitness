@@ -103,4 +103,13 @@ interface WorkoutRepository {
      * @return Flow emitting map of exercise name to session count whenever data changes
      */
     fun observeExerciseSessionCounts(): Flow<Map<String, Int>>
+
+    /**
+     * Get the most recently performed instance of an exercise by name, with the
+     * sets/reps/weight actually recorded in that last session.
+     *
+     * @param exerciseName The display name of the exercise (must match stored exercise names)
+     * @return The last performed [Exercise], or null if the exercise was never performed
+     */
+    suspend fun getLastExercisePerformance(exerciseName: String): Exercise?
 }

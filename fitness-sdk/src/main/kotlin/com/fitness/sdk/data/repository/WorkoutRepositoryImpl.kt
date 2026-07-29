@@ -232,6 +232,11 @@ class WorkoutRepositoryImpl(
         }
     }
 
+    override suspend fun getLastExercisePerformance(exerciseName: String): Exercise? =
+        withContext(Dispatchers.IO) {
+            exerciseDao.getMostRecentExerciseByName(exerciseName)?.let { ExerciseMapper.toDomain(it) }
+        }
+
     private fun calculateEpley1RM(weight: Float, reps: Int): Float {
         return if (reps == 1) weight
         else weight * (1 + reps / 30f)

@@ -69,6 +69,10 @@ fun FitnessNavGraph(
     var selectedExercise by remember { mutableStateOf<ExerciseDefinition?>(null) }
     var pendingExerciseSource by remember { mutableStateOf<String?>(null) }
 
+    // Shared state for the "replace exercise" flow: which exercise (by index/name) is being swapped
+    var swapExerciseIndex by remember { mutableStateOf<Int?>(null) }
+    var swapExerciseName by remember { mutableStateOf<String?>(null) }
+
     // Create shared ViewModels at NavGraph level to survive navigation to picker
     // Use rememberSaveable key to reset when starting fresh
     var addWorkoutKey by rememberSaveable { mutableStateOf(0) }
@@ -205,7 +209,8 @@ fun FitnessNavGraph(
                 },
                 onCreateCustomExercise = {
                     navController.navigate(Screen.CreateCustomExercise.route)
-                }
+                },
+                priorityExerciseName = if (pendingExerciseSource == "swap_exercise") swapExerciseName else null
             )
         }
 
@@ -325,6 +330,7 @@ fun FitnessNavGraph(
 
             // Check if we have a pending exercise from the picker
             val exerciseToAdd = if (pendingExerciseSource == "active_workout") selectedExercise else null
+            val exerciseToSwap = if (pendingExerciseSource == "swap_exercise") selectedExercise else null
 
             ActiveWorkoutScreen(
                 templateId = templateId,
@@ -345,6 +351,20 @@ fun FitnessNavGraph(
                 onExerciseConsumed = {
                     selectedExercise = null
                     pendingExerciseSource = null
+                },
+                onReplaceExercise = { index, exerciseName ->
+                    swapExerciseIndex = index
+                    swapExerciseName = exerciseName
+                    pendingExerciseSource = "swap_exercise"
+                    navController.navigate(Screen.ExercisePicker.createRoute("swap_exercise"))
+                },
+                swapExercise = exerciseToSwap,
+                swapTargetIndex = swapExerciseIndex,
+                onSwapConsumed = {
+                    selectedExercise = null
+                    pendingExerciseSource = null
+                    swapExerciseIndex = null
+                    swapExerciseName = null
                 },
                 viewModel = activeWorkoutViewModel
             )

@@ -90,6 +90,7 @@
     <string name="btn_saving">儲存中…</string>
     <string name="btn_save_workout">儲存訓練</string>
     <string name="cd_add_exercise">新增動作</string>
+    <string name="cd_replace_exercise">替換動作</string>
 
     <!-- Workout Details Screen -->
     <string name="title_workout_details">訓練詳情</string>

@@ -90,6 +90,7 @@
     <string name="btn_saving">Saving…</string>
     <string name="btn_save_workout">Save Workout</string>
     <string name="cd_add_exercise">Add Exercise</string>
+    <string name="cd_replace_exercise">Replace Exercise</string>
 
     <!-- Workout Details Screen -->
     <string name="title_workout_details">Workout Details</string>

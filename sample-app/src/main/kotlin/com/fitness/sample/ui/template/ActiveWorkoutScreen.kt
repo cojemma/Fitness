@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -96,6 +97,10 @@ fun ActiveWorkoutScreen(
     onAddExercise: () -> Unit = {},
     pendingExercise: ExerciseDefinition? = null,
     onExerciseConsumed: (() -> Unit)? = null,
+    onReplaceExercise: ((index: Int, exerciseName: String) -> Unit)? = null,
+    swapExercise: ExerciseDefinition? = null,
+    swapTargetIndex: Int? = null,
+    onSwapConsumed: (() -> Unit)? = null,
     viewModel: ActiveWorkoutViewModel = viewModel()
 ) {
     val workout by viewModel.workout.collectAsState()
@@ -133,6 +138,16 @@ fun ActiveWorkoutScreen(
         pendingExercise?.let { definition ->
             viewModel.addExercise(definition)
             onExerciseConsumed?.invoke()
+        }
+    }
+
+    // Handle pending exercise swap from library picker
+    LaunchedEffect(swapExercise, swapTargetIndex) {
+        val definition = swapExercise
+        val targetIndex = swapTargetIndex
+        if (definition != null && targetIndex != null) {
+            viewModel.replaceExercise(targetIndex, definition)
+            onSwapConsumed?.invoke()
         }
     }
 
@@ -415,6 +430,7 @@ fun ActiveWorkoutScreen(
                     }
 
                     // Current exercise card
+                    val currentCompletedSetsCount = completedSets[currentExerciseIndex]?.size ?: 0
                     CurrentExerciseCard(
                         exerciseName = currentExercise.name,
                         currentSet = currentSetIndex + 1,
@@ -422,8 +438,11 @@ fun ActiveWorkoutScreen(
                         targetReps = viewModel.getTargetReps(),
                         targetWeight = viewModel.getTargetWeight(),
                         lastSetInfo = viewModel.getLastSetData(currentExercise.name, currentSetIndex + 1),
-                        completedSetsCount = completedSets[currentExerciseIndex]?.size ?: 0,
-                        onLogSet = { reps, weight -> viewModel.logSet(reps, weight) }
+                        completedSetsCount = currentCompletedSetsCount,
+                        onLogSet = { reps, weight -> viewModel.logSet(reps, weight) },
+                        onReplaceExercise = if (onReplaceExercise != null && currentCompletedSetsCount == 0) {
+                            { onReplaceExercise(currentExerciseIndex, currentExercise.name) }
+                        } else null
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -551,6 +570,7 @@ private fun CurrentExerciseCard(
     lastSetInfo: String?,
     completedSetsCount: Int,
     onLogSet: (Int, Float?) -> Unit,
+    onReplaceExercise: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // Local TextFieldValue state — decoupled from model to prevent cursor jumping
@@ -579,13 +599,27 @@ private fun CurrentExerciseCard(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Exercise name
-            Text(
-                text = exerciseName,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
+            // Exercise name (with optional replace-exercise action)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = exerciseName,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                if (onReplaceExercise != null) {
+                    IconButton(onClick = onReplaceExercise, modifier = Modifier.size(32.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.SwapHoriz,
+                            contentDescription = stringResource(R.string.cd_replace_exercise),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 

@@ -37,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -59,11 +60,17 @@ fun ExercisePickerScreen(
     onNavigateBack: () -> Unit,
     onExerciseSelected: (ExerciseDefinition) -> Unit,
     onCreateCustomExercise: (() -> Unit)? = null,
+    /** When set (swap-exercise flow), prioritizes this exercise's muscle group in sort order. */
+    priorityExerciseName: String? = null,
     viewModel: ExerciseLibraryViewModel = viewModel()
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedMuscleGroup by viewModel.selectedMuscleGroup.collectAsState()
     val exercises by viewModel.exercises.collectAsState()
+
+    LaunchedEffect(priorityExerciseName) {
+        viewModel.setPriorityExerciseName(priorityExerciseName)
+    }
 
     Scaffold(
         topBar = {

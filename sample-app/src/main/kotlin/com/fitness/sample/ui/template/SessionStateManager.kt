@@ -294,4 +294,27 @@ class SessionStateManager {
 
         _workout.value = currentWorkout.copy(exercises = exercises)
     }
+
+    /**
+     * Replaces the exercise at [index] with [newExercise] in place (same position in the plan).
+     * Only allowed if no sets have been logged yet for that exercise — swapping mid-progress
+     * would leave already-completed sets attributed to an exercise that's no longer there.
+     *
+     * @return true if the replacement was applied, false if it was rejected (invalid index or
+     * sets already logged).
+     */
+    fun replaceExercise(index: Int, newExercise: Exercise): Boolean {
+        val currentWorkout = _workout.value ?: return false
+        if (index !in currentWorkout.exercises.indices) return false
+        if (!_completedSets.value[index].isNullOrEmpty()) return false
+
+        val exercises = currentWorkout.exercises.toMutableList()
+        exercises[index] = newExercise
+        _workout.value = currentWorkout.copy(exercises = exercises)
+
+        if (_currentExerciseIndex.value == index) {
+            _currentSetIndex.value = 0
+        }
+        return true
+    }
 }
