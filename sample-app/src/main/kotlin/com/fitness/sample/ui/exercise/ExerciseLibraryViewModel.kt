@@ -32,13 +32,6 @@ class ExerciseLibraryViewModel : ViewModel() {
     /** Exercise name -> session count, used for default sorting (most-performed first) */
     private var sessionCounts: Map<String, Int> = emptyMap()
 
-    /**
-     * Name of the exercise currently being swapped out (if this picker was opened from the
-     * "replace exercise" flow). Its primary muscle group is prioritized in sort order without
-     * hiding other exercises, unlike the hard muscle-group filter chips.
-     */
-    private var priorityExerciseName: String? = null
-
     init {
         loadAllExercises()
         observeExercises()
@@ -85,22 +78,9 @@ class ExerciseLibraryViewModel : ViewModel() {
         updateExerciseList()
     }
 
-    /**
-     * Sets the exercise being swapped out, so its primary muscle group is prioritized in the
-     * (unfiltered) sort order. Pass null to clear (e.g. when the picker is used for a plain
-     * add-exercise flow instead of a swap).
-     */
-    fun setPriorityExerciseName(exerciseName: String?) {
-        priorityExerciseName = exerciseName
-        updateExerciseList()
-    }
-
     private fun updateExerciseList() {
         val query = _searchQuery.value
         val muscleGroup = _selectedMuscleGroup.value
-        val priorityMuscle = priorityExerciseName?.let { name ->
-            allExercises.find { it.name == name }?.primaryMuscle
-        }
 
         val filtered = when {
             query.isNotBlank() -> allExercises.filter {
@@ -112,16 +92,13 @@ class ExerciseLibraryViewModel : ViewModel() {
             else -> allExercises
         }
 
-        _exercises.value = when {
-            muscleGroup != null && query.isBlank() -> filtered.sortedWith(
+        _exercises.value = if (muscleGroup != null && query.isBlank()) {
+            filtered.sortedWith(
                 compareByDescending<ExerciseDefinition> { it.primaryMuscle == muscleGroup }
                     .thenByDescending { sessionCounts[it.name] ?: 0 }
             )
-            priorityMuscle != null && query.isBlank() -> filtered.sortedWith(
-                compareByDescending<ExerciseDefinition> { it.primaryMuscle == priorityMuscle }
-                    .thenByDescending { sessionCounts[it.name] ?: 0 }
-            )
-            else -> filtered.sortedByDescending { sessionCounts[it.name] ?: 0 }
+        } else {
+            filtered.sortedByDescending { sessionCounts[it.name] ?: 0 }
         }
     }
 

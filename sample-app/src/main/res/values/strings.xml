@@ -219,4 +219,12 @@
     <string name="export_success">Workout history exported successfully</string>
     <string name="export_no_data">No workout data found in the selected range</string>
     <string name="export_error">Failed to export: %s</string>
+
+    <!-- Workout Notification -->
+    <string name="notification_channel_workout_name">Active Workout</string>
+    <string name="notification_channel_workout_description">Shows rest timer and next exercise while a workout is in progress</string>
+    <string name="notification_title_workout_active">Workout in progress</string>
+    <string name="notification_title_resting">Resting… %s</string>
+    <string name="notification_content_current_exercise">Current: %s</string>
+    <string name="notification_content_next_exercise">Next: %s</string>
 </resources>

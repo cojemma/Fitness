@@ -26,7 +26,9 @@ import com.fitness.sample.ui.template.TemplateViewModel
 import com.fitness.sample.ui.workout.AddWorkoutScreen
 import com.fitness.sample.ui.workout.WorkoutDetailsScreen
 import com.fitness.sample.ui.workout.WorkoutViewModel
+import com.fitness.sdk.FitnessSDK
 import com.fitness.sdk.domain.model.ExerciseDefinition
+import com.fitness.sdk.domain.model.MuscleGroup
 
 sealed class Screen(val route: String) {
     // Workout routes
@@ -69,9 +71,10 @@ fun FitnessNavGraph(
     var selectedExercise by remember { mutableStateOf<ExerciseDefinition?>(null) }
     var pendingExerciseSource by remember { mutableStateOf<String?>(null) }
 
-    // Shared state for the "replace exercise" flow: which exercise (by index/name) is being swapped
+    // Shared state for the "replace exercise" flow: which exercise index is being swapped,
+    // and its muscle group (used to pre-select the picker's muscle group filter chip)
     var swapExerciseIndex by remember { mutableStateOf<Int?>(null) }
-    var swapExerciseName by remember { mutableStateOf<String?>(null) }
+    var swapMuscleGroup by remember { mutableStateOf<MuscleGroup?>(null) }
 
     // Create shared ViewModels at NavGraph level to survive navigation to picker
     // Use rememberSaveable key to reset when starting fresh
@@ -210,7 +213,7 @@ fun FitnessNavGraph(
                 onCreateCustomExercise = {
                     navController.navigate(Screen.CreateCustomExercise.route)
                 },
-                priorityExerciseName = if (pendingExerciseSource == "swap_exercise") swapExerciseName else null
+                initialMuscleGroup = if (pendingExerciseSource == "swap_exercise") swapMuscleGroup else null
             )
         }
 
@@ -354,7 +357,8 @@ fun FitnessNavGraph(
                 },
                 onReplaceExercise = { index, exerciseName ->
                     swapExerciseIndex = index
-                    swapExerciseName = exerciseName
+                    swapMuscleGroup = FitnessSDK.getExerciseLibraryManager().getAllExercises()
+                        .find { it.name == exerciseName }?.primaryMuscle
                     pendingExerciseSource = "swap_exercise"
                     navController.navigate(Screen.ExercisePicker.createRoute("swap_exercise"))
                 },
@@ -364,7 +368,7 @@ fun FitnessNavGraph(
                     selectedExercise = null
                     pendingExerciseSource = null
                     swapExerciseIndex = null
-                    swapExerciseName = null
+                    swapMuscleGroup = null
                 },
                 viewModel = activeWorkoutViewModel
             )

@@ -1,7 +1,10 @@
 package com.fitness.sample.ui.template
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.fitness.sample.service.WorkoutForegroundService
+import com.fitness.sample.service.WorkoutSessionNotifier
 import com.fitness.sdk.FitnessSDK
 import com.fitness.sdk.domain.model.Exercise
 import com.fitness.sdk.domain.model.ExerciseDefinition
@@ -10,13 +13,16 @@ import com.fitness.sdk.domain.model.Workout
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
  * ViewModel for managing an active workout session.
  * Delegates logic to TimerManager and SessionStateManager.
  */
-class ActiveWorkoutViewModel : ViewModel() {
+class ActiveWorkoutViewModel(application: Application) : AndroidViewModel(application) {
 
     private val templateManager = FitnessSDK.getTemplateManager()
     private val workoutManager = FitnessSDK.getWorkoutManager()
@@ -64,6 +70,32 @@ class ActiveWorkoutViewModel : ViewModel() {
      */
     private var workoutStarted = false
 
+    init {
+        // Keep the notification's rest countdown / current-vs-next exercise in sync with session state.
+        combine(
+            sessionStateManager.workout,
+            sessionStateManager.currentExerciseIndex,
+            sessionStateManager.currentSetIndex,
+            timerManager.isResting,
+            timerManager.restTimeRemaining
+        ) { workout, exerciseIndex, setIndex, isResting, restRemaining ->
+            val exerciseName = workout?.exercises?.getOrNull(exerciseIndex)?.name
+            if (exerciseName == null) {
+                null
+            } else {
+                WorkoutSessionNotifier.Info(
+                    isResting = isResting,
+                    restSecondsRemaining = restRemaining,
+                    exerciseName = exerciseName,
+                    // A revisited exercise resumes with setIndex > 0, so setIndex == 0 during rest
+                    // reliably means we just auto-advanced to the next exercise.
+                    isUpcomingExercise = isResting && setIndex == 0
+                )
+            }
+        }.onEach { info -> WorkoutSessionNotifier.update(info) }
+            .launchIn(viewModelScope)
+    }
+
     fun startWorkout(templateId: Long) {
         if (workoutStarted) {
             // Already loaded; the screen merely re-entered composition. Keep current session state.
@@ -79,6 +111,7 @@ class ActiveWorkoutViewModel : ViewModel() {
                 .onSuccess { workout ->
                     sessionStateManager.setWorkout(workout)
                     timerManager.startWorkoutTimer()
+                    WorkoutForegroundService.start(getApplication())
 
                     // Load last session data in background for "Last:" display hints.
                     // Non-blocking — the workout UI shows immediately.
@@ -143,6 +176,7 @@ class ActiveWorkoutViewModel : ViewModel() {
         viewModelScope.launch {
             timerManager.stopWorkoutTimer()
             timerManager.skipRest()
+            stopWorkoutNotification()
 
             val workout = workout.value ?: return@launch
             val setsMap = completedSets.value
@@ -284,8 +318,14 @@ class ActiveWorkoutViewModel : ViewModel() {
         }
     }
 
+    private fun stopWorkoutNotification() {
+        WorkoutSessionNotifier.update(null)
+        WorkoutForegroundService.stop(getApplication())
+    }
+
     override fun onCleared() {
         super.onCleared()
         timerManager.cancelAll()
+        stopWorkoutNotification()
     }
 }

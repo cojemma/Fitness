@@ -45,6 +45,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -178,6 +179,8 @@ fun ActiveWorkoutScreen(
     // Derive current exercise from observed states so it updates when index changes
     val currentExercise = workout?.exercises?.getOrNull(currentExerciseIndex)
     val exerciseCount = workout?.exercises?.size ?: 0
+    val currentCompletedSetsCount = completedSets[currentExerciseIndex]?.size ?: 0
+    val canReplaceCurrentExercise = onReplaceExercise != null && currentExercise != null && currentCompletedSetsCount == 0
 
     // Check if workout was started from a template
 
@@ -351,16 +354,33 @@ fun ActiveWorkoutScreen(
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButtonPosition = FabPosition.Center,
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddExercise,
-                shape = RoundedCornerShape(16.dp),
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.cd_add_exercise)
-                )
+            Box(modifier = Modifier.fillMaxWidth()) {
+                if (canReplaceCurrentExercise) {
+                    FloatingActionButton(
+                        onClick = { onReplaceExercise?.invoke(currentExerciseIndex, currentExercise!!.name) },
+                        shape = RoundedCornerShape(16.dp),
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SwapHoriz,
+                            contentDescription = stringResource(R.string.cd_replace_exercise)
+                        )
+                    }
+                }
+                FloatingActionButton(
+                    onClick = onAddExercise,
+                    shape = RoundedCornerShape(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.align(Alignment.CenterEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.cd_add_exercise)
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -430,7 +450,6 @@ fun ActiveWorkoutScreen(
                     }
 
                     // Current exercise card
-                    val currentCompletedSetsCount = completedSets[currentExerciseIndex]?.size ?: 0
                     CurrentExerciseCard(
                         exerciseName = currentExercise.name,
                         currentSet = currentSetIndex + 1,
@@ -439,10 +458,7 @@ fun ActiveWorkoutScreen(
                         targetWeight = viewModel.getTargetWeight(),
                         lastSetInfo = viewModel.getLastSetData(currentExercise.name, currentSetIndex + 1),
                         completedSetsCount = currentCompletedSetsCount,
-                        onLogSet = { reps, weight -> viewModel.logSet(reps, weight) },
-                        onReplaceExercise = if (onReplaceExercise != null && currentCompletedSetsCount == 0) {
-                            { onReplaceExercise(currentExerciseIndex, currentExercise.name) }
-                        } else null
+                        onLogSet = { reps, weight -> viewModel.logSet(reps, weight) }
                     )
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -570,7 +586,6 @@ private fun CurrentExerciseCard(
     lastSetInfo: String?,
     completedSetsCount: Int,
     onLogSet: (Int, Float?) -> Unit,
-    onReplaceExercise: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     // Local TextFieldValue state — decoupled from model to prevent cursor jumping
@@ -599,27 +614,13 @@ private fun CurrentExerciseCard(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Exercise name (with optional replace-exercise action)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = exerciseName,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                if (onReplaceExercise != null) {
-                    IconButton(onClick = onReplaceExercise, modifier = Modifier.size(32.dp)) {
-                        Icon(
-                            imageVector = Icons.Default.SwapHoriz,
-                            contentDescription = stringResource(R.string.cd_replace_exercise),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-            }
+            // Exercise name
+            Text(
+                text = exerciseName,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -944,7 +945,7 @@ private fun RestAdjustButton(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(10.dp),
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
+        color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.16f)
     ) {
         Text(
             text = text,

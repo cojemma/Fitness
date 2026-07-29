@@ -219,4 +219,12 @@
     <string name="export_success">訓練紀錄匯出成功</string>
     <string name="export_no_data">所選範圍內無訓練紀錄</string>
     <string name="export_error">匯出失敗：%s</string>
+
+    <!-- Workout Notification -->
+    <string name="notification_channel_workout_name">訓練進行中</string>
+    <string name="notification_channel_workout_description">訓練期間顯示休息倒數與下一個動作</string>
+    <string name="notification_title_workout_active">訓練進行中</string>
+    <string name="notification_title_resting">休息中… %s</string>
+    <string name="notification_content_current_exercise">目前動作：%s</string>
+    <string name="notification_content_next_exercise">下一個動作：%s</string>
 </resources>

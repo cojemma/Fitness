@@ -60,16 +60,16 @@ fun ExercisePickerScreen(
     onNavigateBack: () -> Unit,
     onExerciseSelected: (ExerciseDefinition) -> Unit,
     onCreateCustomExercise: (() -> Unit)? = null,
-    /** When set (swap-exercise flow), prioritizes this exercise's muscle group in sort order. */
-    priorityExerciseName: String? = null,
+    /** When set (swap-exercise flow), pre-applies this muscle group filter chip on entry. */
+    initialMuscleGroup: MuscleGroup? = null,
     viewModel: ExerciseLibraryViewModel = viewModel()
 ) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedMuscleGroup by viewModel.selectedMuscleGroup.collectAsState()
     val exercises by viewModel.exercises.collectAsState()
 
-    LaunchedEffect(priorityExerciseName) {
-        viewModel.setPriorityExerciseName(priorityExerciseName)
+    LaunchedEffect(initialMuscleGroup) {
+        viewModel.onMuscleGroupSelect(initialMuscleGroup)
     }
 
     Scaffold(
