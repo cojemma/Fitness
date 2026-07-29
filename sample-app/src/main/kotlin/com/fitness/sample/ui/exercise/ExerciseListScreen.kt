@@ -62,8 +62,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fitness.sample.R
+import com.fitness.sample.ui.components.ExerciseThumbnail
 import com.fitness.sample.ui.util.getMuscleGroupStringRes
-import com.fitness.sdk.domain.model.ExerciseCategory
 import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.ExerciseHistory
 import com.fitness.sdk.domain.model.ExerciseSessionSummary
@@ -240,18 +240,7 @@ private fun ExerciseListItem(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(getCategoryColor(exercise.category)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = getCategoryEmoji(exercise.category),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
+                ExerciseThumbnail(exercise = exercise, size = 44.dp)
 
                 Spacer(modifier = Modifier.width(12.dp))
 
@@ -473,23 +462,6 @@ private fun SessionHistoryRow(
             color = MaterialTheme.colorScheme.primary
         )
     }
-}
-
-@Composable
-private fun getCategoryColor(category: ExerciseCategory) = when (category) {
-    ExerciseCategory.STRENGTH -> MaterialTheme.colorScheme.errorContainer
-    ExerciseCategory.CARDIO -> MaterialTheme.colorScheme.tertiaryContainer
-    ExerciseCategory.FLEXIBILITY -> MaterialTheme.colorScheme.secondaryContainer
-    ExerciseCategory.PLYOMETRIC -> MaterialTheme.colorScheme.primaryContainer
-    ExerciseCategory.BODYWEIGHT -> MaterialTheme.colorScheme.surfaceVariant
-}
-
-private fun getCategoryEmoji(category: ExerciseCategory) = when (category) {
-    ExerciseCategory.STRENGTH -> "🏋️"
-    ExerciseCategory.CARDIO -> "🏃"
-    ExerciseCategory.FLEXIBILITY -> "🧘"
-    ExerciseCategory.PLYOMETRIC -> "⚡"
-    ExerciseCategory.BODYWEIGHT -> "💪"
 }
 
 private fun formatSessionDate(timestamp: Long): String {

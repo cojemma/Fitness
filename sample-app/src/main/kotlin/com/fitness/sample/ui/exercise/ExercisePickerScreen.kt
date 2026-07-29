@@ -3,7 +3,6 @@ package com.fitness.sample.ui.exercise
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -49,8 +48,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.fitness.sample.R
+import com.fitness.sample.ui.components.ExerciseThumbnail
 import com.fitness.sample.ui.util.getMuscleGroupStringRes
-import com.fitness.sdk.domain.model.ExerciseCategory
 import com.fitness.sdk.domain.model.ExerciseDefinition
 import com.fitness.sdk.domain.model.MuscleGroup
 
@@ -195,19 +194,8 @@ fun ExerciseLibraryItem(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Category icon/badge
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(getCategoryColor(exercise.category)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = getCategoryEmoji(exercise.category),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
+            // Category icon/badge or exercise demonstration image
+            ExerciseThumbnail(exercise = exercise, size = 48.dp)
 
             Spacer(modifier = Modifier.width(12.dp))
 
@@ -269,19 +257,3 @@ fun ExerciseLibraryItem(
     }
 }
 
-@Composable
-private fun getCategoryColor(category: ExerciseCategory) = when (category) {
-    ExerciseCategory.STRENGTH -> MaterialTheme.colorScheme.errorContainer
-    ExerciseCategory.CARDIO -> MaterialTheme.colorScheme.tertiaryContainer
-    ExerciseCategory.FLEXIBILITY -> MaterialTheme.colorScheme.secondaryContainer
-    ExerciseCategory.PLYOMETRIC -> MaterialTheme.colorScheme.primaryContainer
-    ExerciseCategory.BODYWEIGHT -> MaterialTheme.colorScheme.surfaceVariant
-}
-
-private fun getCategoryEmoji(category: ExerciseCategory) = when (category) {
-    ExerciseCategory.STRENGTH -> "🏋️"
-    ExerciseCategory.CARDIO -> "🏃"
-    ExerciseCategory.FLEXIBILITY -> "🧘"
-    ExerciseCategory.PLYOMETRIC -> "⚡"
-    ExerciseCategory.BODYWEIGHT -> "💪"
-}

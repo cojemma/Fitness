@@ -16,6 +16,7 @@ package com.fitness.sdk.domain.model
  * @property defaultReps Suggested number of reps per set (for rep-based exercises)
  * @property defaultDurationSeconds Suggested duration in seconds (for time-based exercises)
  * @property isCustom True if this exercise was created by the user (not a predefined library exercise)
+ * @property imageUrls Demonstration image URLs for this exercise (empty if none available)
  */
 data class ExerciseDefinition(
     val id: String,
@@ -29,7 +30,8 @@ data class ExerciseDefinition(
     val defaultSets: Int? = 3,
     val defaultReps: Int? = 10,
     val defaultDurationSeconds: Int? = null,
-    val isCustom: Boolean = false
+    val isCustom: Boolean = false,
+    val imageUrls: List<String> = emptyList()
 ) {
     /**
      * Convert this exercise definition to a workout [Exercise].
